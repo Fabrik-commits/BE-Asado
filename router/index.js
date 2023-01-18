@@ -1,14 +1,14 @@
 import {Router} from "express"
+import UserService from "../services/user.service.js"
 
-const router = Router()
 
-router.get("/", (_req, res) => {
+const router = Router();
+const userService = new UserService()
 
-    console.log("aa")
 
-    res.send("aa")
+router.get("/user/:id", userService.getOne.bind(userService));
 
-    }
-);
+router.post("/user", userService.create.bind(userService));
+
 
 export default router
