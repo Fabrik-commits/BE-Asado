@@ -157,4 +157,4 @@ export default class MongoBaseService {
         return mongoose.Types.ObjectId.isValid(id);
     }
     // #endregion
-}
+};

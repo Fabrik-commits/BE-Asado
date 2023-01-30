@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import express, { json } from "express";
-import router from "./router/index.js"
-import users from "./router/users.js"
-import events from "./router/events.js"
+import router from "./router/index.js";
+import users from "./router/users.js";
+import events from "./router/events.js";
 
-mongoose.set('strictQuery', true)
+mongoose.set('strictQuery', true);
 
 dotenv.config();
 

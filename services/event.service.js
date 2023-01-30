@@ -21,4 +21,4 @@ export default class EventsService {
         return await this.#mongoBaseService.getMany(req, res);
     }
 
-}
+};
