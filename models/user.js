@@ -18,9 +18,10 @@ const userSchema = mongoose.Schema({
         required: true
     },
 
-    // verification_code: {
-
-    // },
+    verification_code: {
+        type: String,
+        default: "000000"
+    },
 
     cbu: {
         type: String
@@ -28,6 +29,28 @@ const userSchema = mongoose.Schema({
 
     alias: {
         type: String
+    },
+
+    special_diet: {
+        type: Array,
+        required: true,
+        validate: {
+            validator: function(v){
+                valid_diets = ["celíaco", "hipertenso", "vegano", "vegetariano"]
+                if (!v) return false
+                for (const diet of v){
+                    if (!valid_diets.includes(diet.toLowerCase())){
+                        return false
+                    }
+                }
+                return true
+            } 
+        }
+    },
+
+    profile_picture: {
+        type: String,
+        required: true
     }
 
 })

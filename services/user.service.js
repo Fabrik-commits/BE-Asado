@@ -10,12 +10,16 @@ export default class UsersService {
     }
 
     async create(req, res) {
-        console.log('Crré una cuenta');
+        console.log('Creé una cuenta');
         return await this.#mongoBaseService.createUser(req, res);
     }
 
     async getOne(req, res) {
         return await this.#mongoBaseService.getOne(req, res);
+    }
+
+    async getMany(req, res) {
+        return await this.#mongoBaseService.getMany(req, res);
     }
 
 }

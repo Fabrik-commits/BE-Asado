@@ -91,8 +91,9 @@ export default class MongoBaseService {
         // } else {
         //     return res.status(403).json({ message: "Forbidden Access" })
         // }
-    } catch(error) {
-        this.#throwError(res, { message: error.message });
+    // } catch(error) {
+    //     this.#throwError(res, { message: error.message });
+    //     }
     }
 
 
