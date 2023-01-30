@@ -36,7 +36,7 @@ const userSchema = mongoose.Schema({
         required: true,
         validate: {
             validator: function(v){
-                valid_diets = ["celíaco", "hipertenso", "vegano", "vegetariano"]
+                const valid_diets = ["celíaco", "hipertenso", "vegano", "vegetariano"]
                 if (!v) return false
                 for (const diet of v){
                     if (!valid_diets.includes(diet.toLowerCase())){

@@ -10,7 +10,6 @@ export default class UsersService {
     }
 
     async create(req, res) {
-        console.log('Creé una cuenta');
         return await this.#mongoBaseService.createUser(req, res);
     }
 
