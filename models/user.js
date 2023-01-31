@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
+
     name: {
         type: String,
         required: true
@@ -18,7 +19,7 @@ const userSchema = mongoose.Schema({
         required: true
     },
 
-    verification_code: {
+    verificationCode: {
         type: String,
         default: "000000"
     },
@@ -31,8 +32,8 @@ const userSchema = mongoose.Schema({
         type: String
     },
 
-    special_diet: {
-        type: Array,
+    specialDiet: {
+        type: [String],
         required: true,
         validate: {
             validator: function(v){
@@ -48,11 +49,14 @@ const userSchema = mongoose.Schema({
         }
     },
 
-    profile_picture: {
+    profilePicture: {
         type: String,
         required: true
     }
 
 });
 
-export default mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+
+export {userSchema as userSchema, User as User};

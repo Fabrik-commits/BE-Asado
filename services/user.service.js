@@ -1,5 +1,5 @@
 import MongoBaseService from './mongo.service.js';
-import User from '../models/user.js';
+import {User} from '../models/user.js';
 
 export default class UsersService {
     #mongoBaseService;

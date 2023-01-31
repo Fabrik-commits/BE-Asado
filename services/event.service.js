@@ -1,5 +1,5 @@
 import MongoBaseService from './mongo.service.js';
-import Event from '../models/event.js';
+import {Event} from '../models/event.js';
 
 export default class EventsService {
     #mongoBaseService;
@@ -22,3 +22,4 @@ export default class EventsService {
     }
 
 };
+

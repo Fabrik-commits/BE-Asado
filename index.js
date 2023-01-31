@@ -4,6 +4,8 @@ import express, { json } from "express";
 import router from "./router/index.js";
 import users from "./router/users.js";
 import events from "./router/events.js";
+import transferReceipt from "./router/transferReceipts.js";
+import purchaseReceipt from "./router/purchaseReceipts.js";
 
 mongoose.set('strictQuery', true);
 
@@ -34,6 +36,6 @@ app.use(express.json())
 .use('/', router)
 .use('/users', users)
 .use('/events', events)
+.use('/transfer-receipt', transferReceipt)
+.use('/purchase-receipt', purchaseReceipt)
 .listen(PORT, () => console.log("Server Started"));
-
-
