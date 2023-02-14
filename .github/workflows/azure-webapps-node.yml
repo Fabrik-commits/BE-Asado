@@ -7,7 +7,7 @@ env:
   AZURE_WEBAPP_NAME: Be-Asado-api    # set this to your application's name
   AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '16.x'                # set this to the node version to use
-  DATABASE_URL: "mongodb://beasado:20KsQsbDiL0C7QkJ7kJ2zjcBQiDgG5xahBnPo40M8SmHif1vkFpJMNwVbnJUnjAsMa2Ac5ksQud7ACDb3Ks6oA==@beasado.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@beasado@!
+  DATABASE_URL: "mongodb://beasado:20KsQsbDiL0C7QkJ7kJ2zjcBQiDgG5xahBnPo40M8SmHif1vkFpJMNwVbnJUnjAsMa2Ac5ksQud7ACDb3Ks6oA==@beasado.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@beasado@!"
 
 permissions:
   contents: read
