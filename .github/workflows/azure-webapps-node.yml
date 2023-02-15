@@ -25,6 +25,7 @@ jobs:
 
     - name: npm install, build, and test
       run: |
+        Remove-item .\package.json | Remove-Item -path ./node_modules -recurse -force | npm cache clean --force | npm install
         npm install
         npm run build --if-present
         npm run test --if-present
