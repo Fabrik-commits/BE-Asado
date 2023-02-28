@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ "models" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 env:
