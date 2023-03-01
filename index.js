@@ -38,4 +38,4 @@ app.use(express.json())
 .use('/events', events)
 .use('/transfer-receipt', transferReceipt)
 .use('/purchase-receipt', purchaseReceipt)
-.listen(PORT, () => console.log("Server Started"));
+.listen(PORT, () => console.log("Server Started")); 
