@@ -7,18 +7,26 @@ const router = Router();
 
 
 router.get("/", auth, async (req, res)=> {
-    const purchaseReceipts = await PurchaseReceipt.find();
-    res.send(purchaseReceipts);
+    try{
+        const purchaseReceipts = await PurchaseReceipt.find();
+        res.send(purchaseReceipts);
+    } catch(e){
+        res.status(500).send(e.message)
+    }
 });
 
 
 router.get("/:id", auth, async (req, res)=> {
-    const purchaseReceipt = await PurchaseReceipt.findById(req.params.id);
-    if (!purchaseReceipt) {
-        res.status(404).send("The purchase receipt with the given ID was not found.");
-        return;
-    } else {
-        res.send(purchaseReceipt);
+    try{
+        const purchaseReceipt = await PurchaseReceipt.findById(req.params.id);
+        if (!purchaseReceipt) {
+            res.status(404).send("The purchase receipt with the given ID was not found.");
+            return;
+        } else {
+            res.send(purchaseReceipt);
+        }
+    } catch(e){
+        res.status(500).send(e.message)
     }
 });
 
@@ -28,8 +36,8 @@ router.post("/", auth, async (req, res)=> {
         let purchaseReceipt = new PurchaseReceipt(req.body)
         purchaseReceipt = await purchaseReceipt.save()
         res.send(purchaseReceipt)
-    } catch(e) {
-        res.send(e.message)
+    } catch(e){
+        res.status(500).send(e.message)
     }
 });
 

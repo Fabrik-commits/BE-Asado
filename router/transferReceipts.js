@@ -7,18 +7,26 @@ const router = Router();
 
 
 router.get("/", auth, async (req, res)=> {
-    const transferReceipts = await TransferReceipt.find();
-    res.send(transferReceipts);
+    try{
+        const transferReceipts = await TransferReceipt.find();
+        res.send(transferReceipts);
+    } catch(e){
+        res.status(500).send(e.message)
+    }
 });
 
 
 router.get("/:id", auth, async (req, res)=> {
-    const transferReceipt = await TransferReceipt.findById(req.params.id);
-    if (!transferReceipt) {
-        res.status(404).send("The transfer receipt with the given ID was not found.");
-        return;
-    } else {
-        res.send(transferReceipt);
+    try{
+        const transferReceipt = await TransferReceipt.findById(req.params.id);
+        if (!transferReceipt) {
+            res.status(404).send("The transfer receipt with the given ID was not found.");
+            return;
+        } else {
+            res.send(transferReceipt);
+        }
+    } catch(e){
+        res.status(500).send(e.message)
     }
 });
 
@@ -29,7 +37,7 @@ router.post("/", auth, async (req, res)=> {
         transferReceipt = await transferReceipt.save()
         res.send(transferReceipt)
     } catch(e) {
-        res.send(e.message)
+        res.status(500).send(e.message)
     }
 });
 

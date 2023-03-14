@@ -6,18 +6,26 @@ const router = Router();
 
 
 router.get("/", async (req, res) => {
-    const events = await Event.find();
-    res.send(events);
+    try{
+        const events = await Event.find();
+        res.send(events);
+    } catch(e){
+        res.status(500).send(e.message)
+    }
 });
 
 
 router.get("/:id", async (req, res) => {
-    const event = await Event.findById(req.params.id);
-    if (!event) {
-        res.status(404).send("The event with the given ID was not found.");
-        return;
-    } else {
-        res.send(event);
+    try{
+        const event = await Event.findById(req.params.id);
+        if (!event) {
+            res.status(404).send("The event with the given ID was not found.");
+            return;
+        } else {
+            res.send(event);
+        }
+    } catch(e){
+        res.status(500).send(e.message)
     }
 });
 
@@ -28,7 +36,7 @@ router.post("/", auth, async (req, res) => {
         event = await event.save()
         res.send(event)
     } catch(e){
-        res.send(e.message)
+        res.status(500).send(e.message)
     }
 });
 
