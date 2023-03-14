@@ -19,9 +19,9 @@ router.post('/', async (req, res) => {
     
 
     res.send({
+        id: existingUser.id,
         name: existingUser.name,
-        jwt: token,
-        profilePicture: existingUser.profilePicture
+        jwt: token
     })
 
 });
