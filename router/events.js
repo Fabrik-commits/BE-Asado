@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
 
 
 router.get("/:id", async (req, res) => {
-    const event = await Event.findById(req.id);
+    const event = await Event.findById(req.params.id);
     if (!event) {
         res.status(404).send("The event with the given ID was not found.");
         return;

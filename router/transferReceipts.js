@@ -12,7 +12,7 @@ router.get("/", async (req, res)=> {
 
 
 router.get("/:id", async (req, res)=> {
-    const transferReceipt = await TransferReceipt.findById(req.id);
+    const transferReceipt = await TransferReceipt.findById(req.params.id);
     if (!transferReceipt) {
         res.status(404).send("The transfer receipt with the given ID was not found.");
         return;

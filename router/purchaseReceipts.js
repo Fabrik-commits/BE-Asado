@@ -12,7 +12,7 @@ router.get("/", async (req, res)=> {
 
 
 router.get("/:id", async (req, res)=> {
-    const purchaseReceipt = await PurchaseReceipt.findById(req.id);
+    const purchaseReceipt = await PurchaseReceipt.findById(req.params.id);
     if (!purchaseReceipt) {
         res.status(404).send("The purchase receipt with the given ID was not found.");
         return;
