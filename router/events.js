@@ -23,9 +23,13 @@ router.get("/:id", async (req, res) => {
 
 
 router.post("/", async (req, res) => {
-    let event = new Event(req.body)
-    event = await event.save()
-    res.send(event)
+    try{
+        let event = new Event(req.body)
+        event = await event.save()
+        res.send(event)
+    } catch(e){
+        res.send(e.message)
+    }
 });
 
 

@@ -23,9 +23,13 @@ router.get("/:id", async (req, res) => {
 
 
 router.post("/", async (req, res) => {
-    let user = new User(req.body)
-    user = await user.save()
-    res.send(user)
+    try{
+        let user = new User(req.body)
+        user = await user.save()
+        res.send(user)
+    } catch (e) {
+        res.send(e.message)
+    }
 });
 
 

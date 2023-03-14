@@ -23,9 +23,13 @@ router.get("/:id", async (req, res)=> {
 
 
 router.post("/", async (req, res)=> {
-    let purchaseReceipt = new PurchaseReceipt(req.body)
-    purchaseReceipt = await purchaseReceipt.save()
-    res.send(purchaseReceipt)
+    try{
+        let purchaseReceipt = new PurchaseReceipt(req.body)
+        purchaseReceipt = await purchaseReceipt.save()
+        res.send(purchaseReceipt)
+    } catch(e) {
+        res.send(e.message)
+    }
 });
 
 

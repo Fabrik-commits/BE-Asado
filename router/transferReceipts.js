@@ -23,9 +23,13 @@ router.get("/:id", async (req, res)=> {
 
 
 router.post("/", async (req, res)=> {
-    let transferReceipt = new TransferReceipt(req.body)
-    transferReceipt = await transferReceipt.save()
-    res.send(transferReceipt)
+    try {
+        let transferReceipt = new TransferReceipt(req.body)
+        transferReceipt = await transferReceipt.save()
+        res.send(transferReceipt)
+    } catch(e) {
+        res.send(e.message)
+    }
 });
 
 
