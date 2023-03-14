@@ -1,15 +1,31 @@
 import {Router} from "express";
-import PurchaseReceipt from "../services/purchaseReceipt.service.js";
+import {PurchaseReceipt} from "../models/purchaseReceipt.js";
 
 
 const router = Router();
-const purchaseReceipt = new PurchaseReceipt();
 
 
-router.get("/", purchaseReceipt.getMany.bind(purchaseReceipt));
+router.get("/", async (req, res)=> {
+    const purchaseReceipts = await PurchaseReceipt.find();
+    res.send(purchaseReceipts);
+});
 
-router.get("/:id", purchaseReceipt.getOne.bind(purchaseReceipt));
 
-router.post("/", purchaseReceipt.create.bind(purchaseReceipt));
+router.get("/:id", async (req, res)=> {
+    const purchaseReceipt = await PurchaseReceipt.findById(req.id);
+    if (!purchaseReceipt) {
+        res.status(404).send("The purchase receipt with the given ID was not found.");
+        return;
+    } else {
+        res.send(purchaseReceipt);
+    }
+});
+
+
+router.post("/", async (req, res)=> {
+    let purchaseReceipt = new PurchaseReceipt(req.body)
+    purchaseReceipt = await purchaseReceipt.save()
+    res.send(purchaseReceipt)
+});
 
 export default router;
