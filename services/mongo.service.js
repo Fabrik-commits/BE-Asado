@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt"
 
 
 export default class MongoBaseService {
@@ -121,7 +122,14 @@ export default class MongoBaseService {
      */
     async createUser(req, res) {
         try {
+
+            const existingUser = await this.#model.findOne({email: req.body.email});
+            if (existingUser) {
+                return res.status(400).send('User already registered')
+            }
             const newElement = new this.#model(req.body);
+            const salt = await bcrypt.genSalt(10);
+            newElement.password = await bcrypt.hash(newElement.password, salt);
             const savedElement = await newElement.save();
             //Assign a token with only the username to the user that was created
 
