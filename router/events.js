@@ -1,15 +1,36 @@
 import {Router} from "express";
-import EventService from "../services/event.service.js";
-
+import {Event} from "../models/event.js";
+import {auth} from "../middleware/auth.js"
 
 const router = Router();
-const eventService = new EventService();
 
 
-router.get("/", eventService.getMany.bind(eventService));
+router.get("/", async (req, res) => {
+    const events = await Event.find();
+    res.send(events);
+});
 
-router.get("/:id", eventService.getOne.bind(eventService));
 
-router.post("/", eventService.create.bind(eventService));
+router.get("/:id", async (req, res) => {
+    const event = await Event.findById(req.params.id);
+    if (!event) {
+        res.status(404).send("The event with the given ID was not found.");
+        return;
+    } else {
+        res.send(event);
+    }
+});
+
+
+router.post("/", auth, async (req, res) => {
+    try{
+        let event = new Event(req.body)
+        event = await event.save()
+        res.send(event)
+    } catch(e){
+        res.send(e.message)
+    }
+});
+
 
 export default router;
