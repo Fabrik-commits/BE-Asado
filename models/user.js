@@ -58,6 +58,12 @@ const userSchema = new mongoose.Schema({
 });
 
 
+userSchema.methods.generateAuthToken = function() {
+    return jwt.sign({_id: this._id, isAdmin: this.isAdmin}, config.get("jwtPrivateKey"))
+}
+
+
+
 userSchema.methods.isValidPassword = async function (password) {
 	try {
 		return await bcrypt.compare(password, this.password)
