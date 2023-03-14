@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt"
+import jwt from'jsonwebtoken';
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const jwtPrivateKey = process.env.JWTPRIVATEKEY
 
 
 const userSchema = new mongoose.Schema({
@@ -59,7 +65,7 @@ const userSchema = new mongoose.Schema({
 
 
 userSchema.methods.generateAuthToken = function() {
-    return jwt.sign({_id: this._id, isAdmin: this.isAdmin}, config.get("jwtPrivateKey"))
+    return jwt.sign({_id: this._id, isAdmin: this.isAdmin}, jwtPrivateKey)
 }
 
 
