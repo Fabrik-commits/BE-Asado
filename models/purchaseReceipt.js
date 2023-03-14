@@ -19,6 +19,7 @@ const purchaseReceiptSchema = new mongoose.Schema({
 
 });
 
+
 const PurchaseReceipt = mongoose.model('Purchase-Receipt', purchaseReceiptSchema);
 
 

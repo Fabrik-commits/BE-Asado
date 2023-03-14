@@ -10,6 +10,7 @@ router.get("/", async (req, res) => {
     res.send(users);
 });
 
+
 router.get("/:id", async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -20,10 +21,12 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+
 router.post("/", async (req, res) => {
     let user = new User(req.body)
     user = await user.save()
     res.send(user)
 });
+
 
 export default router;

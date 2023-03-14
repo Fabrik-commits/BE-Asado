@@ -8,28 +8,30 @@ import events from "./router/events.js";
 import transferReceipt from "./router/transferReceipts.js";
 import purchaseReceipt from "./router/purchaseReceipts.js";
 
+
 mongoose.set('strictQuery', true);
 
 dotenv.config();
+
 
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-mongoose.connect(
 
+mongoose.connect(
     process.env.DATABASE_URL,
 
     { useNewUrlParser: true, useUnifiedTopology: true },
-  
+
     (error) => {
-  
-      if (error) console.error(error);
-  
-      else console.log("Connected to Database");
-  
+      if (error) {
+        console.error(error);
+      }
+      else {
+        console.log("Connected to Database");
+      }
     }
-  
   );
 
 app.use(express.json())

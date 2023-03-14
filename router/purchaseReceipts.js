@@ -28,4 +28,5 @@ router.post("/", async (req, res)=> {
     res.send(purchaseReceipt)
 });
 
+
 export default router;
