@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {Event} from "../models/event.js";
-
+import {auth} from "../middleware/auth.js"
 
 const router = Router();
 
@@ -22,7 +22,7 @@ router.get("/:id", async (req, res) => {
 });
 
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
     try{
         let event = new Event(req.body)
         event = await event.save()
