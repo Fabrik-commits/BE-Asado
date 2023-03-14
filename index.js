@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import express, { json } from "express";
 import router from "./router/index.js";
+import login from "./router/login.js";
 import users from "./router/users.js";
 import events from "./router/events.js";
 import transferReceipt from "./router/transferReceipts.js";
@@ -35,6 +36,7 @@ app.use(express.json())
 .use(express.urlencoded({ extended: false, limit: "5mb" }))
 .use('/', router)
 .use('/users', users)
+.use('/login', login)
 .use('/events', events)
 .use('/transfer-receipt', transferReceipt)
 .use('/purchase-receipt', purchaseReceipt)
