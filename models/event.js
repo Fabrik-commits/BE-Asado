@@ -22,7 +22,7 @@ const eventSchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: function(v){
-                const valid_states = ["cerrado", "bloqueado", "cancelado", "abierto", "finalizado"];
+                const valid_states = ["full", "closed", "available", "canceled", "finalizado"];
                 if (!v) return false
                 if (!valid_states.includes(v.toLowerCase())){
                         return false;
