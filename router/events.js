@@ -33,4 +33,20 @@ router.post("/", auth, async (req, res) => {
 });
 
 
+router.delete('/:id', auth, async (req, res) => {
+    try{
+        res.status(501).send("Not programmed yet :)");
+        return
+        const event = await Event.findByIdAndRemove(req.params.id)
+        if (!event){
+            res.status(404).send('The event with the given ID was not found.');
+            return;
+        }
+        res.send(event);
+    } catch(e){
+        res.status(500).send(e.message)
+    }
+});
+
+
 export default router;
