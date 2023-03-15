@@ -5,7 +5,7 @@ import {auth} from "../middleware/auth.js"
 const router = Router();
 
 
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
     try{
         const events = await Event.find();
         res.send(events);
@@ -14,6 +14,28 @@ router.get("/", async (req, res) => {
     }
 });
 
+router.get("/public", async (req, res) => {
+    try{
+        const events = await Event.find().select("datetime description state chef membersLimit members").populate('chef');
+        const publicEvents = [];
+        for (let event of events) {
+            publicEvents.push(
+                {
+                    _id: event.id,
+                    datetime: event.datetime,
+                    description: event.description,
+                    state: event.state,
+                    chef: event.chef ? event.chef.name : null,
+                    memberLimit: event.memberLimit,
+                    members: event.members.length,
+                }
+            );
+        }
+        res.send(publicEvents);
+    } catch(e){
+        res.status(500).send(e.message)
+    }
+})
 
 router.get("/:id", async (req, res) => {
     try{
