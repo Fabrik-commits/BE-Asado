@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {Event} from "../models/event.js";
 import {auth} from "../middleware/auth.js"
+import {eventOrganizer} from "../middleware/eventOrganizer.js"
 
 const router = Router();
 
@@ -63,11 +64,9 @@ router.post("/", auth, async (req, res) => {
 });
 
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, eventOrganizer], async (req, res) => {
     try{
-        res.status(501).send("Not programmed yet :)");
-        return
-        const event = await Event.findByIdAndRemove(req.params.id)
+        const event = await Event.findByIdAndRemove(req.params.id);
         if (!event){
             res.status(404).send('The event with the given ID was not found.');
             return;
