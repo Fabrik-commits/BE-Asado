@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {User} from "../models/user.js";
 import {auth} from "../middleware/auth.js"
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
 
 
 const router = Router();
@@ -12,7 +12,7 @@ router.get("/", auth, async (req, res) => {
         const users = await User.find();
         res.send(users);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
@@ -27,7 +27,7 @@ router.get("/:id", auth, async (req, res) => {
             res.send(user);
         }
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
@@ -41,10 +41,10 @@ router.post("/", async (req, res) => {
         let user = new User(req.body);
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
-        user = await user.save()
-        res.status(201).send(user)
+        user = await user.save();
+        res.status(201).send(user);
     } catch(e) {
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
@@ -58,7 +58,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
         res.send(user);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 

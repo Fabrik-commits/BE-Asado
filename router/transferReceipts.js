@@ -11,7 +11,7 @@ router.get("/", auth, async (req, res)=> {
         const transferReceipts = await TransferReceipt.find();
         res.send(transferReceipts);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
@@ -26,18 +26,18 @@ router.get("/:id", auth, async (req, res)=> {
             res.send(transferReceipt);
         }
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
 
 router.post("/", auth, async (req, res)=> {
     try {
-        let transferReceipt = new TransferReceipt(req.body)
-        transferReceipt = await transferReceipt.save()
-        res.status(201).send(transferReceipt)
+        let transferReceipt = new TransferReceipt(req.body);
+        transferReceipt = await transferReceipt.save();
+        res.status(201).send(transferReceipt);
     } catch(e) {
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 

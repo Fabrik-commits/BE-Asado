@@ -11,7 +11,7 @@ router.get("/", auth, async (req, res) => {
         const events = await Event.find();
         res.send(events);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
@@ -34,7 +34,7 @@ router.get("/public", async (req, res) => {
         }
         res.send(publicEvents);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 })
 
@@ -48,18 +48,18 @@ router.get("/:id", auth, async (req, res) => {
             res.send(event);
         }
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
 
 router.post("/", auth, async (req, res) => {
     try{
-        let event = new Event(req.body)
-        event = await event.save()
-        res.status(201).send(event)
+        let event = new Event(req.body);
+        event = await event.save();
+        res.status(201).send(event);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
@@ -73,7 +73,7 @@ router.delete('/:id', [auth, eventOrganizer], async (req, res) => {
         }
         res.send(event);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
