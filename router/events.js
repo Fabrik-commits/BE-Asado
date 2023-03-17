@@ -56,7 +56,7 @@ router.post("/", auth, async (req, res) => {
     try{
         let event = new Event(req.body)
         event = await event.save()
-        res.send(event)
+        res.status(201).send(event)
     } catch(e){
         res.status(500).send(e.message)
     }

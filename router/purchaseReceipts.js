@@ -35,7 +35,7 @@ router.post("/", auth, async (req, res)=> {
     try{
         let purchaseReceipt = new PurchaseReceipt(req.body)
         purchaseReceipt = await purchaseReceipt.save()
-        res.send(purchaseReceipt)
+        res.status(201).send(purchaseReceipt)
     } catch(e){
         res.status(500).send(e.message)
     }
