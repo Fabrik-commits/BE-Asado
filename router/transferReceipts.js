@@ -42,4 +42,18 @@ router.post("/", auth, async (req, res)=> {
 });
 
 
+router.delete('/:id', auth, async (req, res) => {
+    try{
+        const transferReceipt = await TransferReceipt.findByIdAndRemove(req.params.id);
+        if (!transferReceipt){
+            res.status(404).send('The transfer receipt with the given ID was not found.');
+            return;
+        }
+        res.send(transferReceipt);
+    } catch(e){
+        res.status(500).send(e.message);
+    }
+});
+
+
 export default router;
