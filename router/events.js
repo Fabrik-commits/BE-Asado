@@ -37,7 +37,7 @@ router.get("/public", async (req, res) => {
     }
 })
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
     try{
         const event = await Event.findById(req.params.id);
         if (!event) {
