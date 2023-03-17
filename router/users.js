@@ -49,4 +49,18 @@ router.post("/", async (req, res) => {
 });
 
 
+router.delete('/:id', auth, async (req, res) => {
+    try{
+        const user = await User.findByIdAndRemove(req.params.id);
+        if (!user){
+            res.status(404).send('The user with the given ID was not found.');
+            return;
+        }
+        res.send(user);
+    } catch(e){
+        res.status(500).send(e.message)
+    }
+});
+
+
 export default router;
