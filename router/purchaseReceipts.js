@@ -8,8 +8,14 @@ const router = Router();
 
 router.get("/", auth, async (req, res)=> {
     try{
-        const purchaseReceipts = await PurchaseReceipt.find();
-        res.send(purchaseReceipts);
+        if(!req.params.event){
+            res.status(400).send("No event ID provided")
+        }
+        const event = await PurchaseReceipt.findById(req.params.event).populate("purchaseReceipts");
+        if(!event){
+            res.status(404).send("The event with the given ID was not found.")
+        }
+        res.send(event.purchaseReceipts);
     } catch(e){
         res.status(500).send(e.message);
     }
