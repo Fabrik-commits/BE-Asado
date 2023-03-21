@@ -21,18 +21,15 @@ const PORT = process.env.PORT || 3000;
 
 mongoose.connect(
     process.env.DATABASE_URL,
-
     { useNewUrlParser: true, useUnifiedTopology: true },
-
     (error) => {
-      if (error) {
-        console.error(error);
-      }
-      else {
+        if (error) {
+            console.error(error);
+        }else {
         console.log("Connected to Database");
-      }
+        }
     }
-  );
+);
 
 app.use(express.json())
 .use(express.urlencoded({ extended: false, limit: "5mb" }))
