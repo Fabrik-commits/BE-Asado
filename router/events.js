@@ -68,15 +68,15 @@ router.put("/:id", auth, async (req, res) => {
             shoppingDesignee: req.body.shoppingDesignee,
             transferReceipts: req.body.transferReceipts,
             purchaseReceipts: req.body.purchaseReceipts
-        }, {new: true})
+        }, {new: true});
         
         if (!event){
-            return res.status(404).send("The genre with the given ID was not found.")
+            return res.status(404).send("The genre with the given ID was not found.");
         }
 
-        res.send(event)
+        res.send(event);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 

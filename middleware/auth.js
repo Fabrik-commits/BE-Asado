@@ -19,4 +19,4 @@ function auth(req, res, next){
 }
 
 
-export {auth as auth}
+export {auth as auth};
