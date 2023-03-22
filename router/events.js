@@ -32,7 +32,9 @@ router.get("/:id", auth, async (req, res) => {
         const event = await Event.findById(req.params.id)
             .populate("members")
             .populate("chef")
-            .populate("organizer");
+            .populate("organizer")
+            .populate("transferReceipts")
+            .populate("purchaseReceipts");
         if (!event) {
             res.status(404).send("The event with the given ID was not found.");
             return;
