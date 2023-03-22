@@ -54,12 +54,12 @@ const eventSchema = new mongoose.Schema({
     },
 
     transferReceipts: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: [mongoose.Schema.Types.ObjectId],
         ref: 'TransferReceipt'
     },
 
     purchaseReceipts: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: [mongoose.Schema.Types.ObjectId],
         ref: 'PurchaseReceipt'
     }
 
