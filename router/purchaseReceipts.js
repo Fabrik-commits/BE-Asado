@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {PurchaseReceipt} from "../models/purchaseReceipt.js";
 import {auth} from "../middleware/auth.js"
+import {shoppingDesignee} from "../middleware/shoppingDesignee.js"
 
 
 const router = Router();
@@ -37,7 +38,7 @@ router.get("/:id", auth, async (req, res)=> {
 });
 
 
-router.post("/", auth, async (req, res)=> {
+router.post("/", [auth, shoppingDesignee], async (req, res)=> {
     try{
         let purchaseReceipt = new PurchaseReceipt(req.body);
         purchaseReceipt = await purchaseReceipt.save();
@@ -46,6 +47,19 @@ router.post("/", auth, async (req, res)=> {
         res.status(500).send(e.message);
     }
 });
+
+
+router.delete("/:id", [auth, shoppingDesignee], async (req, res) => {
+    try {
+        const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id)
+        if (!purchaseReceipt) {
+            return res.status(404).send("The purchase receipt with the given ID was not found.")
+        }
+        res.send(purchaseReceipt)
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+})
 
 
 export default router;
