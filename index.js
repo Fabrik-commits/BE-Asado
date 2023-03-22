@@ -37,6 +37,6 @@ app.use(express.json())
 .use('/users', users)
 .use('/login', login)
 .use('/events', events)
-.use('/transfer-receipt', transferReceipt)
-.use('/purchase-receipt', purchaseReceipt)
+.use('/transfer-receipts', transferReceipt)
+.use('/purchase-receipts', purchaseReceipt)
 .listen(PORT, () => console.log("Server Started")); 
