@@ -20,7 +20,7 @@ const purchaseReceiptSchema = new mongoose.Schema({
 });
 
 
-const PurchaseReceipt = mongoose.model('Purchase-Receipt', purchaseReceiptSchema);
+const PurchaseReceipt = mongoose.model('PurchaseReceipt', purchaseReceiptSchema);
 
 
 export {purchaseReceiptSchema as purchaseReceiptSchema, PurchaseReceipt as PurchaseReceipt};

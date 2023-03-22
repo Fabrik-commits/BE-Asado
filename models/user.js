@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const jwtPrivateKey = process.env.JWTPRIVATEKEY
+const jwtPrivateKey = process.env.JWTPRIVATEKEY;
 
 
 const userSchema = new mongoose.Schema({
@@ -65,17 +65,17 @@ const userSchema = new mongoose.Schema({
 
 
 userSchema.methods.generateAuthToken = function() {
-    return jwt.sign({_id: this._id, isAdmin: this.isAdmin}, jwtPrivateKey)
+    return jwt.sign({_id: this._id, email: this.email}, jwtPrivateKey)
 }
 
 
 userSchema.methods.isValidPassword = async function (password) {
 	try {
-		return await bcrypt.compare(password, this.password)
+		return await bcrypt.compare(password, this.password);
 	} catch (error) {
-		throw error
+		throw error;
 	}
-}
+};
 
 
 const User = mongoose.model('User', userSchema);

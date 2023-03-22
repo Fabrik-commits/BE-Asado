@@ -21,18 +21,15 @@ const PORT = process.env.PORT || 3000;
 
 mongoose.connect(
     process.env.DATABASE_URL,
-
     { useNewUrlParser: true, useUnifiedTopology: true },
-
     (error) => {
-      if (error) {
-        console.error(error);
-      }
-      else {
+        if (error) {
+            console.error(error);
+        }else {
         console.log("Connected to Database");
-      }
+        }
     }
-  );
+);
 
 app.use(express.json())
 .use(express.urlencoded({ extended: false, limit: "5mb" }))
@@ -40,6 +37,6 @@ app.use(express.json())
 .use('/users', users)
 .use('/login', login)
 .use('/events', events)
-.use('/transfer-receipt', transferReceipt)
-.use('/purchase-receipt', purchaseReceipt)
+.use('/transfer-receipts', transferReceipt)
+.use('/purchase-receipts', purchaseReceipt)
 .listen(PORT, () => console.log("Server Started")); 

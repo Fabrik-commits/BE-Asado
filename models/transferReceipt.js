@@ -34,7 +34,7 @@ const transferReceiptSchema = new mongoose.Schema({
 });
 
 
-const TransferReceipt = mongoose.model('Transfer-Receipt', transferReceiptSchema);
+const TransferReceipt = mongoose.model('TransferReceipt', transferReceiptSchema);
 
 
 export {transferReceiptSchema as transferReceiptSchema, TransferReceipt as TransferReceipt};

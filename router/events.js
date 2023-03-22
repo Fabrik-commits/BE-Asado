@@ -1,45 +1,40 @@
 import {Router} from "express";
 import {Event} from "../models/event.js";
 import {auth} from "../middleware/auth.js"
+import {eventOrganizer} from "../middleware/eventOrganizer.js"
+import {getPublicEvents, getEvents} from "../services/events.service.js";
 
 const router = Router();
 
 
 router.get("/", auth, async (req, res) => {
     try{
-        const events = await Event.find();
+        const events = await getEvents(req.params.limit);
         res.send(events);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
+
 router.get("/public", async (req, res) => {
     try{
-        const events = await Event.find().select("datetime description state chef membersLimit members").populate('chef');
-        const publicEvents = [];
-        for (let event of events) {
-            publicEvents.push(
-                {
-                    _id: event.id,
-                    datetime: event.datetime,
-                    description: event.description,
-                    state: event.state,
-                    chef: event.chef ? event.chef.name : null,
-                    memberLimit: event.memberLimit,
-                    members: event.members.length,
-                }
-            );
-        }
+        const publicEvents = await getPublicEvents();
         res.send(publicEvents);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 })
 
-router.get("/:id", async (req, res) => {
+
+router.get("/:id", auth, async (req, res) => {
     try{
-        const event = await Event.findById(req.params.id);
+        const event = await Event.findById(req.params.id)
+            .populate("members")
+            .populate("chef")
+            .populate("organizer")
+            .populate("transferReceipts")
+            .populate("purchaseReceipts");
         if (!event) {
             res.status(404).send("The event with the given ID was not found.");
             return;
@@ -47,34 +42,57 @@ router.get("/:id", async (req, res) => {
             res.send(event);
         }
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
 
 router.post("/", auth, async (req, res) => {
     try{
-        let event = new Event(req.body)
-        event = await event.save()
-        res.send(event)
+        let event = new Event(req.body);
+        event = await event.save();
+        res.status(201).send(event);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
 
-router.delete('/:id', auth, async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
     try{
-        res.status(501).send("Not programmed yet :)");
-        return
-        const event = await Event.findByIdAndRemove(req.params.id)
+        const event = await Event.findByIdAndUpdate(req.params.id, {
+            datetime: req.body.datetime,
+            description: req.body.description,
+            memberLimit: req.body.memberLimit,
+            state: req.body.state,
+            members: req.body.members,
+            chef: req.body.chef,
+            shoppingDesignee: req.body.shoppingDesignee,
+            transferReceipts: req.body.transferReceipts,
+            purchaseReceipts: req.body.purchaseReceipts
+        }, {new: true});
+        
+        if (!event){
+            return res.status(404).send("The genre with the given ID was not found.");
+        }
+
+        res.send(event);
+    } catch(e){
+        res.status(500).send(e.message);
+    }
+});
+
+
+router.delete('/:id', [auth, eventOrganizer], async (req, res) => {
+    try{
+        const event = await Event.findByIdAndRemove(req.params.id);
         if (!event){
             res.status(404).send('The event with the given ID was not found.');
             return;
         }
         res.send(event);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 
