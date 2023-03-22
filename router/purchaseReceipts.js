@@ -2,23 +2,24 @@ import {Router} from "express";
 import {PurchaseReceipt} from "../models/purchaseReceipt.js";
 import {auth} from "../middleware/auth.js"
 import {shoppingDesignee} from "../middleware/shoppingDesignee.js"
+import {Event} from "../models/event.js";
 
 
 const router = Router();
 
 
-router.get("/", auth, async (req, res)=> {
+router.get("/:event", auth, async (req, res)=> {
     try{
         if(!req.params.event){
-            res.status(400).send("No event ID provided")
+            return res.status(400).send("No event ID provided")
         }
-        const event = await PurchaseReceipt.findById(req.params.event).populate("purchaseReceipts");
+        const event = await Event.findById(req.params.event).populate("purchaseReceipts");
         if(!event){
-            res.status(404).send("The event with the given ID was not found.")
+            return res.status(404).send("The event with the given ID was not found.")
         }
-        res.send(event.purchaseReceipts);
+        return res.send(event.purchaseReceipts);
     } catch(e){
-        res.status(500).send(e.message);
+        return res.status(500).send(e.message);
     }
 });
 
@@ -38,10 +39,13 @@ router.get("/:id", auth, async (req, res)=> {
 });
 
 
-router.post("/", [auth, shoppingDesignee], async (req, res)=> {
+router.post("/:event", [auth, shoppingDesignee], async (req, res)=> {
     try{
         let purchaseReceipt = new PurchaseReceipt(req.body);
         purchaseReceipt = await purchaseReceipt.save();
+        const event = await Event.findById(req.params.event);
+        event.purchaseReceipts.push(purchaseReceipt)
+        await event.save()
         res.status(201).send(purchaseReceipt);
     } catch(e){
         res.status(500).send(e.message);
@@ -49,12 +53,16 @@ router.post("/", [auth, shoppingDesignee], async (req, res)=> {
 });
 
 
-router.delete("/:id", [auth, shoppingDesignee], async (req, res) => {
+router.delete("/:id/:event", [auth, shoppingDesignee], async (req, res) => {
     try {
         const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id)
         if (!purchaseReceipt) {
             return res.status(404).send("The purchase receipt with the given ID was not found.")
         }
+        const event = await Event.findById(req.params.event);
+        const index = event.purchaseReceipts.indexOf(purchaseReceipt)
+        event.purchaseReceipts.splice(index, 1)
+        await event.save()
         res.send(purchaseReceipt)
     } catch (e) {
         res.status(500).send(e.message)
