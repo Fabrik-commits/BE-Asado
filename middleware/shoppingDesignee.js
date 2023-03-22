@@ -3,7 +3,7 @@ import {isValidId} from "../utils/utils.js";
 
 async function shoppingDesignee(req, res, next){
     try{
-        if (!isValidId(req.params.id) || !isValidId(req.params.event)){
+        if (!isValidId(req.user._id) || !isValidId(req.params.event)){
             return res.status(400).send("Invalid ID");
         }
         const event = await Event.findById(req.params.event);
