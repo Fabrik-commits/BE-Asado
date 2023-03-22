@@ -56,6 +56,31 @@ router.post("/", auth, async (req, res) => {
 });
 
 
+router.put("/:id", auth, async (req, res) => {
+    try{
+        const event = await Event.findByIdAndUpdate(req.params.id, {
+            datetime: req.body.datetime,
+            description: req.body.description,
+            memberLimit: req.body.memberLimit,
+            state: req.body.state,
+            members: req.body.members,
+            chef: req.body.chef,
+            shoppingDesignee: req.body.shoppingDesignee,
+            transferReceipts: req.body.transferReceipts,
+            purchaseReceipts: req.body.purchaseReceipts
+        }, {new: true})
+        
+        if (!event){
+            return res.status(404).send("The genre with the given ID was not found.")
+        }
+
+        res.send(event)
+    } catch(e){
+        res.status(500).send(e.message)
+    }
+});
+
+
 router.delete('/:id', [auth, eventOrganizer], async (req, res) => {
     try{
         const event = await Event.findByIdAndRemove(req.params.id);
