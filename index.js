@@ -7,6 +7,7 @@ import users from "./router/users.js";
 import events from "./router/events.js";
 import transferReceipt from "./router/transferReceipts.js";
 import purchaseReceipt from "./router/purchaseReceipts.js";
+import recoverPassword from "./router/recoverPassword.js";
 
 
 mongoose.set('strictQuery', true);
@@ -39,4 +40,5 @@ app.use(express.json())
 .use('/events', events)
 .use('/transfer-receipts', transferReceipt)
 .use('/purchase-receipts', purchaseReceipt)
+.use('/password', recoverPassword)
 .listen(PORT, () => console.log("Server Started")); 
