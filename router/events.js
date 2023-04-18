@@ -7,7 +7,7 @@ import {getPublicEvents, getEvents} from "../services/events.service.js";
 const router = Router();
 
 
-router.get("/", auth, async (req, res) => {
+router.get("/getEvents", auth, async (req, res) => {
     try{
         const events = await getEvents(req.params.limit);
         res.send(events);
@@ -17,7 +17,7 @@ router.get("/", auth, async (req, res) => {
 });
 
 
-router.get("/public", async (req, res) => {
+router.get("/getPublicEvents", async (req, res) => {
     try{
         const publicEvents = await getPublicEvents();
         res.send(publicEvents);
@@ -27,7 +27,7 @@ router.get("/public", async (req, res) => {
 })
 
 
-router.get("/:id", auth, async (req, res) => {
+router.get("/getEventById/:id", auth, async (req, res) => {
     try{
         const event = await Event.findById(req.params.id)
             .populate("members")
@@ -47,7 +47,7 @@ router.get("/:id", auth, async (req, res) => {
 });
 
 
-router.post("/", auth, async (req, res) => {
+router.post("/createEvent", auth, async (req, res) => {
     try{
         let event = new Event(req.body);
         event = await event.save();
@@ -58,23 +58,37 @@ router.post("/", auth, async (req, res) => {
 });
 
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/editEvent/:id", auth, async (req, res) => {
     try{
-        const event = await Event.findByIdAndUpdate(req.params.id, {
-            datetime: req.body.datetime,
-            description: req.body.description,
-            memberLimit: req.body.memberLimit,
-            state: req.body.state,
-            members: req.body.members,
-            chef: req.body.chef,
-            shoppingDesignee: req.body.shoppingDesignee,
-            transferReceipts: req.body.transferReceipts,
-            purchaseReceipts: req.body.purchaseReceipts
-        }, {new: true});
-        
+        const event = await Event.findById(req.params.id);
         if (!event){
             return res.status(404).send("The genre with the given ID was not found.");
         }
+        let state = req.body.state
+        switch (true) {
+            case event.memberLimit > req.body.members.length && event.state === "full":
+                state = "available";
+                break;
+            case event.memberLimit == req.body.members.length && event.state === "available":
+                state = "full"
+                break;
+            case event.memberLimit < req.body.members.length:
+                return res.status(400).send("The event member limit has been met.")
+            default:
+                break;
+        }
+
+        event.datetime = req.body.datetime
+        event.description = req.body.description
+        event.memberLimit = req.body.memberLimit
+        event.state = state
+        event.members = req.body.members
+        event.chef = req.body.chef
+        event.shoppingDesignee = req.body.shoppingDesignee
+        event.transferReceipts = req.body.transferReceipts
+        event.purchaseReceipts = req.body.purchaseReceipts
+
+        event.save()
 
         res.send(event);
     } catch(e){
@@ -83,7 +97,7 @@ router.put("/:id", auth, async (req, res) => {
 });
 
 
-router.delete('/:id', [auth, eventOrganizer], async (req, res) => {
+router.delete('/deleteEvent/:id', [auth, eventOrganizer], async (req, res) => {
     try{
         const event = await Event.findByIdAndRemove(req.params.id);
         if (!event){

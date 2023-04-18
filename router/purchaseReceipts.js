@@ -8,7 +8,7 @@ import {Event} from "../models/event.js";
 const router = Router();
 
 
-router.get("/:event", auth, async (req, res)=> {
+router.get("/getPurchaseReceiptsByEvent/:event", auth, async (req, res)=> {
     try{
         if(!req.params.event){
             return res.status(400).send("No event ID provided")
@@ -24,7 +24,7 @@ router.get("/:event", auth, async (req, res)=> {
 });
 
 
-router.get("/:id", auth, async (req, res)=> {
+router.get("getPurchaseReceiptById/:id", auth, async (req, res)=> {
     try{
         const purchaseReceipt = await PurchaseReceipt.findById(req.params.id);
         if (!purchaseReceipt) {
@@ -39,7 +39,7 @@ router.get("/:id", auth, async (req, res)=> {
 });
 
 
-router.post("/:event", [auth, shoppingDesignee], async (req, res)=> {
+router.post("createPurchaseReceipt/:event", [auth, shoppingDesignee], async (req, res)=> {
     try{
         let purchaseReceipt = new PurchaseReceipt(req.body);
         purchaseReceipt = await purchaseReceipt.save();
@@ -53,7 +53,7 @@ router.post("/:event", [auth, shoppingDesignee], async (req, res)=> {
 });
 
 
-router.delete("/:id/:event", [auth, shoppingDesignee], async (req, res) => {
+router.delete("deletePurchaseReceipt/:id/:event", [auth, shoppingDesignee], async (req, res) => {
     try {
         const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id)
         if (!purchaseReceipt) {

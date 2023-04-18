@@ -7,7 +7,8 @@ import users from "./router/users.js";
 import events from "./router/events.js";
 import transferReceipt from "./router/transferReceipts.js";
 import purchaseReceipt from "./router/purchaseReceipts.js";
-
+import recoverPassword from "./router/recoverPassword.js";
+import cors from 'cors';
 
 mongoose.set('strictQuery', true);
 
@@ -32,6 +33,7 @@ mongoose.connect(
 );
 
 app.use(express.json())
+.use(cors())
 .use(express.urlencoded({ extended: false, limit: "5mb" }))
 .use('/', router)
 .use('/users', users)
@@ -39,4 +41,5 @@ app.use(express.json())
 .use('/events', events)
 .use('/transfer-receipts', transferReceipt)
 .use('/purchase-receipts', purchaseReceipt)
-.listen(PORT, () => console.log("Server Started")); 
+.use('/password', recoverPassword)
+.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 

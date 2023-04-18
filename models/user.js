@@ -27,8 +27,7 @@ const userSchema = new mongoose.Schema({
     },
 
     verificationCode: {
-        type: String,
-        default: "000000"
+        type: String
     },
 
     cbu: {
@@ -44,7 +43,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: function(v){
-                const valid_diets = ["celíaco", "hipertenso", "vegano", "vegetariano"]
+                const valid_diets = ["celiac", "hypertensive", "vegan", "vegetarian"]
                 if (!v) return false
                 for (const diet of v){
                     if (!valid_diets.includes(diet.toLowerCase())){

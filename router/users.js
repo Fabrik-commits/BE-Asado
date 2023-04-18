@@ -7,7 +7,7 @@ import bcrypt from "bcrypt";
 const router = Router();
 
 
-router.get("/", auth, async (req, res) => {
+router.get("/getUsers", auth, async (req, res) => {
     try {
         const users = await User.find();
         res.send(users);
@@ -17,7 +17,7 @@ router.get("/", auth, async (req, res) => {
 });
 
 
-router.get("/:id", auth, async (req, res) => {
+router.get("/getUserById/:id", auth, async (req, res) => {
     try{
         const user = await User.findById(req.params.id);
         if (!user) {
@@ -32,7 +32,7 @@ router.get("/:id", auth, async (req, res) => {
 });
 
 
-router.post("/", async (req, res) => {
+router.post("/register", async (req, res) => {
     try{
         const existingUser = await User.findOne({email: req.body.email});
         if (existingUser) {
@@ -49,7 +49,7 @@ router.post("/", async (req, res) => {
 });
 
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/deleteUser:id', auth, async (req, res) => {
     try{
         const user = await User.findByIdAndRemove(req.params.id);
         if (!user){
