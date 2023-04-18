@@ -14,7 +14,8 @@ const eventSchema = new mongoose.Schema({
     },
 
     memberLimit: {
-        type: Number
+        type: Number,
+        required: true
     },
 
     state: {

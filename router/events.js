@@ -7,7 +7,7 @@ import {getPublicEvents, getEvents} from "../services/events.service.js";
 const router = Router();
 
 
-router.get("/", auth, async (req, res) => {
+router.get("/getEvents", auth, async (req, res) => {
     try{
         const events = await getEvents(req.params.limit);
         res.send(events);
@@ -17,7 +17,7 @@ router.get("/", auth, async (req, res) => {
 });
 
 
-router.get("/public", async (req, res) => {
+router.get("/getPublicEvents", async (req, res) => {
     try{
         const publicEvents = await getPublicEvents();
         res.send(publicEvents);
@@ -27,7 +27,7 @@ router.get("/public", async (req, res) => {
 })
 
 
-router.get("/:id", auth, async (req, res) => {
+router.get("/getEventById/:id", auth, async (req, res) => {
     try{
         const event = await Event.findById(req.params.id)
             .populate("members")
@@ -47,7 +47,7 @@ router.get("/:id", auth, async (req, res) => {
 });
 
 
-router.post("/", auth, async (req, res) => {
+router.post("/createEvent", auth, async (req, res) => {
     try{
         let event = new Event(req.body);
         event = await event.save();
@@ -58,7 +58,7 @@ router.post("/", auth, async (req, res) => {
 });
 
 
-router.put("/:id", auth, async (req, res) => {
+router.put("/editEvent/:id", auth, async (req, res) => {
     try{
         const event = await Event.findById(req.params.id);
         if (!event){
@@ -97,7 +97,7 @@ router.put("/:id", auth, async (req, res) => {
 });
 
 
-router.delete('/:id', [auth, eventOrganizer], async (req, res) => {
+router.delete('/deleteEvent/:id', [auth, eventOrganizer], async (req, res) => {
     try{
         const event = await Event.findByIdAndRemove(req.params.id);
         if (!event){

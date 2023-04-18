@@ -51,7 +51,7 @@ router.post("/forgot", async (req, res) => {
 });
 
 
-router.post("/recover", async (req, res)=>{
+router.put("/recover", async (req, res)=>{
     const user = await User.findOne({email: req.body.email}).exec();
     if (!user) return res.status(404).send('User does not exist');
     const validCode = await bcrypt.compare(req.body.verificationCode, user.verificationCode);
