@@ -27,8 +27,7 @@ const userSchema = new mongoose.Schema({
     },
 
     verificationCode: {
-        type: String,
-        default: "000000"
+        type: String
     },
 
     cbu: {

@@ -8,7 +8,7 @@ import { shoppingDesignee } from "../middleware/shoppingDesignee.js";
 const router = Router();
 
 
-router.get("/:event", [auth, shoppingDesignee], async (req, res)=> {
+router.get("/getTransferReceiptsByEvent/:event", [auth, shoppingDesignee], async (req, res)=> {
     try{
         const transferReceipts = await TransferReceipt.find();
         res.send(transferReceipts);
@@ -18,7 +18,7 @@ router.get("/:event", [auth, shoppingDesignee], async (req, res)=> {
 });
 
 
-router.get("/:id", auth, async (req, res)=> {
+router.get("/getTransferReceiptsById/:id", auth, async (req, res)=> {
     try{
         const transferReceipt = await TransferReceipt.findById(req.params.id);
         if (!transferReceipt) {
@@ -33,7 +33,7 @@ router.get("/:id", auth, async (req, res)=> {
 });
 
 
-router.post("/:event", auth, async (req, res)=> {
+router.post("/createTransferPurchase/:event", auth, async (req, res)=> {
     try {
         let transferReceipt = new TransferReceipt(req.body);
         transferReceipt = await transferReceipt.save();
