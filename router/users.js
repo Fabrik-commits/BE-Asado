@@ -49,7 +49,29 @@ router.post("/register", async (req, res) => {
 });
 
 
-router.delete('/deleteUser:id', auth, async (req, res) => {
+router.put("/editUser/:id"), auth, async (req, res) => {
+    try{
+        const user = await User.findById(req.params.id);
+        if (!user){
+            return res.status(404).send("The user with the given ID was not found.");
+        }
+
+        user.name = req.body.name
+        user.profilePicture = req.body.profilePicture
+        user.specialDiet = req.body.specialDiet
+        user.alias = req.body.alias
+        user.cbu = req.body.cbu
+
+        user.save()
+
+        res.send(user);
+    } catch(e){
+        res.status(500).send(e.message)
+    }
+}
+
+
+router.delete('/deleteUser/:id', auth, async (req, res) => {
     try{
         const user = await User.findByIdAndRemove(req.params.id);
         if (!user){
