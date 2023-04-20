@@ -26,6 +26,7 @@ const eventSchema = new mongoose.Schema({
     state: {
         type: String,
         required: true,
+        default: "available",
         validate: {
             validator: function(v){
                 const valid_states = ["full", "closed", "available", "cancelled", "finished"];
