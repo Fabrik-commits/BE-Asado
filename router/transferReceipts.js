@@ -47,7 +47,7 @@ router.post("/createTransferReceipt/:event", auth, async (req, res)=> {
 });
 
 
-router.delete('deleteTransferReceipt/:id', auth, async (req, res) => {
+router.delete('/deleteTransferReceipt/:id', auth, async (req, res) => {
     try{
         const transferReceipt = await TransferReceipt.findByIdAndRemove(req.params.id);
         if (!transferReceipt){
