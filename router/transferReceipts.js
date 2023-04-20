@@ -33,7 +33,7 @@ router.get("/getTransferReceiptsById/:id", auth, async (req, res)=> {
 });
 
 
-router.post("/createTransferPurchase/:event", auth, async (req, res)=> {
+router.post("/createTransferReceipt/:event", auth, async (req, res)=> {
     try {
         let transferReceipt = new TransferReceipt(req.body);
         transferReceipt = await transferReceipt.save();
@@ -47,7 +47,7 @@ router.post("/createTransferPurchase/:event", auth, async (req, res)=> {
 });
 
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('deleteTransferReceipt/:id', auth, async (req, res) => {
     try{
         const transferReceipt = await TransferReceipt.findByIdAndRemove(req.params.id);
         if (!transferReceipt){
