@@ -50,6 +50,8 @@ router.get("/getEventById/:id", auth, async (req, res) => {
 router.post("/createEvent", auth, async (req, res) => {
     try{
         let event = new Event(req.body);
+        event.chef = req.body.isChef ? req.body.organizer : null
+        event.shoppingDesignee = req.body.isShoppingDesignee ? req.body.organizer : null
         event = await event.save();
         res.status(201).send(event);
     } catch(e){
