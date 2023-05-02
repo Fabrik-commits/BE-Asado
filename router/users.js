@@ -49,7 +49,7 @@ router.post("/register", async (req, res) => {
 });
 
 
-router.put("/editUser/:id"), auth, async (req, res) => {
+router.put("/editUser/:id", auth, async (req, res) => {
     try{
         const user = await User.findById(req.params.id);
         if (!user){
@@ -68,7 +68,7 @@ router.put("/editUser/:id"), auth, async (req, res) => {
     } catch(e){
         res.status(500).send(e.message)
     }
-}
+});
 
 
 router.delete('/deleteUser/:id', auth, async (req, res) => {
