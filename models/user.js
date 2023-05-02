@@ -56,8 +56,8 @@ const userSchema = new mongoose.Schema({
     },
 
     profilePicture: {
-        type: String,
-        required: true
+        type: String//,
+        //required: true
     }
 
 });
