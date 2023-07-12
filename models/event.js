@@ -46,7 +46,8 @@ const eventSchema = new mongoose.Schema({
 
     chef: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        default: null
     },
 
     organizer: {
@@ -57,23 +58,30 @@ const eventSchema = new mongoose.Schema({
 
     shoppingDesignee: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        default: null
     },
 
     transferReceipts: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'TransferReceipt'
+        ref: 'TransferReceipt',
+        default: []
     },
 
     purchaseReceipts: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'PurchaseReceipt'
+        ref: 'PurchaseReceipt',
+        default: []
     }
 
 });
 
 
 const Event = mongoose.model('Event', eventSchema);
+
+
+export {Event as Event};
+
 
 
 export {Event as Event};
