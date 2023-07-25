@@ -6,9 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "build": "node i",
-    "dev": "nodemon index.js",
-    "vercel-build": "echo vercel"
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
