@@ -19,18 +19,19 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-
-mongoose.connect(
-    process.env.DATABASE_URL,
-    { useNewUrlParser: true, useUnifiedTopology: true },
-    (error) => {
-        if (error) {
-            console.error(error);
-        }else {
-        console.log("Connected to Database");
-        }
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect(
+            process.env.DATABASE_URL,
+            { useNewUrlParser: true, useUnifiedTopology: true }
+        );
+        console.log(`Connected to Database`);
+    } catch (error) {
+        console.log(error);
+        process.exit(1);
     }
-);
+}
+
 
 app.use(express.json())
 .use(cors())
@@ -42,4 +43,9 @@ app.use(express.json())
 .use('/transferReceipts', transferReceipt)
 .use('/purchaseReceipts', purchaseReceipt)
 .use('/password', recoverPassword)
-.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 
+
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log("Server running");
+    })
+})
