@@ -18,10 +18,8 @@ router.get("/getEvents", auth, async (req, res) => {
 
 
 router.get("/getPublicEvents", async (req, res) => {
-    console.log("pip")
     try{
         const publicEvents = await getPublicEvents();
-        console.log(publicEvents)
         res.send(publicEvents);
     } catch(e){
         res.status(500).send(e.message);
