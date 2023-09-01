@@ -5,6 +5,7 @@ import router from "./router/index.js";
 import login from "./router/login.js";
 import users from "./router/users.js";
 import events from "./router/events.js";
+import images from "./router/images.js";
 import transferReceipt from "./router/transferReceipts.js";
 import purchaseReceipt from "./router/purchaseReceipts.js";
 import recoverPassword from "./router/recoverPassword.js";
@@ -40,6 +41,7 @@ app.use(express.json())
 .use('/users', users)
 .use('/login', login)
 .use('/events', events)
+.use('/images', images)
 .use('/transferReceipts', transferReceipt)
 .use('/purchaseReceipts', purchaseReceipt)
 .use('/password', recoverPassword)

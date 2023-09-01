@@ -3,6 +3,8 @@ import {TransferReceipt} from "../models/transferReceipt.js";
 import {Event} from "../models/event.js";
 import {auth} from "../middleware/auth.js"
 import { shoppingDesignee } from "../middleware/shoppingDesignee.js";
+import { multerUpload } from "../middleware/multerUpload.js";
+import {saveImage} from "../services/images.service.js";
 
 
 const router = Router();
@@ -33,9 +35,11 @@ router.get("/getTransferReceiptsById/:id", auth, async (req, res)=> {
 });
 
 
-router.post("/createTransferReceipt/:event", auth, async (req, res)=> {
+router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')], async (req, res)=> {
     try {
+        const imageId = await saveImage(req.file);
         let transferReceipt = new TransferReceipt(req.body);
+        transferReceipt.image = imageId
         transferReceipt = await transferReceipt.save();
         const event = await Event.findById(req.params.event);
         event.transferReceipts.push(transferReceipt)

@@ -4,7 +4,9 @@ import mongoose from "mongoose";
 const transferReceiptSchema = new mongoose.Schema({
 
     image: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Image',
+        default: null
     },
 
     description: {
@@ -23,7 +25,8 @@ const transferReceiptSchema = new mongoose.Schema({
     },
 
     paymentMethod: {
-        type: String
+        type: String,
+        default: null
     },
 
     user: {
