@@ -51,7 +51,7 @@ router.post("/register", async (req, res) => {
 
 router.put("/editUser/:id", auth, async (req, res) => {
     try{
-        const user = await User.findById(req.params.id);
+        let user = await User.findById(req.params.id);
         if (!user){
             return res.status(404).send("The user with the given ID was not found.");
         }
@@ -62,7 +62,7 @@ router.put("/editUser/:id", auth, async (req, res) => {
         user.alias = req.body.alias
         user.cbu = req.body.cbu
 
-        user.save()
+        user = await user.save()
 
         res.send(user);
     } catch(e){

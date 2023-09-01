@@ -27,15 +27,18 @@ const userSchema = new mongoose.Schema({
     },
 
     verificationCode: {
-        type: String
+        type: String,
+        default: null
     },
 
     cbu: {
-        type: String
+        type: String,
+        default: null
     },
 
     alias: {
-        type: String
+        type: String,
+        default: null
     },
 
     specialDiet: {
@@ -56,8 +59,9 @@ const userSchema = new mongoose.Schema({
     },
 
     profilePicture: {
-        type: String//,
+        type: String,
         //required: true
+        default: null
     }
 
 });
