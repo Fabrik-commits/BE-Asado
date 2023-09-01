@@ -62,7 +62,7 @@ router.put("/editUser/:id", auth, async (req, res) => {
         user.alias = req.body.alias
         user.cbu = req.body.cbu
 
-        user.save()
+        await user.save()
 
         res.send(user);
     } catch(e){
