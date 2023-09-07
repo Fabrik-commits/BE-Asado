@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import express, { json } from "express";
+import express from "express";
+import cors from 'cors';
 import router from "./router/index.js";
 import login from "./router/login.js";
 import users from "./router/users.js";
@@ -9,7 +10,7 @@ import images from "./router/images.js";
 import transferReceipt from "./router/transferReceipts.js";
 import purchaseReceipt from "./router/purchaseReceipts.js";
 import recoverPassword from "./router/recoverPassword.js";
-import cors from 'cors';
+
 
 mongoose.set('strictQuery', true);
 
@@ -44,10 +45,10 @@ app.use(express.json())
 .use('/images', images)
 .use('/transferReceipts', transferReceipt)
 .use('/purchaseReceipts', purchaseReceipt)
-.use('/password', recoverPassword)
+.use('/password', recoverPassword);
 
 connectDB().then(() => {
     app.listen(PORT, () => {
-        console.log("Server running");
+        console.log(`Server running on port ${PORT}`);
     })
-})
+});
