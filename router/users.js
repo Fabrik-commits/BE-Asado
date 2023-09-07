@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {User} from "../models/user.js";
 import {auth} from "../middleware/auth.js"
+import {sameUser} from "../middleware/sameUser.js"
 import bcrypt from "bcrypt";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
@@ -55,7 +56,7 @@ router.post("/register", multerUpload.single('file'), async (req, res) => {
 });
 
 
-router.put("/editUser/:id", auth, async (req, res) => {
+router.put("/editUser/:id", [auth, sameUser], async (req, res) => {
     try{
         let user = await User.findById(req.params.id);
         if (!user){
@@ -76,7 +77,7 @@ router.put("/editUser/:id", auth, async (req, res) => {
     }
 });
 
-router.put("/editProfilePicture/:id", [auth, multerUpload.single("file")], async (req, res) => {
+router.put("/editProfilePicture/:id", [auth, sameUser, multerUpload.single("file")], async (req, res) => {
     let user = await User.findById(req.params.id);
     if (!user){
         return res.status(404).send("The user with the given ID was not found.");
@@ -87,7 +88,7 @@ router.put("/editProfilePicture/:id", [auth, multerUpload.single("file")], async
     res.send(user);
 });
 
-router.delete('/deleteUser/:id', auth, async (req, res) => {
+router.delete('/deleteUser/:id', [auth, sameUser] , async (req, res) => {
     try{
         const user = await User.findByIdAndRemove(req.params.id);
         if (!user){
