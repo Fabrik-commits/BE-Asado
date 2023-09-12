@@ -1,6 +1,7 @@
 import {Event} from "../models/event.js";
 import {isValidId} from "../utils/utils.js";
 
+
 async function eventParticipant(req, res, next){
     try{
         if (!isValidId(req.params.id)){
@@ -15,7 +16,6 @@ async function eventParticipant(req, res, next){
     } catch(e) {
         res.status(500).send(e.message);
     }
-
 }
 
 export {eventParticipant as eventParticipant};
