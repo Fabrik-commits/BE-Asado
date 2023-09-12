@@ -30,11 +30,11 @@ References:
 | transferReceipts | getTransferReceiptsByEvent/:event | Gets all transferReceipts from an event providing the event's id (12 byte Object ID) | GET | event | Yes and user token needs to be the shoppingDesignee's |  |
 | transferReceipts | getTransferReceiptsById/:id | Gets a single transferReceipts by its id (12 byte Object ID) | GET | id | Yes |  |
 | transferReceipts | createTransferReceipt/:event | Creates a transferReceipt for a certain event | POST | event | Yes | <ul><li>description: String</li> <li>amount: Number</li> <li>user: ObjectId of a member</li> <li>(paymentMethod: String)</li> <li>(image: String)</li>  <li>DON'T SEND hasPaid: Boolean or send it as false</li></ul> |
-| transferReceipts | deleteTransferReceipt/:id | Deletes a transferReceipt by its id (12 byte Object ID) | DELETE | id | Yes (and user token needs to be the receipt owner -> not functional yet) |  |
+| transferReceipts | deleteTransferReceipt/:id | Deletes a transferReceipt by its id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the receipt owner |  |
 | users | getUsers  | Gets all users in the database | GET |  | Yes |  |
 | users | getUserById/:id | Gets a user by its id (12 byte Object ID) | GET | id | Yes |  |
 | users | register | Creates a user | POST |  | No | <ul><li>name: String</li> <li>email: String</li> <li>password: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>(cbu: String)</li> <li>(alias: String)</li></ul> |
 | users | editProfilePicture/:id | Modifies a user's profile picture | PUT | id | Yes | <ul><li>file: png/jpeg/pdf</ul></li> |
-| users | editUser/:id | Edits a user by its id (12 byte Object ID) | PUT | id | Yes (and user token needs to be the user to edit) | <ul><li>name: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>cbu: String</li> <li>alias: String</li> </ul> |
-| users | deleteUser/:id | Deletes a user by id (12 byte Object ID) | DELETE | id | Yes (and user token needs to be the user to delete) |  |
+| users | editUser/:id | Edits a user by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the user to edit | <ul><li>name: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>cbu: String</li> <li>alias: String</li> </ul> |
+| users | deleteUser/:id | Deletes a user by id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the user to delete |  |
 
