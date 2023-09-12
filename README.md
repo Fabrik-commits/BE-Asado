@@ -35,6 +35,6 @@ References:
 | users | getUserById/:id | Gets a user by its id (12 byte Object ID) | GET | id | Yes |  |
 | users | register | Creates a user | POST |  | No | <ul><li>name: String</li> <li>email: String</li> <li>password: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>(cbu: String)</li> <li>(alias: String)</li></ul> |
 | users | editProfilePicture/:id | Modifies a user's profile picture | PUT | id | Yes | <ul><li>file: png/jpeg/pdf</ul></li> |
-| users | editUser/:id | Edits a user by its id (12 byte Object ID) - NEED TO FIX AUTH -  | PUT | id | Yes (and user token needs to be the user to edit-> not functional yet) | <ul><li>name: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>cbu: String</li> <li>alias: String</li> </ul> |
-| users | deleteUser/:id | Deletes a user by id (12 byte Object ID) - NEED TO FIX AUTH - | DELETE | id | Yes (and user token needs to be the user to delete -> not functional yet) |  |
+| users | editUser/:id | Edits a user by its id (12 byte Object ID) | PUT | id | Yes (and user token needs to be the user to edit) | <ul><li>name: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>cbu: String</li> <li>alias: String</li> </ul> |
+| users | deleteUser/:id | Deletes a user by id (12 byte Object ID) | DELETE | id | Yes (and user token needs to be the user to delete) |  |
 
