@@ -1,7 +1,7 @@
 import {isValidId} from "../utils/utils.js";
 
 
-async function sameUser(){
+async function sameUser(req, res, next){
     try{
         if (!isValidId(req.user._id) || !isValidId(req.params.id)){
             return res.status(400).send("Invalid ID");
