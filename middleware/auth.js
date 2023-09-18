@@ -1,6 +1,7 @@
 import {verify} from 'jsonwebtoken';
 import dotenv from "dotenv";
 
+
 dotenv.config();
 
 const jwtPrivateKey = process.env.JWTPRIVATEKEY;
@@ -17,6 +18,5 @@ function auth(req, res, next){
         res.status(400).send('Invalid token.');
     }
 }
-
 
 export {auth as auth};

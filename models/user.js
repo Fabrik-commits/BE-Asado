@@ -60,8 +60,10 @@ const userSchema = new mongoose.Schema({
 
     profilePicture: {
         type: String,
-        //required: true
         default: null
+        //required: true
+        // type: mongoose.Schema.Types.ObjectId,
+        // ref: 'Image',
     }
 
 });

@@ -2,13 +2,16 @@ import {Router} from "express";
 import {PurchaseReceipt} from "../models/purchaseReceipt.js";
 import {auth} from "../middleware/auth.js"
 import {shoppingDesignee} from "../middleware/shoppingDesignee.js"
+import {eventParticipant} from "../middleware/eventParticipant.js"
 import {Event} from "../models/event.js";
+import {multerUpload} from "../middleware/multerUpload.js";
+import {saveImage} from "../services/images.service.js";
 
 
 const router = Router();
 
 
-router.get("/getPurchaseReceiptsByEvent/:event", auth, async (req, res)=> {
+router.get("/getPurchaseReceiptsByEvent/:event", [auth, eventParticipant], async (req, res)=> {
     try{
         if(!req.params.event){
             return res.status(400).send("No event ID provided")
@@ -24,7 +27,7 @@ router.get("/getPurchaseReceiptsByEvent/:event", auth, async (req, res)=> {
 });
 
 
-router.get("getPurchaseReceiptById/:id", auth, async (req, res)=> {
+router.get("getPurchaseReceiptById/:id/:event", [auth, eventParticipant], async (req, res)=> {
     try{
         const purchaseReceipt = await PurchaseReceipt.findById(req.params.id);
         if (!purchaseReceipt) {
@@ -39,13 +42,15 @@ router.get("getPurchaseReceiptById/:id", auth, async (req, res)=> {
 });
 
 
-router.post("createPurchaseReceipt/:event", [auth, shoppingDesignee], async (req, res)=> {
+router.post("createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUpload.single("file")], async (req, res)=> {
     try{
+        const imageId = await saveImage(req.file);
         let purchaseReceipt = new PurchaseReceipt(req.body);
+        purchaseReceipt.image = imageId;
         purchaseReceipt = await purchaseReceipt.save();
         const event = await Event.findById(req.params.event);
-        event.purchaseReceipts.push(purchaseReceipt)
-        await event.save()
+        event.purchaseReceipts.push(purchaseReceipt);
+        await event.save();
         res.status(201).send(purchaseReceipt);
     } catch(e){
         res.status(500).send(e.message);

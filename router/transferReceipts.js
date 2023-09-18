@@ -2,8 +2,9 @@ import {Router} from "express";
 import {TransferReceipt} from "../models/transferReceipt.js";
 import {Event} from "../models/event.js";
 import {auth} from "../middleware/auth.js"
-import { shoppingDesignee } from "../middleware/shoppingDesignee.js";
-import { multerUpload } from "../middleware/multerUpload.js";
+import {transferReceiptOwner} from "../middleware/transferReceiptOwner.js"
+import {shoppingDesignee} from "../middleware/shoppingDesignee.js";
+import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
 
 
@@ -39,11 +40,11 @@ router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')]
     try {
         const imageId = await saveImage(req.file);
         let transferReceipt = new TransferReceipt(req.body);
-        transferReceipt.image = imageId
+        transferReceipt.image = imageId;
         transferReceipt = await transferReceipt.save();
         const event = await Event.findById(req.params.event);
-        event.transferReceipts.push(transferReceipt)
-        await event.save()
+        event.transferReceipts.push(transferReceipt);
+        await event.save();
         res.status(201).send(transferReceipt);
     } catch(e) {
         res.status(500).send(e.message);
@@ -51,7 +52,7 @@ router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')]
 });
 
 
-router.delete('/deleteTransferReceipt/:id', auth, async (req, res) => {
+router.delete('/deleteTransferReceipt/:id', [auth, transferReceiptOwner], async (req, res) => {
     try{
         const transferReceipt = await TransferReceipt.findByIdAndRemove(req.params.id);
         if (!transferReceipt){
