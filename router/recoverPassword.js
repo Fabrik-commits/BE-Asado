@@ -1,65 +1,95 @@
 import dotenv from "dotenv";
 import {Router} from "express";
-import nodemailer from "nodemailer";
 import bcrypt from "bcrypt";
 import {User} from "../models/user.js";
+import https from "https";
+
 
 dotenv.config();
 
-const emailAddress = process.env.EMAIL_ADDRESS;
-const emailPass = process.env.EMAIL_PASS;
-
+const BREVO_API_KEY = process.env.BREVO_API_KEY
 
 const router = Router();
 
-let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: emailAddress,
-        pass: emailPass
-    }
-})
-
-
 router.post("/forgot", async (req, res) => {
-
     const user = await User.findOne({email: req.body.email}).exec();
-
-    if(!user){
-        return res.status(404).send("The user with the given ID was not found.");
-    }
-
+    if(!user) return res.status(404).send("User does not exist.");
     const code = Math.floor(Math.random() * 900000) + 100000;
     const salt = await bcrypt.genSalt(10);
     user.verificationCode = await bcrypt.hash(code.toString(), salt);
     await user.save();
-
-    let mailOptions = {
-        from: emailAddress,
-        to: "ignaciocurtijristo@gmail.com",
-        subject: "Password recovery",
-        html: `<h1>Did you forgot your password?</h1><p>Your authentication code is <h3>${code}<h3/>. Please copy and paste it into the prompted page of the app.</p>`
-    };
-
-    transporter.sendMail(mailOptions, (err, info) => {
-        if (err){
-            return res.status(500).send(err.message);
-        } else {
-            return res.status(200).send(`Email sent succesfully. ${info.response}`);
-        }
-    } )
+    try {
+        sendMail(user.email, user.name, code)
+        res.status(200).send(`Mail sent succesfully to ${user.email}.`)
+    } catch (error) {
+        res.status(500).send(error)
+    }
 });
+
+
+router.put("/verifyCode", async (req, res) => {
+    const user = await User.findOne({email: req.body.email}).exec();
+    if (!user) return res.status(404).send('User does not exist');
+    const validCode = await bcrypt.compare(req.body.verificationCode, user.verificationCode);
+    if (validCode) {
+        return res.status(200).send('Verification code is correct.');
+    } else {
+        return res.status(400).send('Invalid verification code.');
+    }
+})
 
 
 router.put("/recover", async (req, res)=>{
     const user = await User.findOne({email: req.body.email}).exec();
-    if (!user) return res.status(404).send('User does not exist');
+    if (!user) return res.status(404).send('User does not exist.');
+    if (user.verificationCode === null) return res.status(400).send('User never requested a password change')
     const validCode = await bcrypt.compare(req.body.verificationCode, user.verificationCode);
-    if (!validCode) return res.status(400).send('Invalid verification code');
+    if (!validCode) return res.status(400).send('Invalid verification code.');
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(req.body.password, salt);
+    user.verificationCode = null
     await user.save()
     res.status(200).send("Password was updated correctly.")
 })
+
+
+function sendMail(email, name, code) {
+    let data = JSON.stringify({
+        "sender": {
+            "name": "Eat-Asado",
+            "email": "eat-asado-no-reply@vercel.app"
+        },
+        "to": [
+            {
+                "email": email,
+                "name": name,
+            }
+        ],
+        "subject": "Eat asado | Password recovery",
+        "htmlContent": `<html><head></head><body><h1>Eat asado | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`
+    })
+    const options = {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'api-key': BREVO_API_KEY,
+            'Content-Type': 'application/json',
+            'Content-Length': data.length,
+        }
+    }
+    const url = "https://api.brevo.com/v3/smtp/email"
+    let req = https.request(url, options, (res) => {
+            res.on('data', (d) => {
+                process.stdout.write(d);
+            });
+        });
+    req.on('error', (e) => {
+        console.error(e);
+        console.log("xd")
+    });
+    req.write(data);
+    req.end();
+}
+
 
 export default router;
