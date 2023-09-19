@@ -35,7 +35,7 @@ router.get("/getUserById/:id", auth, async (req, res) => {
 });
 
 
-router.post("/register", multerUpload.single('file'), async (req, res) => {
+router.post("/register", /*multerUpload.single('file'),*/ async (req, res) => {
     try{
         
         const existingUser = await User.findOne({email: req.body.email});
@@ -43,9 +43,9 @@ router.post("/register", multerUpload.single('file'), async (req, res) => {
             return res.status(400).send('User already registered')
         }
 
-        const imageId = await saveImage(req.file);
+        // const imageId = await saveImage(req.file);
         let user = new User(req.body);
-        user.profilePicture = imageId;
+        // user.profilePicture = imageId;
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
         user = await user.save();
