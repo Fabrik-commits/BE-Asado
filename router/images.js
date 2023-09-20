@@ -5,7 +5,6 @@ import {auth} from "../middleware/auth.js"
 
 const router = Router();
 
-
 router.get('/getImage/:id', auth, async (req, res) => {
     const id = req.params.id;
     const image = await Image.findById(id);

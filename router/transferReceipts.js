@@ -25,8 +25,7 @@ router.get("/getTransferReceiptsById/:id", auth, async (req, res)=> {
     try{
         const transferReceipt = await TransferReceipt.findById(req.params.id);
         if (!transferReceipt) {
-            res.status(404).send("The transfer receipt with the given ID was not found.");
-            return;
+            return res.status(404).send("The transfer receipt with the given ID was not found.");
         } else {
             res.send(transferReceipt);
         }
@@ -55,14 +54,11 @@ router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')]
 router.delete('/deleteTransferReceipt/:id', [auth, transferReceiptOwner], async (req, res) => {
     try{
         const transferReceipt = await TransferReceipt.findByIdAndRemove(req.params.id);
-        if (!transferReceipt){
-            res.status(404).send('The transfer receipt with the given ID was not found.');
-            return;
-        }
+        if (!transferReceipt) return res.status(404).send('The transfer receipt with the given ID was not found.');
         const event = await Event.findById(req.params.event);
-        const index = event.transferReceipts.indexOf(transferReceipt)
-        event.transferReceipts.splice(index, 1)
-        await event.save()
+        const index = event.transferReceipts.indexOf(transferReceipt);
+        event.transferReceipts.splice(index, 1);
+        await event.save();
         res.send(transferReceipt);
     } catch(e){
         res.status(500).send(e.message);

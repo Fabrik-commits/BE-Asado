@@ -5,7 +5,7 @@ import {auth} from "../middleware/auth.js"
 import {eventOrganizer} from "../middleware/eventOrganizer.js"
 import {sameUser} from "../middleware/sameUser.js"
 import {getPublicEvents, getEvents} from "../services/events.service.js";
-import {removeElementfromArray} from "../utils/utils.js"
+
 
 const router = Router();
 
@@ -40,8 +40,7 @@ router.get("/getEventById/:id", auth, async (req, res) => {
             .populate("transferReceipts")
             .populate("purchaseReceipts");
         if (!event) {
-            res.status(404).send("The event with the given ID was not found.");
-            return;
+            return res.status(404).send("The event with the given ID was not found.");
         } else {
             res.send(event);
         }
@@ -72,8 +71,8 @@ router.put("subscribeToAnEvent/:id/:event", [auth, sameUser], async (req, res) =
     const user = await User.findById(req.params.id);
     event.members.push(user);
     if (event.members.length == event.memberLimit) event.state = 'full';
-    await event.save()
-    res.status(200).send(event)
+    await event.save();
+    res.status(200).send(event);
 })
 
 
@@ -81,10 +80,10 @@ router.put("unsubscribeFromEvent/:id/:event", [auth, sameUser], async (req, res)
     if(!req.params.event) return res.status(400).send("No event ID provided.")
     const event = await Event.findById(req.params.event);
     if(!event) return res.status(404).send("The event with the given ID was not found.")
-    const memberIndex = event.members.indexOf(req.params.id);
-    if (memberIndex === -1) return res.status(404).send("The member with the given ID is not part of the event.")
-    event.members = removeElementfromArray(event.members, memberIndex);
-    if (event.members.length == event.memberLimit) event.state = 'full'
+    const index = event.members.indexOf(req.params.id);
+    if (index === -1) return res.status(404).send("The member with the given ID is not part of the event.")
+    if (event.members.length == event.memberLimit) event.state = 'available';
+    event.members.splice(index, 1);
     await event.save();
     res.status(200).send(event);
 })
@@ -93,18 +92,14 @@ router.put("unsubscribeFromEvent/:id/:event", [auth, sameUser], async (req, res)
 router.put("/editEvent/:id", [auth, eventOrganizer], async (req, res) => {
     try{
         const event = await Event.findById(req.params.id);
-        if (!event){
-            return res.status(404).send("The event with the given ID was not found.");
-        }
-
-        event.datetime = req.body.datetime
-        event.description = req.body.description
-        event.memberLimit = req.body.memberLimit
-        event.state = req.body.state
-        event.chef = req.body.chef
-        event.shoppingDesignee = req.body.shoppingDesignee
-
-        event.save()
+        if (!event)return res.status(404).send("The event with the given ID was not found.");
+        event.datetime = req.body.datetime;
+        event.description = req.body.description;
+        event.memberLimit = req.body.memberLimit;
+        event.state = req.body.state;
+        event.chef = req.body.chef;
+        event.shoppingDesignee = req.body.shoppingDesignee;
+        event.save();
         res.send(event);
     } catch(e){
         res.status(500).send(e.message);
@@ -115,10 +110,7 @@ router.put("/editEvent/:id", [auth, eventOrganizer], async (req, res) => {
 router.delete('/deleteEvent/:id', [auth, eventOrganizer], async (req, res) => {
     try{
         const event = await Event.findByIdAndRemove(req.params.id);
-        if (!event){
-            res.status(404).send('The event with the given ID was not found.');
-            return;
-        }
+        if (!event) return res.status(404).send('The event with the given ID was not found.');
         res.send(event);
     } catch(e){
         res.status(500).send(e.message);

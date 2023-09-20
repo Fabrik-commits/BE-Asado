@@ -24,8 +24,7 @@ router.get("/getUserById/:id", auth, async (req, res) => {
     try{
         const user = await User.findById(req.params.id);
         if (!user) {
-            res.status(404).send("The user with the given ID was not found.");
-            return;
+            return res.status(404).send("The user with the given ID was not found.");
         } else {
             res.send(user);
         }
@@ -39,10 +38,7 @@ router.post("/register", /*multerUpload.single('file'),*/ async (req, res) => {
     try{
         
         const existingUser = await User.findOne({email: req.body.email});
-        if (existingUser) {
-            return res.status(400).send('User already registered')
-        }
-
+        if (existingUser) return res.status(400).send('User already registered')
         // const imageId = await saveImage(req.file);
         let user = new User(req.body);
         // user.profilePicture = imageId;
@@ -59,18 +55,13 @@ router.post("/register", /*multerUpload.single('file'),*/ async (req, res) => {
 router.put("/editUser/:id", [auth, sameUser], async (req, res) => {
     try{
         let user = await User.findById(req.params.id);
-        if (!user){
-            return res.status(404).send("The user with the given ID was not found.");
-        }
-
-        user.name = req.body.name ? req.body.name : user.name 
-        user.profilePicture = req.body.profilePicture
-        user.specialDiet = req.body.specialDiet
-        user.alias = req.body.alias
-        user.cbu = req.body.cbu
-
-        user = await user.save()
-
+        if (!user) return res.status(404).send("The user with the given ID was not found.");
+        user.name = req.body.name ? req.body.name : user.name;
+        user.profilePicture = req.body.profilePicture;
+        user.specialDiet = req.body.specialDiet;
+        user.alias = req.body.alias;
+        user.cbu = req.body.cbu;
+        user = await user.save();
         res.send(user);
     } catch(e){
         res.status(500).send(e.message)
@@ -79,22 +70,17 @@ router.put("/editUser/:id", [auth, sameUser], async (req, res) => {
 
 router.put("/editProfilePicture/:id", [auth, sameUser, multerUpload.single("file")], async (req, res) => {
     let user = await User.findById(req.params.id);
-    if (!user){
-        return res.status(404).send("The user with the given ID was not found.");
-    }
+    if (!user) return res.status(404).send("The user with the given ID was not found.");
     const imageId = await saveImage(req.file);
     user.profilePicture = imageId;
     user = await user.save();
-    res.send(user);
+    res.status(200).send(user);
 });
 
 router.delete('/deleteUser/:id', [auth, sameUser] , async (req, res) => {
     try{
         const user = await User.findByIdAndRemove(req.params.id);
-        if (!user){
-            res.status(404).send('The user with the given ID was not found.');
-            return;
-        }
+        if (!user) return res.status(404).send('The user with the given ID was not found.');
         res.send(user);
     } catch(e){
         res.status(500).send(e.message);

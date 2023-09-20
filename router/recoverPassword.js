@@ -7,7 +7,8 @@ import https from "https";
 
 dotenv.config();
 
-const BREVO_API_KEY = process.env.BREVO_API_KEY
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+const BREVO_URL = process.env.BREVO_URL;
 
 const router = Router();
 
@@ -19,10 +20,10 @@ router.post("/forgot", async (req, res) => {
     user.verificationCode = await bcrypt.hash(code.toString(), salt);
     await user.save();
     try {
-        sendMail(user.email, user.name, code)
-        res.status(200).send(`Mail sent succesfully to ${user.email}.`)
+        sendMail(user.email, user.name, code);
+        res.status(200).send(`Mail sent succesfully to ${user.email}.`);
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send(error);
     }
 });
 
@@ -47,9 +48,9 @@ router.put("/recover", async (req, res)=>{
     if (!validCode) return res.status(400).send('Invalid verification code.');
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(req.body.password, salt);
-    user.verificationCode = null
-    await user.save()
-    res.status(200).send("Password was updated correctly.")
+    user.verificationCode = null;
+    await user.save();
+    res.status(200).send("Password was updated correctly.");
 })
 
 
@@ -67,7 +68,7 @@ function sendMail(email, name, code) {
         ],
         "subject": "Eat asado | Password recovery",
         "htmlContent": `<html><head></head><body><h1>Eat asado | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`
-    })
+    });
     const options = {
         method: 'POST',
         headers: {
@@ -76,16 +77,15 @@ function sendMail(email, name, code) {
             'Content-Type': 'application/json',
             'Content-Length': data.length,
         }
-    }
-    const url = "https://api.brevo.com/v3/smtp/email"
+    };
+    const url = BREVO_URL;
     let req = https.request(url, options, (res) => {
             res.on('data', (d) => {
                 process.stdout.write(d);
             });
-        });
+    });
     req.on('error', (e) => {
-        console.error(e);
-        console.log("xd")
+        throw e
     });
     req.write(data);
     req.end();
