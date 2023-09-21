@@ -34,6 +34,20 @@ router.get("/getUserById/:id", auth, async (req, res) => {
 });
 
 
+router.get("/isDebtor/:id", [auth, sameUser], async (req, res) => {
+    const eventsWithoutReceipts = await Event.findOne({"members": req.params.id,
+                                                    "transferReceipts.user": {
+                                                        "$ne": req.params.id
+                                                    }
+    })
+    if (eventsWithoutReceipts) return res.status(200).send({"eventId": eventsWithoutReceipts.id})
+    const eventsNotPaid = await TransferReceipt.findOne({user: req.params.id,
+                                                        hasPaid: false})
+    if (eventsNotPaid) return res.status(200).send({"eventId": eventsNotPaid.event.id})
+    res.status(200).send({"eventId": null})
+})
+
+
 router.post("/register", /*multerUpload.single('file'),*/ async (req, res) => {
     try{
         
