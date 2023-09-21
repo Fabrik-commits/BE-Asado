@@ -32,7 +32,7 @@ const eventSchema = new mongoose.Schema({
                 const valid_states = ["full", "closed", "available", "cancelled", "finished"];
                 if (!v) return false
                 if (!valid_states.includes(v.toLowerCase())){
-                        return false;
+                    return false;
                 }
                 return true;
             } 

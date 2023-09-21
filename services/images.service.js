@@ -6,7 +6,6 @@ async function saveImage(file){
     if(!file) {
         throw new Error('No file provided');
     }
-
     let image = new Image();
     image.name = createImageName(file);
     image.mimetype = file.mimetype;

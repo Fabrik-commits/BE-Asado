@@ -60,17 +60,16 @@ router.post("createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUploa
 
 router.delete("deletePurchaseReceipt/:id/:event", [auth, shoppingDesignee], async (req, res) => {
     try {
-        const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id)
-        if (!purchaseReceipt) {
-            return res.status(404).send("The purchase receipt with the given ID was not found.")
-        }
+        const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id);
+        if (!purchaseReceipt) return res.status(404).send("The purchase receipt with the given ID was not found.")
         const event = await Event.findById(req.params.event);
-        const index = event.purchaseReceipts.indexOf(purchaseReceipt)
-        event.purchaseReceipts.splice(index, 1)
-        await event.save()
-        res.send(purchaseReceipt)
+        const index = event.purchaseReceipts.indexOf(purchaseReceipt);
+        if (index === -1) return res.status(404).send("The receipt with the given ID is not part of the event.")
+        event.purchaseReceipts.splice(index, 1);
+        await event.save();
+        res.status(200).send(purchaseReceipt);
     } catch (e) {
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 })
 
