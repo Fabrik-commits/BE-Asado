@@ -68,6 +68,7 @@ router.put("/editUser/:id", [auth, sameUser], async (req, res) => {
     }
 });
 
+
 router.put("/editProfilePicture/:id", [auth, sameUser, multerUpload.single("file")], async (req, res) => {
     let user = await User.findById(req.params.id);
     if (!user) return res.status(404).send("The user with the given ID was not found.");
@@ -76,6 +77,7 @@ router.put("/editProfilePicture/:id", [auth, sameUser, multerUpload.single("file
     user = await user.save();
     res.status(200).send(user);
 });
+
 
 router.delete('/deleteUser/:id', [auth, sameUser] , async (req, res) => {
     try{
