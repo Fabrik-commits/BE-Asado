@@ -1,8 +1,8 @@
 import {Router} from "express";
 import bcrypt from "bcrypt";
 import {User} from "../models/user.js";
-import {auth} from "../middleware/auth.js"
-import {sameUser} from "../middleware/sameUser.js"
+import {auth} from "../middleware/auth.js";
+import {sameUser} from "../middleware/sameUser.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
 
@@ -38,7 +38,7 @@ router.post("/register", /*multerUpload.single('file'),*/ async (req, res) => {
     try{
         
         const existingUser = await User.findOne({email: req.body.email});
-        if (existingUser) return res.status(400).send('User already registered')
+        if (existingUser) return res.status(400).send('User already registered');
         // const imageId = await saveImage(req.file);
         let user = new User(req.body);
         // user.profilePicture = imageId;
@@ -62,9 +62,9 @@ router.put("/editUser/:id", [auth, sameUser], async (req, res) => {
         user.alias = req.body.alias;
         user.cbu = req.body.cbu;
         user = await user.save();
-        res.send(user);
+        res.status(200).send(user);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 

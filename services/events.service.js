@@ -22,7 +22,7 @@ async function getPublicEvents(limit){
             }
         );
     }
-    return publicEvents
+    return publicEvents;
 }
 
 
@@ -30,9 +30,9 @@ async function getEvents(limit){
     if (limit){
         return await Event.find().sort({"datetime": -1, ":id": 1}).limit(limit);
     } else{
-        return await Event.find()
+        return await Event.find();
     }
 }
 
 
-export {getPublicEvents, getEvents}
+export {getPublicEvents, getEvents};
