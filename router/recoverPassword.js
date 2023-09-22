@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 import {Router} from "express";
 import bcrypt from "bcrypt";
-import {User} from "../models/user.js";
 import https from "https";
+import {User} from "../models/user.js";
 
 
 dotenv.config();

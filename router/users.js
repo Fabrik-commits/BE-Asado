@@ -1,8 +1,8 @@
 import {Router} from "express";
+import bcrypt from "bcrypt";
 import {User} from "../models/user.js";
 import {auth} from "../middleware/auth.js"
 import {sameUser} from "../middleware/sameUser.js"
-import bcrypt from "bcrypt";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
 

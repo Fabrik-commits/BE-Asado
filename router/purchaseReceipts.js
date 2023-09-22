@@ -1,9 +1,9 @@
 import {Router} from "express";
 import {PurchaseReceipt} from "../models/purchaseReceipt.js";
+import {Event} from "../models/event.js";
 import {auth} from "../middleware/auth.js"
 import {shoppingDesignee} from "../middleware/shoppingDesignee.js"
 import {eventParticipant} from "../middleware/eventParticipant.js"
-import {Event} from "../models/event.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
 
