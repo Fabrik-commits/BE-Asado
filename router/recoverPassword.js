@@ -80,9 +80,7 @@ function sendMail(email, name, code) {
     };
     const url = BREVO_URL;
     let req = https.request(url, options, (res) => {
-            res.on('data', (d) => {
-                process.stdout.write(d);
-            });
+            res.on('data', (d) => {});
     });
     req.on('error', (e) => {
         throw e
