@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
         validate: {
             validator: function (v){
                 if (!v) return false;
+                let username, domain, rest
                 [username, domain, ...rest] = v.split("@");
                 if (rest.length) return false;
                 if (domain !== "endava.com") return false;
