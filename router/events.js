@@ -76,7 +76,7 @@ router.put("/subscribeToAnEvent/:id/:event", [auth, sameUser], async (req, res) 
 })
 
 
-router.put("unsubscribeFromEvent/:id/:event", [auth, sameUser], async (req, res) => {
+router.put("/unsubscribeFromEvent/:id/:event", [auth, sameUser], async (req, res) => {
     if(!req.params.event) return res.status(400).send("No event ID provided.")
     const event = await Event.findById(req.params.event);
     if(!event) return res.status(404).send("The event with the given ID was not found.")
