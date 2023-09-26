@@ -89,16 +89,28 @@ router.put("unsubscribeFromEvent/:id/:event", [auth, sameUser], async (req, res)
 })
 
 
+router.put("/editRoles/:id", auth, async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+        if (!event) return res.status(404).send("The event with the given ID was not found.");
+        event.chef = req.body.chef ? req.body.chef : event.chef;
+        event.shoppingDesignee = req.body.shoppingDesignee ? req.body.shoppingDesignee : event.shoppingDesignee;
+        event.save();
+        res.send(event);
+    } catch (e) {
+        res.status(500).send(e.message);
+    }
+})
+
+
 router.put("/editEvent/:id", [auth, eventOrganizer], async (req, res) => {
     try{
         const event = await Event.findById(req.params.id);
-        if (!event)return res.status(404).send("The event with the given ID was not found.");
+        if (!event) return res.status(404).send("The event with the given ID was not found.");
         event.datetime = req.body.datetime;
         event.description = req.body.description;
         event.memberLimit = req.body.memberLimit;
         event.state = req.body.state;
-        event.chef = req.body.chef;
-        event.shoppingDesignee = req.body.shoppingDesignee;
         event.save();
         res.send(event);
     } catch(e){
