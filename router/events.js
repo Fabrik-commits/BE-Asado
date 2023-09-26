@@ -93,8 +93,8 @@ router.put("/editRoles/:id", auth, async (req, res) => {
     try {
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).send("The event with the given ID was not found.");
-        event.chef = req.body.chef ? req.body.chef : event.chef;
-        event.shoppingDesignee = req.body.shoppingDesignee ? req.body.shoppingDesignee : event.shoppingDesignee;
+        event.chef = req.body.chef ? req.body.chef : null;
+        event.shoppingDesignee = req.body.shoppingDesignee ? req.body.shoppingDesignee : null;
         event.save();
         res.send(event);
     } catch (e) {
