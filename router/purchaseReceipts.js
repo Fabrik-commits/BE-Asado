@@ -27,7 +27,7 @@ router.get("/getPurchaseReceiptsByEvent/:event", [auth, eventParticipant], async
 });
 
 
-router.get("getPurchaseReceiptById/:id/:event", [auth, eventParticipant], async (req, res)=> {
+router.get("/getPurchaseReceiptById/:id/:event", [auth, eventParticipant], async (req, res)=> {
     try{
         const purchaseReceipt = await PurchaseReceipt.findById(req.params.id);
         if (!purchaseReceipt) {
@@ -42,7 +42,7 @@ router.get("getPurchaseReceiptById/:id/:event", [auth, eventParticipant], async 
 });
 
 
-router.post("createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUpload.single("file")], async (req, res)=> {
+router.post("/createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUpload.single("file")], async (req, res)=> {
     try{
         const imageId = await saveImage(req.file);
         let purchaseReceipt = new PurchaseReceipt(req.body);
@@ -58,7 +58,7 @@ router.post("createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUploa
 });
 
 
-router.delete("deletePurchaseReceipt/:id/:event", [auth, shoppingDesignee], async (req, res) => {
+router.delete("/deletePurchaseReceipt/:id/:event", [auth, shoppingDesignee], async (req, res) => {
     try {
         const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id);
         if (!purchaseReceipt) return res.status(404).send("The purchase receipt with the given ID was not found.")
