@@ -7,7 +7,7 @@ async function eventOrganizer(req, res, next){
         if (!isValidId(req.params.id)) return res.status(400).send("Invalid ID");
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).send("The event with the given ID does not exist.");
-        if (event.organizer !== req.user._id) return res.status(403).send("Access denied.");
+        if (event.organizer.toString() !== req.user._id) return res.status(403).send("Access denied.");
         next();
     } catch(e) {
         res.status(500).send(e.message);
