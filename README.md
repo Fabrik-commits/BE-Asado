@@ -19,8 +19,9 @@ References:
 | events | getEventById/:id | Gets an event by its id (12 byte Object ID) | GET | id | Yes |  |
 | events | createEvent | Creates an event | POST |  | Yes | <ul> <li>title: String</li> <li>description: String</li> <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>members: [ObjectId of members]</li> <li>organizer: ObjectId of a member</li> <li>(chef: ObjectId of a member)</li> <li>(shoppingDesignee: ObjectId of a member)</li></ul> |
 | events | subscribeToAnEvent/:id/:event | Subscribes a user by id for a certain event providing the event's id (12 byte Object ID) | PUT | id, event | Yes and user token needs to be the user to subscribe |  |
-| events | unsubscribeFromEvent/:id/event | Removes a user by id for a certain event providing the event's id (12 byte Object ID) | PUT | id, event | Yes and user token needs to be the user to remove |  |
-| events | editEvent/:id | Edits an event by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the organizer's | <ul><li>title: String, <li>description: String, <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>state: String with limited values {full, closed, available, cancelled, finished}</li> <li>chef: ObjectId of a member</li> <li>shoppingDesignee: ObjectId of a member</li> </ul> |
+| events | unsubscribeFromEvent/:id/:event | Removes a user by id for a certain event providing the event's id (12 byte Object ID) | PUT | id, event | Yes and user token needs to be the user to remove |  |
+| events | editRoles/:id | Edits an event's chef and shopping designee by its id (12 byte Object ID) | PUT | id | Yes | <ul><li>chef: ObjectId of a member</li> <li>shoppingDesignee: ObjectId of a member</li> </ul> |
+| events | editEvent/:id | Edits an event by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the organizer's | <ul><li>title: String, <li>description: String, <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>state: String with limited values {full, closed, available, cancelled, finished}</li> </ul> |
 | events | deleteEvent/:id | Deletes an event by its id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the organizer's |  |
 | - | login | Logs a user and returns the auth token | POST |  | No | <ul><li>email: String</li> <li>password: String</li></ul> |
 | purchaseReceipts | getPurchaseReceiptsByEvent/:event | Gets all purchaseReceipts from an event providing the event's id (12 byte Object ID) | GET | event | Yes and user token needs to be an event member |  |
@@ -36,8 +37,8 @@ References:
 | transferReceipts | deleteTransferReceipt/:id | Deletes a transferReceipt by its id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the receipt owner |  |
 | users | getUsers  | Gets all users in the database | GET |  | Yes |  |
 | users | getUserById/:id | Gets a user by its id (12 byte Object ID) | GET | id | Yes |  |
-| users | register | Creates a user | POST |  | No | <ul><li>name: String</li> <li>email: String</li> <li>password: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>(cbu: String)</li> <li>(alias: String)</li></ul> |
+| users | register | Creates a user | POST |  | No | <ul><li>name: String</li> <li>last_name: String</li> <li>email: String</li> <li>password: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>(cbu: String)</li> <li>(alias: String)</li></ul> |
 | users | editProfilePicture/:id | Modifies a user's profile picture | PUT | id | Yes | <ul><li>file: png/jpeg/pdf</ul></li> |
-| users | editUser/:id | Edits a user by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the user to edit | <ul><li>name: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>cbu: String</li> <li>alias: String</li> </ul> |
+| users | editUser/:id | Edits a user by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the user to edit | <ul><li>name: String</li> <li>last_name: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>cbu: String</li> <li>alias: String</li> </ul> |
 | users | deleteUser/:id | Deletes a user by id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the user to delete |  |
 
