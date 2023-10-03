@@ -13,6 +13,7 @@ async function getPublicEvents(limit){
         publicEvents.push(
             {
                 _id: event.id,
+                title: event.title,
                 datetime: event.datetime,
                 description: event.description,
                 state: event.state,
