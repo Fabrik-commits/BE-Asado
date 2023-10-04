@@ -4,7 +4,7 @@ import {Event} from "../models/event.js";
 async function getPublicEvents(limit){
     const events = await Event
         .find()        
-        .select("datetime description state chef membersLimit members title")
+        .select("datetime description state chef memberLimit members title")
         .sort({"_id": -1})
         .populate("chef", "name");
     if(limit) await events.limit(limit);
