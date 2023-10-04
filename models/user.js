@@ -15,9 +15,8 @@ const userSchema = new mongoose.Schema({
         required: true
     },
 
-    last_name: {
-        type: String,
-        required: true
+    lastName: {
+        type: String
     },
 
     email: {
@@ -31,7 +30,7 @@ const userSchema = new mongoose.Schema({
                 [username, domain, ...rest] = v.split("@");
                 if (rest.length) return false;
                 if (domain !== "endava.com") return false;
-                if (username.split(".").length < 2) return false;
+                // if (username.split(".").length < 2) return false;
                 return true;
             },
             message: (props) => `${props.value} is not a valid endava email.`
