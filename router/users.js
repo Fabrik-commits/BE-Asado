@@ -1,5 +1,6 @@
 import {Router} from "express";
 import {User} from "../models/user.js";
+import {Event} from "../models/event.js";
 import {auth} from "../middleware/auth.js"
 import {sameUser} from "../middleware/sameUser.js"
 import bcrypt from "bcrypt";
@@ -34,17 +35,34 @@ router.get("/getUserById/:id", auth, async (req, res) => {
 });
 
 
-router.get("/isDebtor/:id", [auth, sameUser], async (req, res) => {
-    const eventsWithoutReceipts = await Event.findOne({"members": req.params.id,
-                                                    "transferReceipts.user": {
-                                                        "$ne": req.params.id
+router.get("/isDebtor/:id", [auth], async (req, res) => {
+    const eventsWithoutReceipts = await Event.find({
+                                                    "members": req.params.id,
+                                                    "shoppingDesignee": {
+                                                        $ne: req.params.id
+                                                    },
+                                                    "state": {
+                                                        $nin: ["available", "full", "cancelled"]
                                                     }
-    })
-    if (eventsWithoutReceipts) return res.status(200).send({"eventId": eventsWithoutReceipts.id})
-    const eventsNotPaid = await TransferReceipt.findOne({user: req.params.id,
-                                                        hasPaid: false})
-    if (eventsNotPaid) return res.status(200).send({"eventId": eventsNotPaid.event.id})
+    }).populate("transferReceipts");
+
+    for (const event of eventsWithoutReceipts) {
+        let hasReceipts = false
+        for (const receipt of event.transferReceipts) {
+            if (receipt.user == req.params.id && receipt.hasPaid) {
+                hasReceipts = true
+                break
+            }
+            if (receipt.user == req.params.id && receipt.hasPaid) {
+                return res.status(200).send({"eventId": event.id})
+            }
+        }
+        if (!hasReceipts) {
+            return res.status(200).send({"eventId": event.id})
+        }
+    }
     res.status(200).send({"eventId": null})
+
 })
 
 
