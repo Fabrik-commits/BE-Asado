@@ -15,10 +15,26 @@ const userSchema = new mongoose.Schema({
         required: true
     },
 
+    lastName: {
+        type: String
+    },
+
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        validate: {
+            validator: function (v){
+                if (!v) return false;
+                let username, domain, rest
+                [username, domain, ...rest] = v.split("@");
+                if (rest.length) return false;
+                if (domain !== "endava.com") return false;
+                // if (username.split(".").length < 2) return false;
+                return true;
+            },
+            message: (props) => `${props.value} is not a valid endava email.`
+        }
     },
 
     password: {
@@ -46,14 +62,14 @@ const userSchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: function(v){
-                const valid_diets = ["celiac", "hypertensive", "vegan", "vegetarian"]
-                if (!v) return false
+                const valid_diets = ["celiac", "hypertensive", "vegan", "vegetarian"];
+                if (!v) return false;
                 for (const diet of v){
                     if (!valid_diets.includes(diet.toLowerCase())){
-                        return false
+                        return false;
                     }
                 }
-                return true
+                return true;
             } 
         }
     },
@@ -69,7 +85,7 @@ const userSchema = new mongoose.Schema({
 
 
 userSchema.methods.generateAuthToken = function() {
-    return jwt.sign({_id: this._id, email: this.email}, jwtPrivateKey)
+    return jwt.sign({_id: this._id, email: this.email}, jwtPrivateKey);
 }
 
 

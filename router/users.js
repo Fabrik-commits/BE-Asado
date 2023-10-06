@@ -1,9 +1,9 @@
 import {Router} from "express";
+import bcrypt from "bcrypt";
 import {User} from "../models/user.js";
 import {Event} from "../models/event.js";
-import {auth} from "../middleware/auth.js"
-import {sameUser} from "../middleware/sameUser.js"
-import bcrypt from "bcrypt";
+import {auth} from "../middleware/auth.js";
+import {sameUser} from "../middleware/sameUser.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
 
@@ -13,7 +13,7 @@ const router = Router();
 
 router.get("/getUsers", auth, async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select("-password -verificationCode");
         res.send(users);
     } catch(e){
         res.status(500).send(e.message);
@@ -23,7 +23,7 @@ router.get("/getUsers", auth, async (req, res) => {
 
 router.get("/getUserById/:id", auth, async (req, res) => {
     try{
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id).select("-password -verificationCode");
         if (!user) {
             return res.status(404).send("The user with the given ID was not found.");
         } else {
@@ -70,7 +70,7 @@ router.post("/register", /*multerUpload.single('file'),*/ async (req, res) => {
     try{
         
         const existingUser = await User.findOne({email: req.body.email});
-        if (existingUser) return res.status(400).send('User already registered')
+        if (existingUser) return res.status(400).send('User already registered');
         // const imageId = await saveImage(req.file);
         let user = new User(req.body);
         // user.profilePicture = imageId;
@@ -89,14 +89,14 @@ router.put("/editUser/:id", [auth, sameUser], async (req, res) => {
         let user = await User.findById(req.params.id);
         if (!user) return res.status(404).send("The user with the given ID was not found.");
         user.name = req.body.name ? req.body.name : user.name;
-        user.profilePicture = req.body.profilePicture;
+        user.last_name = req.body.last_name ? req.body.last_name : user.last_name;
         user.specialDiet = req.body.specialDiet;
         user.alias = req.body.alias;
         user.cbu = req.body.cbu;
         user = await user.save();
-        res.send(user);
+        res.status(200).send(user);
     } catch(e){
-        res.status(500).send(e.message)
+        res.status(500).send(e.message);
     }
 });
 

@@ -4,7 +4,7 @@ import {Event} from "../models/event.js";
 async function getPublicEvents(limit){
     const events = await Event
         .find()        
-        .select("datetime description state chef membersLimit members")
+        .select("datetime description state chef memberLimit members title")
         .sort({"_id": -1})
         .populate("chef", "name");
     if(limit) await events.limit(limit);
@@ -13,6 +13,7 @@ async function getPublicEvents(limit){
         publicEvents.push(
             {
                 _id: event.id,
+                title: event.title,
                 datetime: event.datetime,
                 description: event.description,
                 state: event.state,
@@ -22,7 +23,7 @@ async function getPublicEvents(limit){
             }
         );
     }
-    return publicEvents
+    return publicEvents;
 }
 
 
@@ -30,9 +31,9 @@ async function getEvents(limit){
     if (limit){
         return await Event.find().sort({"datetime": -1, ":id": 1}).limit(limit);
     } else{
-        return await Event.find()
+        return await Event.find();
     }
 }
 
 
-export {getPublicEvents, getEvents}
+export {getPublicEvents, getEvents};

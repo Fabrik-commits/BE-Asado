@@ -1,9 +1,9 @@
 import {Router} from "express";
 import {Event} from "../models/event.js";
 import {User} from "../models/user.js";
-import {auth} from "../middleware/auth.js"
-import {eventOrganizer} from "../middleware/eventOrganizer.js"
-import {sameUser} from "../middleware/sameUser.js"
+import {auth} from "../middleware/auth.js";
+import {eventOrganizer} from "../middleware/eventOrganizer.js";
+import {sameUser} from "../middleware/sameUser.js";
 import {getPublicEvents, getEvents} from "../services/events.service.js";
 
 
@@ -63,11 +63,11 @@ router.post("/createEvent", auth, async (req, res) => {
 });
 
 
-router.put("subscribeToAnEvent/:id/:event", [auth, sameUser], async (req, res) => {
+router.put("/subscribeToAnEvent/:id/:event", [auth, sameUser], async (req, res) => {
     if(!req.params.event) return res.status(400).send("No event ID provided.")
     const event = await Event.findById(req.params.event);
-    if(!event) return res.status(404).send("The event with the given ID was not found.")
-    if(event.state !== "available") return res.status(400).send("The event is not available for users to join")
+    if(!event) return res.status(404).send("The event with the given ID was not found.");
+    if(event.state !== "available") return res.status(400).send("The event is not available for users to join");
     const user = await User.findById(req.params.id);
     event.members.push(user);
     if (event.members.length == event.memberLimit) event.state = 'full';
@@ -76,12 +76,12 @@ router.put("subscribeToAnEvent/:id/:event", [auth, sameUser], async (req, res) =
 })
 
 
-router.put("unsubscribeFromEvent/:id/:event", [auth, sameUser], async (req, res) => {
+router.put("/unsubscribeFromEvent/:id/:event", [auth, sameUser], async (req, res) => {
     if(!req.params.event) return res.status(400).send("No event ID provided.")
     const event = await Event.findById(req.params.event);
-    if(!event) return res.status(404).send("The event with the given ID was not found.")
+    if(!event) return res.status(404).send("The event with the given ID was not found.");
     const index = event.members.indexOf(req.params.id);
-    if (index === -1) return res.status(404).send("The member with the given ID is not part of the event.")
+    if (index === -1) return res.status(404).send("The member with the given ID is not part of the event.");
     if (event.members.length == event.memberLimit) event.state = 'available';
     event.members.splice(index, 1);
     await event.save();
@@ -89,16 +89,28 @@ router.put("unsubscribeFromEvent/:id/:event", [auth, sameUser], async (req, res)
 })
 
 
+router.put("/editRoles/:id", auth, async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+        if (!event) return res.status(404).send("The event with the given ID was not found.");
+        event.chef = req.body.chef ? req.body.chef : null;
+        event.shoppingDesignee = req.body.shoppingDesignee ? req.body.shoppingDesignee : null;
+        event.save();
+        res.send(event);
+    } catch (e) {
+        res.status(500).send(e.message);
+    }
+})
+
+
 router.put("/editEvent/:id", [auth, eventOrganizer], async (req, res) => {
     try{
         const event = await Event.findById(req.params.id);
-        if (!event)return res.status(404).send("The event with the given ID was not found.");
+        if (!event) return res.status(404).send("The event with the given ID was not found.");
         event.datetime = req.body.datetime;
         event.description = req.body.description;
         event.memberLimit = req.body.memberLimit;
         event.state = req.body.state;
-        event.chef = req.body.chef;
-        event.shoppingDesignee = req.body.shoppingDesignee;
         event.save();
         res.send(event);
     } catch(e){
