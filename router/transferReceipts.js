@@ -61,13 +61,13 @@ router.put('/approveTransferReceipt/:id', [auth, shoppingDesignee], async (req, 
     try {
         let transferReceipt = await TransferReceipt.findById(req.params.id);
         if (!transferReceipt) return res.status(404).send('The transfer receipt with the given ID was not found.');
+        if (transferReceipt.hasPaid) return res.status(400).send('The transfer receipt is already approved.')
         transferReceipt.hasPaid = true;
         await transferReceipt.save();
         res.send(transferReceipt);
     } catch (e) {
         res.status(500).send(e.message);
     }
-
 })
 
 
