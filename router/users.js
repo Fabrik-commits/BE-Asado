@@ -53,12 +53,12 @@ router.get("/isDebtor/:id", [auth], async (req, res) => {
                 hasReceipts = true
                 break
             }
-            if (receipt.user == req.params.id && receipt.hasPaid) {
-                return res.status(200).send({"eventId": event.id})
+            if (receipt.user == req.params.id && (!receipt.hasPaid)) {
+                return res.status(200).send({"eventId": event.id, "reason": "Receipt is not approved by Shopping Designee."})
             }
         }
         if (!hasReceipts) {
-            return res.status(200).send({"eventId": event.id})
+            return res.status(200).send({"eventId": event.id, "reason": "Transfer Receipt hasn't been uploaded yet."})
         }
     }
     res.status(200).send({"eventId": null})
