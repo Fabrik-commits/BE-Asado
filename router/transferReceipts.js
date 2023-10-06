@@ -37,9 +37,15 @@ router.get("/getTransferReceiptsById/:id", auth, async (req, res)=> {
 
 router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')], async (req, res)=> {
     try {
-        const imageId = await saveImage(req.file);
-        let transferReceipt = new TransferReceipt(req.body);
-        transferReceipt.image = imageId;
+        let transferReceipt;
+        if (req.file){
+            const imageId = await saveImage(req.file);
+            transferReceipt = new TransferReceipt(req.body);
+            transferReceipt.image = imageId;
+        } else {
+            transferReceipt = new TransferReceipt(req.body);
+        }
+        transferReceipt.event = req.params.event;
         transferReceipt = await transferReceipt.save();
         const event = await Event.findById(req.params.event);
         event.transferReceipts.push(transferReceipt);
@@ -49,6 +55,20 @@ router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')]
         res.status(500).send(e.message);
     }
 });
+
+
+router.put('/approveTransferReceipt/:id', [auth, shoppingDesignee], async (req, res) => {
+    try {
+        let transferReceipt = await TransferReceipt.findById(req.params.id);
+        if (!transferReceipt) return res.status(404).send('The transfer receipt with the given ID was not found.');
+        if (transferReceipt.hasPaid) return res.status(400).send('The transfer receipt is already approved.')
+        transferReceipt.hasPaid = true;
+        await transferReceipt.save();
+        res.send(transferReceipt);
+    } catch (e) {
+        res.status(500).send(e.message);
+    }
+})
 
 
 router.delete('/deleteTransferReceipt/:id', [auth, transferReceiptOwner], async (req, res) => {

@@ -1,6 +1,7 @@
 import {Router} from "express";
 import bcrypt from "bcrypt";
 import {User} from "../models/user.js";
+import {Event} from "../models/event.js";
 import {auth} from "../middleware/auth.js";
 import {sameUser} from "../middleware/sameUser.js";
 import {multerUpload} from "../middleware/multerUpload.js";
@@ -32,6 +33,37 @@ router.get("/getUserById/:id", auth, async (req, res) => {
         res.status(500).send(e.message);
     }
 });
+
+
+router.get("/isDebtor/:id", [auth], async (req, res) => {
+    const eventsWithoutReceipts = await Event.find({
+                                                    "members": req.params.id,
+                                                    "shoppingDesignee": {
+                                                        $ne: req.params.id
+                                                    },
+                                                    "state": {
+                                                        $nin: ["available", "full", "cancelled"]
+                                                    }
+    }).populate("transferReceipts");
+
+    for (const event of eventsWithoutReceipts) {
+        let hasReceipts = false
+        for (const receipt of event.transferReceipts) {
+            if (receipt.user == req.params.id && receipt.hasPaid) {
+                hasReceipts = true
+                break
+            }
+            if (receipt.user == req.params.id && receipt.hasPaid) {
+                return res.status(200).send({"eventId": event.id})
+            }
+        }
+        if (!hasReceipts) {
+            return res.status(200).send({"eventId": event.id})
+        }
+    }
+    res.status(200).send({"eventId": null})
+
+})
 
 
 router.post("/register", /*multerUpload.single('file'),*/ async (req, res) => {
