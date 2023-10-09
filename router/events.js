@@ -55,6 +55,7 @@ router.post("/createEvent", auth, async (req, res) => {
         let event = new Event(req.body);
         event.chef = req.body.isChef ? req.body.organizer : null;
         event.shoppingDesignee = req.body.isShoppingDesignee ? req.body.organizer : null;
+        if (event.memberLimit == 1) event.state == 'full'
         event = await event.save();
         res.status(201).send(event);
     } catch(e){
