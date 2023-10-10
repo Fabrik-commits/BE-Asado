@@ -36,4 +36,16 @@ async function getEvents(limit){
 }
 
 
-export {getPublicEvents, getEvents};
+async function deleteEvents(){
+    const totalEvents = await Event.count()
+    if (totalEvents > 6){
+        let matches = await Event.find({"state": "finished"}).sort({datetime: "asc"})
+        if (matches.length > 0) {
+            const deletedId = matches[0].id
+            const deleted = await Event.deleteOne({_id: deletedId})
+        }
+    } 
+}
+
+
+export {getPublicEvents, getEvents, deleteEvents};

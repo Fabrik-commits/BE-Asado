@@ -4,7 +4,7 @@ import {User} from "../models/user.js";
 import {auth} from "../middleware/auth.js";
 import {eventOrganizer} from "../middleware/eventOrganizer.js";
 import {sameUser} from "../middleware/sameUser.js";
-import {getPublicEvents, getEvents} from "../services/events.service.js";
+import {getPublicEvents, getEvents, deleteEvents} from "../services/events.service.js";
 
 
 const router = Router();
@@ -57,6 +57,7 @@ router.post("/createEvent", auth, async (req, res) => {
         event.shoppingDesignee = req.body.isShoppingDesignee ? req.body.organizer : null;
         if (event.memberLimit == 1) event.state == 'full'
         event = await event.save();
+        await deleteEvents()
         res.status(201).send(event);
     } catch(e){
         res.status(500).send(e.message);
