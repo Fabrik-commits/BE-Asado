@@ -1,9 +1,9 @@
 import {Router} from "express";
 import {PurchaseReceipt} from "../models/purchaseReceipt.js";
+import {Event} from "../models/event.js";
 import {auth} from "../middleware/auth.js"
 import {shoppingDesignee} from "../middleware/shoppingDesignee.js"
 import {eventParticipant} from "../middleware/eventParticipant.js"
-import {Event} from "../models/event.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
 
@@ -13,13 +13,9 @@ const router = Router();
 
 router.get("/getPurchaseReceiptsByEvent/:event", [auth, eventParticipant], async (req, res)=> {
     try{
-        if(!req.params.event){
-            return res.status(400).send("No event ID provided")
-        }
+        if(!req.params.event) return res.status(400).send("No event ID provided");
         const event = await Event.findById(req.params.event).populate("purchaseReceipts");
-        if(!event){
-            return res.status(404).send("The event with the given ID was not found.")
-        }
+        if(!event) return res.status(404).send("The event with the given ID was not found.");
         return res.send(event.purchaseReceipts);
     } catch(e){
         return res.status(500).send(e.message);
@@ -31,8 +27,7 @@ router.get("/getPurchaseReceiptById/:id/:event", [auth, eventParticipant], async
     try{
         const purchaseReceipt = await PurchaseReceipt.findById(req.params.id);
         if (!purchaseReceipt) {
-            res.status(404).send("The purchase receipt with the given ID was not found.");
-            return;
+            return res.status(404).send("The purchase receipt with the given ID was not found.");
         } else {
             res.send(purchaseReceipt);
         }
@@ -61,10 +56,10 @@ router.post("/createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUplo
 router.delete("/deletePurchaseReceipt/:id/:event", [auth, shoppingDesignee], async (req, res) => {
     try {
         const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id);
-        if (!purchaseReceipt) return res.status(404).send("The purchase receipt with the given ID was not found.")
+        if (!purchaseReceipt) return res.status(404).send("The purchase receipt with the given ID was not found.");
         const event = await Event.findById(req.params.event);
         const index = event.purchaseReceipts.indexOf(purchaseReceipt);
-        if (index === -1) return res.status(404).send("The receipt with the given ID is not part of the event.")
+        if (index === -1) return res.status(404).send("The receipt with the given ID is not part of the event.");
         event.purchaseReceipts.splice(index, 1);
         await event.save();
         res.status(200).send(purchaseReceipt);

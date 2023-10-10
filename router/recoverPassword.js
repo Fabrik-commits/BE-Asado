@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 import {Router} from "express";
 import bcrypt from "bcrypt";
-import {User} from "../models/user.js";
 import https from "https";
+import {User} from "../models/user.js";
 
 
 dotenv.config();
@@ -43,7 +43,7 @@ router.put("/verifyCode", async (req, res) => {
 router.put("/recover", async (req, res)=>{
     const user = await User.findOne({email: req.body.email}).exec();
     if (!user) return res.status(404).send('User does not exist.');
-    if (user.verificationCode === null) return res.status(400).send('User never requested a password change')
+    if (user.verificationCode === null) return res.status(400).send('User never requested a password change.');
     const validCode = await bcrypt.compare(req.body.verificationCode, user.verificationCode);
     if (!validCode) return res.status(400).send('Invalid verification code.');
     const salt = await bcrypt.genSalt(10);
@@ -80,9 +80,7 @@ function sendMail(email, name, code) {
     };
     const url = BREVO_URL;
     let req = https.request(url, options, (res) => {
-            res.on('data', (d) => {
-                process.stdout.write(d);
-            });
+            res.on('data', (d) => {});
     });
     req.on('error', (e) => {
         throw e
