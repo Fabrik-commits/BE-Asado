@@ -89,7 +89,7 @@ router.put("/editUser/:id", [auth, sameUser], async (req, res) => {
         let user = await User.findById(req.params.id);
         if (!user) return res.status(404).send("The user with the given ID was not found.");
         user.name = req.body.name ? req.body.name : user.name;
-        user.last_name = req.body.last_name ? req.body.last_name : user.last_name;
+        user.lastName = req.body.lastName ? req.body.lastName : user.lastName;
         user.specialDiet = req.body.specialDiet;
         user.alias = req.body.alias;
         user.cbu = req.body.cbu;

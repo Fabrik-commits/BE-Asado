@@ -4,7 +4,7 @@ import {User} from "../models/user.js";
 import {auth} from "../middleware/auth.js";
 import {eventOrganizer} from "../middleware/eventOrganizer.js";
 import {sameUser} from "../middleware/sameUser.js";
-import {getPublicEvents, getEvents} from "../services/events.service.js";
+import {getPublicEvents, getEvents, deleteEvents} from "../services/events.service.js";
 
 
 const router = Router();
@@ -55,7 +55,9 @@ router.post("/createEvent", auth, async (req, res) => {
         let event = new Event(req.body);
         event.chef = req.body.isChef ? req.body.organizer : null;
         event.shoppingDesignee = req.body.isShoppingDesignee ? req.body.organizer : null;
+        if (event.memberLimit == 1) event.state == 'full'
         event = await event.save();
+        await deleteEvents()
         res.status(201).send(event);
     } catch(e){
         res.status(500).send(e.message);
@@ -95,7 +97,7 @@ router.put("/editRoles/:id", auth, async (req, res) => {
         if (!event) return res.status(404).send("The event with the given ID was not found.");
         event.chef = req.body.chef ? req.body.chef : null;
         event.shoppingDesignee = req.body.shoppingDesignee ? req.body.shoppingDesignee : null;
-        event.save();
+        await event.save();
         res.send(event);
     } catch (e) {
         res.status(500).send(e.message);

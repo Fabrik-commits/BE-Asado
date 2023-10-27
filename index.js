@@ -18,6 +18,15 @@ dotenv.config();
 
 
 const app = express();
+app.use(
+    cors({
+        allowedHeaders: ["authorization", "Content-Type"],
+        exposedHeaders: ["authorization"],
+        origin: true,
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        preflightContinue: false
+    })
+);
 
 const PORT = process.env.PORT || 3000;
 
@@ -36,7 +45,6 @@ const connectDB = async () => {
 
 
 app.use(express.json())
-.use(cors())
 .use(express.urlencoded({ extended: false, limit: "5mb" }))
 .use('/', router)
 .use('/users', users)
