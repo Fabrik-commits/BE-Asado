@@ -6,6 +6,7 @@ import {transferReceiptOwner} from "../middleware/transferReceiptOwner.js";
 import {shoppingDesignee} from "../middleware/shoppingDesignee.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
+import {isFinished} from "../services/transferReceipts.service.js";
 
 
 const router = Router();
@@ -64,6 +65,11 @@ router.put('/approveTransferReceipt/:id', [auth, shoppingDesignee], async (req, 
         if (transferReceipt.hasPaid) return res.status(400).send('The transfer receipt is already approved.')
         transferReceipt.hasPaid = true;
         await transferReceipt.save();
+        if (isFinished(transferReceipt.event)) {
+            const event = await Event.findById(transferReceipt.event);
+            event.state = 'finished'
+            await event.save()
+        }
         res.send(transferReceipt);
     } catch (e) {
         res.status(500).send(e.message);
