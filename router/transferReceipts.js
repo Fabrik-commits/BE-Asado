@@ -36,16 +36,20 @@ router.get("/getTransferReceiptsById/:id", auth, async (req, res)=> {
 });
 
 
+router.post("/uploadFile/:transferReceipt", [auth, multerUpload.single('file')], async (req, res) => {
+    if (req.file){
+        const imageId = await saveImage(req.file);
+        let transferReceipt = await TransferReceipt.findById(req.params.transferReceipt);
+        transferReceipt.image = imageId;
+        await transferReceipt.save()
+        res.status(200).send({"imageId": imageId});
+    }
+})
+
+
 router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')], async (req, res)=> {
     try {
-        let transferReceipt;
-        if (req.file){
-            const imageId = await saveImage(req.file);
-            transferReceipt = new TransferReceipt(req.body);
-            transferReceipt.image = imageId;
-        } else {
-            transferReceipt = new TransferReceipt(req.body);
-        }
+        let transferReceipt = new TransferReceipt(req.body);
         transferReceipt.event = req.params.event;
         transferReceipt = await transferReceipt.save();
         const event = await Event.findById(req.params.event);
