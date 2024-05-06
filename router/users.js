@@ -35,6 +35,21 @@ router.get("/getUserById/:id", auth, async (req, res) => {
 });
 
 
+router.get("/hasUploaded/:user/:event", async (req, res) => {
+    try{
+        const event = await Event.findById(req.params.event).populate("transferReceipt");
+        for (const receipt of event.transferReceipts){
+            if (receipt.user == req.params.user){
+                res.status(200).send({"hasUpload": true});
+            }
+        }
+        res.status(200).send({"hasUpload": false});
+    } catch(e){
+        res.status(500).send(e.message);
+    }
+})
+
+
 router.get("/isDebtor/:id", [auth], async (req, res) => {
     const eventsWithoutReceipts = await Event.find({
                                                     "members": req.params.id,
