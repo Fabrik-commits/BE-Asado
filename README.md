@@ -23,6 +23,7 @@ References:
 | events | editRoles/:id | Edits an event's chef and shopping designee by its id (12 byte Object ID) | PUT | id | Yes | <ul><li>chef: ObjectId of a member</li> <li>shoppingDesignee: ObjectId of a member</li> </ul> |
 | events | editEvent/:id | Edits an event by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the organizer's | <ul><li>title: String, <li>description: String, <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>state: String with limited values {full, closed, available, cancelled, finished}</li> </ul> |
 | events | deleteEvent/:id | Deletes an event by its id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the organizer's |  |
+| images | getImage/:id | Gets an image by its id (12 byte Object ID) | GET | id | Yes |  |
 | - | login | Logs a user and returns the auth token | POST |  | No | <ul><li>email: String</li> <li>password: String</li></ul> |
 | purchaseReceipts | getPurchaseReceiptsByEvent/:event | Gets all purchaseReceipts from an event providing the event's id (12 byte Object ID) | GET | event | Yes and user token needs to be an event member |  |
 | purchaseReceipts | getPurchaseReceiptById/:id/:event | Gets a single purchaseReceipt by id for a certain event providing the event's id (12 byte Object ID)  | GET | id, event | Yes and user token needs to be an event member |  |
