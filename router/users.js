@@ -37,15 +37,16 @@ router.get("/getUserById/:id", auth, async (req, res) => {
 
 router.get("/hasUploaded/:user/:event", async (req, res) => {
     try{
-        const event = await Event.findById(req.params.event).populate("transferReceipt");
+        const event = await Event.findById(req.params.event).populate("transferReceipts");
         for (const receipt of event.transferReceipts){
+            console.log(receipt)
             if (receipt.user == req.params.user){
-                res.status(200).send({"hasUpload": true});
+                return res.status(200).send({"hasUpload": true});
             }
         }
-        res.status(200).send({"hasUpload": false});
+        return res.status(200).send({"hasUpload": false});
     } catch(e){
-        res.status(500).send(e.message);
+        return res.status(500).send(e.message);
     }
 })
 
