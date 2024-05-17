@@ -39,7 +39,6 @@ router.get("/hasUploaded/:user/:event", async (req, res) => {
     try{
         const event = await Event.findById(req.params.event).populate("transferReceipts");
         for (const receipt of event.transferReceipts){
-            console.log(receipt)
             if (receipt.user == req.params.user){
                 return res.status(200).send({"hasUpload": true});
             }
