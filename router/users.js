@@ -40,10 +40,10 @@ router.get("/hasUploaded/:user/:event", async (req, res) => {
         const event = await Event.findById(req.params.event).populate("transferReceipts");
         for (const receipt of event.transferReceipts){
             if (receipt.user == req.params.user){
-                return res.status(200).send({"hasUpload": true});
+                return res.status(200).send({"hasUploaded": true});
             }
         }
-        return res.status(200).send({"hasUpload": false});
+        return res.status(200).send({"hasUploaded": false});
     } catch(e){
         return res.status(500).send(e.message);
     }
