@@ -6,7 +6,7 @@ import {transferReceiptOwner} from "../middleware/transferReceiptOwner.js";
 import {shoppingDesignee} from "../middleware/shoppingDesignee.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
-import {isFinished} from "../services/transferReceipts.service.js";
+import {isFinished, hasUploaded} from "../services/transferReceipts.service.js";
 
 
 const router = Router();
@@ -49,6 +49,14 @@ router.post("/uploadFile/:transferReceipt", [auth, multerUpload.single('file')],
 
 router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')], async (req, res)=> {
     try {
+        const hasUploadedValue = await hasUploaded(req.body.user, req.params.event)
+        if (hasUploadedValue.hasUploaded){
+            let oldTransferReceipt = await TransferReceipt.findByIdAndRemove(hasUploadedValue.transferReceipt);
+            let event = await Event.findById(req.params.event);
+            const index = event.transferReceipts.indexOf(oldTransferReceipt);
+            event.transferReceipts.splice(index, 1);
+            await event.save();
+        }
         let transferReceipt = new TransferReceipt(req.body);
         transferReceipt.event = req.params.event;
         transferReceipt = await transferReceipt.save();

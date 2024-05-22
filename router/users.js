@@ -6,6 +6,8 @@ import {auth} from "../middleware/auth.js";
 import {sameUser} from "../middleware/sameUser.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
+import {hasUploaded} from "../services/transferReceipts.service.js";
+
 
 
 const router = Router();
@@ -37,15 +39,10 @@ router.get("/getUserById/:id", auth, async (req, res) => {
 
 router.get("/hasUploaded/:user/:event", async (req, res) => {
     try{
-        const event = await Event.findById(req.params.event).populate("transferReceipt");
-        for (const receipt of event.transferReceipts){
-            if (receipt.user == req.params.user){
-                res.status(200).send({"hasUploaded": true});
-            }
-        }
-        res.status(200).send({"hasUploaded": false});
+        const answer = await hasUploaded(req.params.user, req.params.event);
+        return res.status(200).send(answer);
     } catch(e){
-        res.status(500).send(e.message);
+        return res.status(500).send(e.message);
     }
 })
 
