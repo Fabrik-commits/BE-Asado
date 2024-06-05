@@ -14,8 +14,8 @@ const router = Router();
 
 router.get("/getTransferReceiptsByEvent/:event", [auth, shoppingDesignee], async (req, res)=> {
     try{
-        const transferReceipts = await TransferReceipt.find();
-        res.send(transferReceipts);
+        const event = await Event.findOne(req.params.event).populate("transferReceipts");
+        res.send(event.transferReceipts);
     } catch(e){
         res.status(500).send(e.message);
     }
