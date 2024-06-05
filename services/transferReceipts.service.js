@@ -19,12 +19,14 @@ async function hasUploaded(userId, eventId){
         if (receipt.user == userId){
             return {
                 hasUploaded: true,
+                hasReceiptApproved: receipt.hasPaid,
                 transferReceipt: receipt._id
             };
         }
     }
     return {
         hasUploaded: false,
+        hasReceiptApproved: false,
         transferReceipt: null
     };
 }
