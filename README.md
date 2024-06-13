@@ -27,7 +27,7 @@ References:
 | - | login | Logs a user and returns the auth token | POST |  | No | <ul><li>email: String</li> <li>password: String</li></ul> |
 | purchaseReceipts | getPurchaseReceiptsByEvent/:event | Gets all purchaseReceipts from an event providing the event's id (12 byte Object ID) | GET | event | Yes and user token needs to be an event member |  |
 | purchaseReceipts | getPurchaseReceiptById/:id/:event | Gets a single purchaseReceipt by id for a certain event providing the event's id (12 byte Object ID)  | GET | id, event | Yes and user token needs to be an event member |  |
-| purchaseReceipts | createPurchaseReceipt/:event | Creates a purchaseReceipt for a certain event | POST | event | Yes and user token needs to be the shoppingDesignee's | <ul><li>description: String</li> <li>amount: Number</li> <li>(file: png/jpeg/pdf)</li></ul> |
+| purchaseReceipts | createPurchaseReceipt/:event | Creates a purchaseReceipt for a certain event | POST | event | Yes and user token needs to be the shoppingDesignee's | <ul><li>description: String</li> <li>amount: Number</li></ul> |
 | purchaseReceipts | uploadFile/:purchaseReceipt | Uploads a file for a purchaseReceipt | POST | purchaseReceipt | Yes | file: png/jpeg/pdf |
 | purchaseReceipts | deletePurchaseReceipt/:id/:event | Deletes a purchaseReceipt by id for a certain event providing the event's id (12 byte Object ID) | DELETE | id, event | Yes and user token needs to be the shoppingDesignee's |  |
 | password | forgot | Updates verification code for password recovery and sends the recovery email | POST |  | No | <ul><li>email: String</li></ul> |
@@ -36,7 +36,7 @@ References:
 | transferReceipts | getTransferReceiptsByEvent/:event | Gets all transferReceipts from an event providing the event's id (12 byte Object ID) | GET | event | Yes |  |
 | transferReceipts | getTransferReceiptsById/:id | Gets a single transferReceipt by its id (12 byte Object ID) | GET | id | Yes |  |
 | transferReceipts | uploadFile/:transferReceipt | Uploads a file for a transferReceipt | POST | transferReceipt | Yes | file: png/jpeg/pdf |
-| transferReceipts | createTransferReceipt/:event | Creates a transferReceipt for a certain event | POST | event | Yes | <ul><li>description: String</li> <li>amount: Number</li> <li>user: ObjectId of a member</li> <li>(paymentMethod: String)</li> <li>(file: png/jpeg/pdf)</li>  <li>DON'T SEND hasPaid: Boolean or send it as false</li></ul> |
+| transferReceipts | createTransferReceipt/:event | Creates a transferReceipt for a certain event | POST | event | Yes | <ul><li>description: String</li> <li>amount: Number</li> <li>user: ObjectId of a member</li> <li>(paymentMethod: String)</li> <li>DON'T SEND hasPaid: Boolean or send it as false</li></ul> |
 | transferReceipts | approveTransferReceipts/:id | Approves a single transferReceipt by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the shoppingDesignee |  |
 | transferReceipts | deleteTransferReceipt/:id | Deletes a transferReceipt by its id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the receipt owner |  |
 | users | getUsers  | Gets all users in the database | GET |  | Yes |  |
