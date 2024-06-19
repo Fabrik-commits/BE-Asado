@@ -37,11 +37,20 @@ router.get("/getPurchaseReceiptById/:id/:event", [auth, eventParticipant], async
 });
 
 
+router.post("/uploadFile/:purchaseReceipt", [auth, multerUpload.single('file')], async (req, res) => {
+    if (req.file){
+        const imageId = await saveImage(req.file);
+        let purchaseReceipt = await PurchaseReceipt.findById(req.params.purchaseReceipt);
+        purchaseReceipt.image = imageId;
+        await purchaseReceipt.save()
+        res.status(200).send({"imageId": imageId});
+    }
+})
+
+
 router.post("/createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUpload.single("file")], async (req, res)=> {
     try{
-        const imageId = await saveImage(req.file);
         let purchaseReceipt = new PurchaseReceipt(req.body);
-        purchaseReceipt.image = imageId;
         purchaseReceipt = await purchaseReceipt.save();
         const event = await Event.findById(req.params.event);
         event.purchaseReceipts.push(purchaseReceipt);

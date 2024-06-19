@@ -6,7 +6,7 @@ import {transferReceiptOwner} from "../middleware/transferReceiptOwner.js";
 import {shoppingDesignee} from "../middleware/shoppingDesignee.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
-import {isFinished} from "../services/transferReceipts.service.js";
+import {isFinished, hasUploaded} from "../services/transferReceipts.service.js";
 
 
 const router = Router();
@@ -14,8 +14,8 @@ const router = Router();
 
 router.get("/getTransferReceiptsByEvent/:event", [auth, shoppingDesignee], async (req, res)=> {
     try{
-        const transferReceipts = await TransferReceipt.find();
-        res.send(transferReceipts);
+        const event = await Event.findOne(req.params.event).populate("transferReceipts");
+        res.send(event.transferReceipts);
     } catch(e){
         res.status(500).send(e.message);
     }
@@ -36,16 +36,28 @@ router.get("/getTransferReceiptsById/:id", auth, async (req, res)=> {
 });
 
 
+router.post("/uploadFile/:transferReceipt", [auth, multerUpload.single('file')], async (req, res) => {
+    if (req.file){
+        const imageId = await saveImage(req.file);
+        let transferReceipt = await TransferReceipt.findById(req.params.transferReceipt);
+        transferReceipt.image = imageId;
+        await transferReceipt.save()
+        res.status(200).send({"imageId": imageId});
+    }
+})
+
+
 router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')], async (req, res)=> {
     try {
-        let transferReceipt;
-        if (req.file){
-            const imageId = await saveImage(req.file);
-            transferReceipt = new TransferReceipt(req.body);
-            transferReceipt.image = imageId;
-        } else {
-            transferReceipt = new TransferReceipt(req.body);
+        const hasUploadedValue = await hasUploaded(req.body.user, req.params.event)
+        if (hasUploadedValue.hasUploaded){
+            let oldTransferReceipt = await TransferReceipt.findByIdAndRemove(hasUploadedValue.transferReceipt);
+            let event = await Event.findById(req.params.event);
+            const index = event.transferReceipts.indexOf(oldTransferReceipt);
+            event.transferReceipts.splice(index, 1);
+            await event.save();
         }
+        let transferReceipt = new TransferReceipt(req.body);
         transferReceipt.event = req.params.event;
         transferReceipt = await transferReceipt.save();
         const event = await Event.findById(req.params.event);

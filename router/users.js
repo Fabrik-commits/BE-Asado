@@ -6,6 +6,8 @@ import {auth} from "../middleware/auth.js";
 import {sameUser} from "../middleware/sameUser.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
+import {hasUploaded} from "../services/transferReceipts.service.js";
+
 
 
 const router = Router();
@@ -33,6 +35,16 @@ router.get("/getUserById/:id", auth, async (req, res) => {
         res.status(500).send(e.message);
     }
 });
+
+
+router.get("/hasUploaded/:user/:event", async (req, res) => {
+    try{
+        const answer = await hasUploaded(req.params.user, req.params.event);
+        return res.status(200).send(answer);
+    } catch(e){
+        return res.status(500).send(e.message);
+    }
+})
 
 
 router.get("/isDebtor/:id", [auth], async (req, res) => {
