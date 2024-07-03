@@ -29,7 +29,7 @@ References:
 | purchaseReceipts | getPurchaseReceiptById/:id/:event | Gets a single purchaseReceipt by id for a certain event providing the event's id (12 byte Object ID)  | GET | id, event | Yes and user token needs to be an event member |  |
 | purchaseReceipts | createPurchaseReceipt/:event | Creates a purchaseReceipt for a certain event | POST | event | Yes and user token needs to be the shoppingDesignee's | <ul><li>description: String</li> <li>amount: Number</li></ul> |
 | purchaseReceipts | uploadFile/:purchaseReceipt | Uploads a file for a purchaseReceipt | POST | purchaseReceipt | Yes | file: png/jpeg/pdf |
-| purchaseReceipts | deletePurchaseReceipt/:id/:event | Deletes a purchaseReceipt by id for a certain event providing the event's id (12 byte Object ID) | DELETE | id, event | Yes and user token needs to be the shoppingDesignee's |  |
+| purchaseReceipts | deletePurchaseReceipt/:id | Deletes a purchaseReceipt by id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the shoppingDesignee's |  |
 | password | forgot | Updates verification code for password recovery and sends the recovery email | POST |  | No | <ul><li>email: String</li></ul> |
 | password | verifyCode | Verifies if the code for password recovery is correct | PUT |  | No | <ul><li>verificationCode: String</li></ul> |
 | password | recover | Changes user's password providing the correct verification code | PUT |  | No | <ul><li>email: String</li> <li>verificationCode: String</li> <li>password: String</li></ul> |

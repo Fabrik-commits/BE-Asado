@@ -17,6 +17,12 @@ const purchaseReceiptSchema = new mongoose.Schema({
     amount: {
         type: Number,
         required: true
+    },
+
+    event: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event',
+        required: true
     }
 
 });
