@@ -63,7 +63,7 @@ router.post("/createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUplo
 });
 
 
-router.delete("/deletePurchaseReceipt/:id", [auth, shoppingDesignee], async (req, res) => {
+router.delete("/deletePurchaseReceipt/:id/:event", [auth, shoppingDesignee], async (req, res) => {
     try {
         const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id);
         if (!purchaseReceipt) return res.status(404).send("The purchase receipt with the given ID was not found.");
