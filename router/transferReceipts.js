@@ -91,13 +91,14 @@ router.put('/approveTransferReceipt/:id', [auth, shoppingDesignee], async (req, 
 
 router.delete('/deleteTransferReceipt/:id', [auth, transferReceiptOwner], async (req, res) => {
     try{
-        const transferReceipt = await TransferReceipt.findByIdAndRemove(req.params.id);
+        const transferReceipt = await TransferReceipt.findByIdAndDelete(req.params.id);
         if (!transferReceipt) return res.status(404).send('The transfer receipt with the given ID was not found.');
-        const event = await Event.findById(req.params.event);
-        const index = event.transferReceipts.indexOf(transferReceipt);
+        const eventId = transferReceipt.event
+        const event = await Event.findById(eventId);
+        const index = event.transferReceipts.indexOf(transferReceipt._id);
         event.transferReceipts.splice(index, 1);
         await event.save();
-        res.send(transferReceipt);
+        res.status(200).send(transferReceipt);
     } catch(e){
         res.status(500).send(e.message);
     }

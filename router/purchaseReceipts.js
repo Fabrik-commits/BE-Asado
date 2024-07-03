@@ -51,6 +51,7 @@ router.post("/uploadFile/:purchaseReceipt", [auth, multerUpload.single('file')],
 router.post("/createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUpload.single("file")], async (req, res)=> {
     try{
         let purchaseReceipt = new PurchaseReceipt(req.body);
+        purchaseReceipt.event = req.params.event;
         purchaseReceipt = await purchaseReceipt.save();
         const event = await Event.findById(req.params.event);
         event.purchaseReceipts.push(purchaseReceipt);
@@ -62,13 +63,13 @@ router.post("/createPurchaseReceipt/:event", [auth, shoppingDesignee, multerUplo
 });
 
 
-router.delete("/deletePurchaseReceipt/:id/:event", [auth, shoppingDesignee], async (req, res) => {
+router.delete("/deletePurchaseReceipt/:id", [auth, shoppingDesignee], async (req, res) => {
     try {
         const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id);
         if (!purchaseReceipt) return res.status(404).send("The purchase receipt with the given ID was not found.");
-        const event = await Event.findById(req.params.event);
-        const index = event.purchaseReceipts.indexOf(purchaseReceipt);
-        if (index === -1) return res.status(404).send("The receipt with the given ID is not part of the event.");
+        const eventId = purchaseReceipt.event
+        const event = await Event.findById(eventId);
+        const index = event.purchaseReceipts.indexOf(purchaseReceipt._id);
         event.purchaseReceipts.splice(index, 1);
         await event.save();
         res.status(200).send(purchaseReceipt);
