@@ -6,8 +6,6 @@ import {auth} from "../middleware/auth.js";
 import {sameUser} from "../middleware/sameUser.js";
 import {multerUpload} from "../middleware/multerUpload.js";
 import {saveImage} from "../services/images.service.js";
-import {hasUploaded} from "../services/transferReceipts.service.js";
-
 
 
 const router = Router();
