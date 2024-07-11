@@ -5,6 +5,7 @@ import {auth} from "../middleware/auth.js";
 import {eventOrganizer} from "../middleware/eventOrganizer.js";
 import {sameUser} from "../middleware/sameUser.js";
 import {getPublicEvents, getEvents, deleteEvents} from "../services/events.service.js";
+import {hasUploaded} from "../services/transferReceipts.service.js";
 
 
 const router = Router();
