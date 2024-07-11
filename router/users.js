@@ -37,9 +37,9 @@ router.get("/getUserById/:id", auth, async (req, res) => {
 });
 
 
-router.get("/hasUploaded/:user/:event", async (req, res) => {
+router.get("/getMembersAndReceiptsInfo/:event", async (req, res) => {
     try{
-        const answer = await hasUploaded(req.params.user, req.params.event);
+        const answer = await hasUploaded(req.params.event);
         return res.status(200).send(answer);
     } catch(e){
         return res.status(500).send(e.message);
