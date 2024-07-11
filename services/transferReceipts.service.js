@@ -13,22 +13,39 @@ async function isFinished(eventId){
 }
 
 
-async function hasUploaded(userId, eventId){
-    const event = await Event.findById(eventId).populate("transferReceipts");
-    for (const receipt of event.transferReceipts){
-        if (receipt.user == userId){
-            return {
-                hasUploaded: true,
-                hasReceiptApproved: receipt.hasPaid,
-                transferReceipt: receipt._id
-            };
+async function hasUploaded(eventId){
+    const event = await Event.findById(eventId).populate("members transferReceipts");
+    const membersWithReceipts = []
+    const receiptInfo = []
+    for (let receipt of event.transferReceipts){
+        membersWithReceipts.push(String(receipt.user))
+        receiptInfo.push({
+            hasReceiptApproved: receipt.hasPaid,
+            transferReceipt: receipt._id
+        })
+    }
+    const members = []
+    for (let member of event.members){
+        if (membersWithReceipts.includes(String(member._id))){
+            const index = membersWithReceipts.indexOf(String(member._id))
+            members.push({
+                userId: member._id,
+                userName: member.name,
+                transferReceipt: receiptInfo[index].transferReceipt,
+                hasReceiptApproved: receiptInfo[index].hasReceiptApproved,
+                hasUploaded: true
+            })
+        } else {
+            members.push({
+                userId: member._id,
+                userName: member.name,
+                transferReceipt: null,
+                hasReceiptApproved: null,
+                hasUploaded: false
+            })
         }
     }
-    return {
-        hasUploaded: false,
-        hasReceiptApproved: false,
-        transferReceipt: null
-    };
+    return members
 }
 
 
