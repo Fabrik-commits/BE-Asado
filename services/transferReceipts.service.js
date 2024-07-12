@@ -4,7 +4,7 @@ import {Event} from "../models/event.js";
 
 async function isFinished(eventId){
     const event = await Event.findById(eventId).populate("transferReceipts")
-    for (receipt of event.transferReceipts){
+    for (let receipt of event.transferReceipts){
         if (!receipt.hasPaid) {
             return false
         }
