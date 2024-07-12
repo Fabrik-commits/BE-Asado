@@ -70,7 +70,7 @@ router.post("/createTransferReceipt/:event", [auth, multerUpload.single('file')]
 });
 
 
-router.put('/approveTransferReceipt/:id', [auth, shoppingDesignee], async (req, res) => {
+router.put('/approveTransferReceipt/:id/:event', [auth, shoppingDesignee], async (req, res) => {
     try {
         let transferReceipt = await TransferReceipt.findById(req.params.id);
         if (!transferReceipt) return res.status(404).send('The transfer receipt with the given ID was not found.');
@@ -89,7 +89,7 @@ router.put('/approveTransferReceipt/:id', [auth, shoppingDesignee], async (req, 
 })
 
 
-router.delete('/deleteTransferReceipt/:id', [auth, transferReceiptOwner], async (req, res) => {
+router.delete('/deleteTransferReceipt/:id', [auth], async (req, res) => {
     try{
         const transferReceipt = await TransferReceipt.findByIdAndDelete(req.params.id);
         if (!transferReceipt) return res.status(404).send('The transfer receipt with the given ID was not found.');
