@@ -13,7 +13,7 @@ async function isFinished(eventId){
 }
 
 
-async function hasUploaded(eventId){
+async function membersWhoHaveUploaded(eventId){
     const event = await Event.findById(eventId).populate("members transferReceipts");
     const membersWithReceipts = []
     const receiptInfo = []
@@ -49,4 +49,23 @@ async function hasUploaded(eventId){
 }
 
 
-export {isFinished, hasUploaded}
+async function hasUploaded(userId, eventId){
+    const event = await Event.findById(eventId).populate("transferReceipts");
+    for (const receipt of event.transferReceipts){
+        if (receipt.user == userId){
+            return {
+                hasUploaded: true,
+                hasReceiptApproved: receipt.hasPaid,
+                transferReceipt: receipt._id
+            };
+        }
+    }
+    return {
+        hasUploaded: false,
+        hasReceiptApproved: false,
+        transferReceipt: null
+    };
+}
+
+
+export {isFinished, membersWhoHaveUploaded, hasUploaded}
