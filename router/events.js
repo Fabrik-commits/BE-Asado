@@ -5,7 +5,7 @@ import {auth} from "../middleware/auth.js";
 import {eventOrganizer} from "../middleware/eventOrganizer.js";
 import {sameUser} from "../middleware/sameUser.js";
 import {getPublicEvents, getEvents, deleteEvents} from "../services/events.service.js";
-import {hasUploaded} from "../services/transferReceipts.service.js";
+import {membersWhoHaveUploaded} from "../services/transferReceipts.service.js";
 
 
 const router = Router();
@@ -53,7 +53,7 @@ router.get("/getEventById/:id", auth, async (req, res) => {
 
 router.get("/getMembersAndReceiptsInfo/:event", async (req, res) => {
     try{
-        const answer = await hasUploaded(req.params.event);
+        const answer = await membersWhoHaveUploaded(req.params.event);
         return res.status(200).send(answer);
     } catch(e){
         return res.status(500).send(e.message);
