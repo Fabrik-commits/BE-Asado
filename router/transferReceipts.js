@@ -77,7 +77,7 @@ router.put('/approveTransferReceipt/:id/:event', [auth, shoppingDesignee], async
         if (transferReceipt.hasPaid) return res.status(400).send('The transfer receipt is already approved.')
         transferReceipt.hasPaid = true;
         await transferReceipt.save();
-        if (isFinished(transferReceipt.event)) {
+        if (await isFinished(transferReceipt.event)) {
             const event = await Event.findById(transferReceipt.event);
             event.state = 'finished'
             await event.save()
