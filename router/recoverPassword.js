@@ -13,6 +13,7 @@ const BREVO_URL = process.env.BREVO_URL;
 const router = Router();
 
 router.post("/forgot", async (req, res) => {
+    req.body.email = req.body.email.toLowerCase()
     const user = await User.findOne({email: req.body.email}).exec();
     if(!user) return res.status(404).send("User does not exist.");
     const code = Math.floor(Math.random() * 900000) + 100000;
@@ -29,6 +30,7 @@ router.post("/forgot", async (req, res) => {
 
 
 router.put("/verifyCode", async (req, res) => {
+    req.body.email = req.body.email.toLowerCase()
     const user = await User.findOne({email: req.body.email}).exec();
     if (!user) return res.status(404).send('User does not exist');
     const validCode = await bcrypt.compare(req.body.verificationCode, user.verificationCode);
@@ -41,6 +43,7 @@ router.put("/verifyCode", async (req, res) => {
 
 
 router.put("/recover", async (req, res)=>{
+    req.body.email = req.body.email.toLowerCase()
     const user = await User.findOne({email: req.body.email}).exec();
     if (!user) return res.status(404).send('User does not exist.');
     if (user.verificationCode === null) return res.status(400).send('User never requested a password change.');

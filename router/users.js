@@ -68,7 +68,7 @@ router.get("/isDebtor/:id", [auth], async (req, res) => {
 
 router.post("/register", /*multerUpload.single('file'),*/ async (req, res) => {
     try{
-        
+        req.body.email = req.body.email.toLowerCase()
         const existingUser = await User.findOne({email: req.body.email});
         if (existingUser) return res.status(400).send('User already registered');
         // const imageId = await saveImage(req.file);
