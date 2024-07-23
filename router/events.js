@@ -77,15 +77,22 @@ router.post("/createEvent", auth, async (req, res) => {
 
 
 router.put("/subscribeToAnEvent/:id/:event", [auth, sameUser], async (req, res) => {
-    if(!req.params.event) return res.status(400).send("No event ID provided.")
-    const event = await Event.findById(req.params.event);
-    if(!event) return res.status(404).send("The event with the given ID was not found.");
-    if(event.state !== "available") return res.status(400).send("The event is not available for users to join");
-    const user = await User.findById(req.params.id);
-    event.members.push(user);
-    if (event.members.length == event.memberLimit) event.state = 'full';
-    await event.save();
-    res.status(200).send(event);
+    try{
+        if(!req.params.event) return res.status(400).send("No event ID provided.")
+        const event = await Event.findById(req.params.event);
+        if(!event) return res.status(404).send("The event with the given ID was not found.");
+        if(event.state !== "available") return res.status(400).send("The event is not available for users to join");
+        if (event.members.includes(req.params.id) ){
+            return res.status(400).send("The user has already joined the event")
+        }
+        const user = await User.findById(req.params.id);
+        event.members.push(user);
+        if (event.members.length == event.memberLimit) event.state = 'full';
+        await event.save();
+        return res.status(200).send(event);
+    } catch (e) {
+        return res.status(500).send(e.message);
+    }
 })
 
 
