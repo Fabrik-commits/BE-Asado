@@ -38,12 +38,16 @@ router.get("/getPurchaseReceiptById/:id/:event", [auth, eventParticipant], async
 
 
 router.post("/uploadFile/:purchaseReceipt", [auth, multerUpload.single('file')], async (req, res) => {
-    if (req.file){
-        const imageId = await saveImage(req.file);
-        let purchaseReceipt = await PurchaseReceipt.findById(req.params.purchaseReceipt);
-        purchaseReceipt.image = imageId;
-        await purchaseReceipt.save()
-        res.status(200).send({"imageId": imageId});
+    try{
+        if (req.file){
+            const imageId = await saveImage(req.file);
+            let purchaseReceipt = await PurchaseReceipt.findById(req.params.purchaseReceipt);
+            purchaseReceipt.image = imageId;
+            await purchaseReceipt.save()
+            res.status(200).send({"imageId": imageId});
+        }
+    } catch(e){
+        res.status(500).send(e.message);
     }
 })
 
