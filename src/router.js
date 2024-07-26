@@ -6,7 +6,7 @@ import {login} from './controllers/login.js';
 import {getPurchaseReceiptsByEvent, getPurchaseReceiptById, uploadFilePurchaseReceipt, createPurchaseReceipt, deletePurchaseReceipt} from './controllers/purchaseReceipts.js';
 import {forgot, verifyCode, recover} from "./controllers/password.js";
 import {getTransferReceiptsByEvent, getTransferReceiptsById, uploadFileTransferReceipt, createTransferReceipt, approveTransferReceipt, deleteTransferReceipt} from "./controllers/transferReceipts.js";
-import {getUsers, getUserById, isDebtor, register, editUser, editProfilePicture, deleteUser} from "./controllers/users.js"
+import {getUsers, getUserById, isDebtor, register, editUser, editProfilePicture, deleteUser} from "./controllers/users.js";
 
 
 const router = express.Router();
