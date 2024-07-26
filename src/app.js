@@ -32,6 +32,6 @@ app.get('/', (req, res) => {
 app.use('/api', router)
 
 // connecting to database
-await connectDB();
+connectDB();
 
 export default app;

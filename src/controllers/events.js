@@ -34,7 +34,7 @@ export async function getPublicEvents(req, res){
                 }
             );
         }
-        return res.send(publicEvents);
+        return res.status(200).json(publicEvents);
     } catch(e){
         return res.status(500).send(e.message);
     }
