@@ -137,7 +137,7 @@ export async function membersWhoHaveUploaded(eventId){
         } else {
             members.push({
                 userId: member._id,
-                userName: member.name,,
+                userName: member.name,
                 userLastName: member.lastName,
                 transferReceipt: null,
                 hasReceiptApproved: null,
