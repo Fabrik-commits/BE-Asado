@@ -42,7 +42,7 @@ router.get('/images/getImage/:id', auth, getImage);
 
 
 // login
-router.post('/login', login)
+router.post('/login', login);
 
 
 // purchaseReceipts routes
@@ -52,7 +52,7 @@ router.get("/purchaseReceipts/getPurchaseReceiptById/:id/:event", [auth, eventPa
 router.post("/purchaseReceipts/uploadFile/:purchaseReceipt", [auth, multerUpload.single('file')], uploadFilePurchaseReceipt);
 router.post("/purchaseReceipts/createPurchaseReceipt/:event", [auth, shoppingDesignee], createPurchaseReceipt);
 
-router.delete("/purchaseReceipts/deletePurchaseReceipt/:id/:event", [auth, shoppingDesignee], deletePurchaseReceipt)
+router.delete("/purchaseReceipts/deletePurchaseReceipt/:id/:event", [auth, shoppingDesignee], deletePurchaseReceipt);
 
 
 // password routes
@@ -84,7 +84,7 @@ router.post("/users/register", register);
 router.put("/users/editUser/:id", [auth, sameUser], editUser);
 router.put("/users/editProfilePicture/:id", [auth, sameUser, multerUpload.single("file")], editProfilePicture);
 
-router.delete('/users/deleteUser/:id', [auth, sameUser] , deleteUser)
+router.delete('/users/deleteUser/:id', [auth, sameUser] , deleteUser);
 
 
 export default router;
