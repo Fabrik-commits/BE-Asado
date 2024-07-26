@@ -174,8 +174,3 @@ async function deleteEvents(){
         }
     } 
 }
-
-export function test(req, res){
-        let dos = 1 + 1
-        return res.send(dos.toString());
-}
