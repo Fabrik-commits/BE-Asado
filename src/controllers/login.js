@@ -1,11 +1,8 @@
-import {Router} from 'express';
 import bcrypt from 'bcrypt';
 import {User} from '../models/user.js';
 
 
-const router = Router();
-
-router.post('/', async (req, res) => {
+export async function login (req, res) {
     try {
         req.body.email = req.body.email.toLowerCase()
         const existingUser = await User.findOne({email: req.body.email});
@@ -21,7 +18,4 @@ router.post('/', async (req, res) => {
     } catch(e){
         res.status(500).send(e.message);
     }
-});
-
-
-export default router;
+};

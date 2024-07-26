@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import {Router} from "express";
 import bcrypt from "bcrypt";
 import https from "https";
 import {User} from "../models/user.js";
@@ -10,10 +9,8 @@ dotenv.config();
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const BREVO_URL = process.env.BREVO_URL;
 
-const router = Router();
-
-router.post("/forgot", async (req, res) => {
-    req.body.email = req.body.email.toLowerCase()
+export async function forgot(req, res) {
+    req.body.email = req.body.email.toLowerCase();
     const user = await User.findOne({email: req.body.email}).exec();
     if(!user) return res.status(404).send("User does not exist.");
     const code = Math.floor(Math.random() * 900000) + 100000;
@@ -26,11 +23,11 @@ router.post("/forgot", async (req, res) => {
     } catch (error) {
         res.status(500).send(error);
     }
-});
+}
 
 
-router.put("/verifyCode", async (req, res) => {
-    req.body.email = req.body.email.toLowerCase()
+export async function verifyCode(req, res) {
+    req.body.email = req.body.email.toLowerCase();
     const user = await User.findOne({email: req.body.email}).exec();
     if (!user) return res.status(404).send('User does not exist');
     const validCode = await bcrypt.compare(req.body.verificationCode, user.verificationCode);
@@ -39,11 +36,11 @@ router.put("/verifyCode", async (req, res) => {
     } else {
         return res.status(400).send('Invalid verification code.');
     }
-})
+}
 
 
-router.put("/recover", async (req, res)=>{
-    req.body.email = req.body.email.toLowerCase()
+export async function recover(req, res) {
+    req.body.email = req.body.email.toLowerCase();
     const user = await User.findOne({email: req.body.email}).exec();
     if (!user) return res.status(404).send('User does not exist.');
     if (user.verificationCode === null) return res.status(400).send('User never requested a password change.');
@@ -54,7 +51,7 @@ router.put("/recover", async (req, res)=>{
     user.verificationCode = null;
     await user.save();
     res.status(200).send("Password was updated correctly.");
-})
+}
 
 
 function sendMail(email, name, code) {
@@ -91,6 +88,3 @@ function sendMail(email, name, code) {
     req.write(data);
     req.end();
 }
-
-
-export default router;

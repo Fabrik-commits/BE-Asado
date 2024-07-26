@@ -1,37 +1,47 @@
-import {Router} from "express";
 import {Event} from "../models/event.js";
 import {User} from "../models/user.js";
-import {auth} from "../middleware/auth.js";
-import {eventOrganizer} from "../middleware/eventOrganizer.js";
-import {sameUser} from "../middleware/sameUser.js";
-import {getPublicEvents, getEvents, deleteEvents} from "../services/events.service.js";
-import {membersWhoHaveUploaded} from "../services/transferReceipts.service.js";
+import {membersWhoHaveUploaded} from "./transferReceipts.js";
 
-
-const router = Router();
-
-
-router.get("/getEvents", auth, async (req, res) => {
+export async function getEvents(req, res) {
     try{
-        const events = await getEvents(req.params.limit);
-        res.send(events);
+        const events = await Event.find().sort({"datetime": -1, ":id": 1}).limit(limit);
+        return res.send(events);
     } catch(e){
-        res.status(500).send(e.message);
+        return res.status(500).send(e.message);
     }
-});
+}
 
 
-router.get("/getPublicEvents", async (req, res) => {
+export async function getPublicEvents(req, res){
     try{
-        const publicEvents = await getPublicEvents();
-        res.send(publicEvents);
+        const events = await Event
+            .find()        
+            .select("datetime description state chef memberLimit members title")
+            .sort({"_id": -1})
+            .populate("chef", "name");
+        const publicEvents = [];
+        for (let event of events) {
+            publicEvents.push(
+                {
+                    _id: event.id,
+                    title: event.title,
+                    datetime: event.datetime,
+                    description: event.description,
+                    state: event.state,
+                    chef: event.chef ? event.chef.name : null,
+                    memberLimit: event.memberLimit,
+                    members: event.members.length,
+                }
+            );
+        }
+        return res.send(publicEvents);
     } catch(e){
-        res.status(500).send(e.message);
+        return res.status(500).send(e.message);
     }
-})
+}
 
 
-router.get("/getEventById/:id", auth, async (req, res) => {
+export async function getEventById(req, res) {
     try{
         const event = await Event.findById(req.params.id)
             .populate("members")
@@ -43,25 +53,25 @@ router.get("/getEventById/:id", auth, async (req, res) => {
         if (!event) {
             return res.status(404).send("The event with the given ID was not found.");
         } else {
-            res.send(event);
+            return res.send(event);
         }
     } catch(e){
-        res.status(500).send(e.message);
+        return res.status(500).send(e.message);
     }
-});
+}
 
 
-router.get("/getMembersAndReceiptsInfo/:event", async (req, res) => {
+export async function getMembersAndReceiptsInfo(req, res) {
     try{
         const answer = await membersWhoHaveUploaded(req.params.event);
         return res.status(200).send(answer);
     } catch(e){
         return res.status(500).send(e.message);
     }
-})
+}
 
 
-router.post("/createEvent", auth, async (req, res) => {
+export async function createEvent(req, res) {
     try{
         let event = new Event(req.body);
         event.chef = req.body.isChef ? req.body.organizer : null;
@@ -69,21 +79,21 @@ router.post("/createEvent", auth, async (req, res) => {
         if (event.memberLimit == 1) event.state == 'full'
         event = await event.save();
         await deleteEvents()
-        res.status(201).send(event);
+        return res.status(201).send(event);
     } catch(e){
-        res.status(500).send(e.message);
+        return res.status(500).send(e.message);
     }
-});
+}
 
 
-router.put("/subscribeToAnEvent/:id/:event", [auth, sameUser], async (req, res) => {
+export async function subscribeToAnEvent(req, res) {
     try{
-        if(!req.params.event) return res.status(400).send("No event ID provided.")
+        if(!req.params.event) return res.status(400).send("No event ID provided.");
         const event = await Event.findById(req.params.event);
         if(!event) return res.status(404).send("The event with the given ID was not found.");
         if(event.state !== "available") return res.status(400).send("The event is not available for users to join");
         if (event.members.includes(req.params.id) ){
-            return res.status(400).send("The user has already joined the event")
+            return res.status(400).send("The user has already joined the event");
         }
         const user = await User.findById(req.params.id);
         event.members.push(user);
@@ -93,23 +103,27 @@ router.put("/subscribeToAnEvent/:id/:event", [auth, sameUser], async (req, res) 
     } catch (e) {
         return res.status(500).send(e.message);
     }
-})
+}
 
 
-router.put("/unsubscribeFromEvent/:id/:event", [auth, sameUser], async (req, res) => {
-    if(!req.params.event) return res.status(400).send("No event ID provided.")
-    const event = await Event.findById(req.params.event);
-    if(!event) return res.status(404).send("The event with the given ID was not found.");
-    const index = event.members.indexOf(req.params.id);
-    if (index === -1) return res.status(404).send("The member with the given ID is not part of the event.");
-    if (event.members.length == event.memberLimit) event.state = 'available';
-    event.members.splice(index, 1);
-    await event.save();
-    res.status(200).send(event);
-})
+export async function unsubscribeFromEvent(req, res) {
+    try {
+        if(!req.params.event) return res.status(400).send("No event ID provided.");
+        const event = await Event.findById(req.params.event);
+        if(!event) return res.status(404).send("The event with the given ID was not found.");
+        const index = event.members.indexOf(req.params.id);
+        if (index === -1) return res.status(404).send("The member with the given ID is not part of the event.");
+        if (event.members.length == event.memberLimit) event.state = 'available';
+        event.members.splice(index, 1);
+        await event.save();
+        res.status(200).send(event);
+    } catch(e){
+        return res.status(500).send(e.message);
+    }
+}
 
 
-router.put("/editRoles/:id", auth, async (req, res) => {
+export async function editRoles(req, res) {
     try {
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).send("The event with the given ID was not found.");
@@ -120,10 +134,10 @@ router.put("/editRoles/:id", auth, async (req, res) => {
     } catch (e) {
         res.status(500).send(e.message);
     }
-})
+}
 
 
-router.put("/editEvent/:id", [auth, eventOrganizer], async (req, res) => {
+export async function editEvent (req, res) {
     try{
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).send("The event with the given ID was not found.");
@@ -136,10 +150,10 @@ router.put("/editEvent/:id", [auth, eventOrganizer], async (req, res) => {
     } catch(e){
         res.status(500).send(e.message);
     }
-});
+}
 
 
-router.delete('/deleteEvent/:id', [auth, eventOrganizer], async (req, res) => {
+export async function deleteEvent(req, res) {
     try{
         const event = await Event.findByIdAndRemove(req.params.id);
         if (!event) return res.status(404).send('The event with the given ID was not found.');
@@ -147,7 +161,16 @@ router.delete('/deleteEvent/:id', [auth, eventOrganizer], async (req, res) => {
     } catch(e){
         res.status(500).send(e.message);
     }
-});
+}
 
 
-export default router;
+async function deleteEvents(){
+    const totalEvents = await Event.count()
+    if (totalEvents > 6){
+        let matches = await Event.find({"state": "finished"}).sort({datetime: "asc"})
+        if (matches.length > 0) {
+            const deletedId = matches[0].id
+            const deleted = await Event.deleteOne({_id: deletedId})
+        }
+    } 
+}
