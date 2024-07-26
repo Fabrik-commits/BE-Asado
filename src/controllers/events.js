@@ -176,6 +176,6 @@ async function deleteEvents(){
 }
 
 export function test(req, res){
-    let dos = 1 + 1
-    res.send(dos)
+        let dos = 1 + 1
+        return res.send(dos.toString());
 }
