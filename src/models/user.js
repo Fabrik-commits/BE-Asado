@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
         validate: {
             validator: function (v){
                 if (!v) return false;
-                if (v == "david.gallegos@gmail.com") return true;
+                if (v == "davidmartingallegos@gmail.com") return true;
                 let username, domain, rest
                 [username, domain, ...rest] = v.split("@");
                 if (rest.length) return false;
