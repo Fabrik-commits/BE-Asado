@@ -102,6 +102,7 @@ export async function deleteTransferReceipt(req, res) {
 
 export async function isFinished(eventId){
     const event = await Event.findById(eventId).populate("transferReceipts")
+    if (event.members.length - 1 > event.transferReceipts.length) return false
     for (let receipt of event.transferReceipts){
         if (!receipt.hasPaid) {
             return false
