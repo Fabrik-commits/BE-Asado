@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import {User} from "../models/user.js";
 import {Event} from "../models/event.js";
+import {hasUploaded} from "./transferReceipts.js";
 
 
 export async function getUsers(req, res){
@@ -28,32 +29,31 @@ export async function getUserById(req, res) {
 
 
 export async function isDebtor(req, res) {
-    const eventsWithoutReceipts = await Event.find({
-                                                    "members": req.params.id,
-                                                    "shoppingDesignee": {
-                                                        $ne: req.params.id
-                                                    },
-                                                    "state": {
-                                                        $nin: ["available", "full", "cancelled"]
-                                                    }
-    }).populate("transferReceipts");
+    try {
+        const eventsWithoutReceipts = await Event.find({
+                                                        "members": req.params.id,
+                                                        "shoppingDesignee": {
+                                                            $ne: req.params.id
+                                                        },
+                                                        "state": "closed"
+        });
 
-    for (const event of eventsWithoutReceipts) {
-        let hasReceipts = false
-        for (const receipt of event.transferReceipts) {
-            if (receipt.user == req.params.id && receipt.hasPaid) {
-                hasReceipts = true
-                break
-            }
-            if (receipt.user == req.params.id && (!receipt.hasPaid)) {
-                return res.status(200).send({"eventId": event.id, "reason": "Receipt is not approved by Shopping Designee."})
+        for (const event of eventsWithoutReceipts) {
+            const uploadInfo = await hasUploaded(req.params.id, event.id)
+            if (uploadInfo.hasUploaded){
+                if (uploadInfo.hasReceiptApproved){
+                    continue
+                } else {
+                    return res.status(200).send({"eventId": event.id, "reason": "Receipt is not approved by Shopping Designee."})
+                }
+            } else {
+                return res.status(200).send({"eventId": event.id, "reason": "Transfer Receipt hasn't been uploaded yet."})
             }
         }
-        if (!hasReceipts) {
-            return res.status(200).send({"eventId": event.id, "reason": "Transfer Receipt hasn't been uploaded yet."})
-        }
+        return res.status(200).send({"eventId": null, "reason": "User has no debts."})
+    } catch(e) {
+        return res.status(500).send(e)
     }
-    return res.status(200).send({"eventId": null})
 }
 
 
