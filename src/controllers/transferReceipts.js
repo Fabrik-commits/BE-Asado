@@ -138,6 +138,7 @@ export async function membersWhoHaveUploaded(eventId){
             members.push({
                 userId: member._id,
                 userName: member.name,
+                userLastName: member.lastName,
                 transferReceipt: null,
                 hasReceiptApproved: null,
                 hasUploaded: false
