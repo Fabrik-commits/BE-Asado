@@ -1,8 +1,20 @@
+import {Image} from "../models/image.js";
 import {extname} from 'path';
-import {Image} from '../models/image.js';
 
 
-async function saveImage(file){
+export async function getImage (req, res) {
+    try{
+        const id = req.params.id;
+        const image = await Image.findById(id);
+        res.contentType(image.mimetype);
+        res.status(200).send(image.image);
+    } catch {
+        res.status(500).send(e.message);
+    }
+}
+
+
+export async function saveImage(file){
     if(!file) {
         throw new Error('No file provided');
     }
@@ -19,5 +31,3 @@ function createImageName(file){
     const fileName = file.originalname.split(fileExtension)[0];
     return `${fileName}_${Date.now()}${fileExtension}`;
 }
-
-export {saveImage as saveImage};
