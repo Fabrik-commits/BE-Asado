@@ -12,15 +12,6 @@ import {getUsers, getUserById, isDebtor, register, editUser, editProfilePicture,
 const router = express.Router();
 
 
-//default routes
-
-router.get('/', (req, res) => {
-	res.json({
-		message: 'Eat Asado API'
-	});
-});
-
-
 // events routes
 router.get("/events/getEvents", auth, getEvents);
 router.get("/events/getPublicEvents", getPublicEvents);
