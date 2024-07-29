@@ -63,15 +63,15 @@ router.put("/password/recover", recover);
 
 
 // transferReceipts routes
-router.get("/events/getTransferReceiptsByEvent/:event", [auth, shoppingDesignee], getTransferReceiptsByEvent);
-router.get("/events/getTransferReceiptsById/:event", auth, getTransferReceiptsById);
+router.get("/transferReceipts/getTransferReceiptsByEvent/:event", [auth, shoppingDesignee], getTransferReceiptsByEvent);
+router.get("/transferReceipts/getTransferReceiptsById/:event", auth, getTransferReceiptsById);
 
-router.post("/events/uploadFile/:transferReceipt", [auth, multerUpload.single('file')], uploadFileTransferReceipt);
-router.post("/events/createTransferReceipt/:event", auth, createTransferReceipt);
+router.post("/transferReceipts/uploadFile/:transferReceipt", [auth, multerUpload.single('file')], uploadFileTransferReceipt);
+router.post("/transferReceipts/createTransferReceipt/:event", auth, createTransferReceipt);
 
-router.put('/events/approveTransferReceipt/:id/:event', [auth, shoppingDesignee], approveTransferReceipt);
+router.put('/transferReceipts/approveTransferReceipt/:id/:event', [auth, shoppingDesignee], approveTransferReceipt);
 
-router.delete('/events/deleteTransferReceipt/:id', [auth], deleteTransferReceipt);
+router.delete('/transferReceipts/deleteTransferReceipt/:id', [auth], deleteTransferReceipt);
 
 
 //users routes
