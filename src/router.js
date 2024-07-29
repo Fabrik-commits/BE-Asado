@@ -64,7 +64,7 @@ router.put("/password/recover", recover);
 
 // transferReceipts routes
 router.get("/transferReceipts/getTransferReceiptsByEvent/:event", [auth, shoppingDesignee], getTransferReceiptsByEvent);
-router.get("/transferReceipts/getTransferReceiptsById/:event", auth, getTransferReceiptsById);
+router.get("/transferReceipts/getTransferReceiptsById/:id", auth, getTransferReceiptsById);
 
 router.post("/transferReceipts/uploadFile/:transferReceipt", [auth, multerUpload.single('file')], uploadFileTransferReceipt);
 router.post("/transferReceipts/createTransferReceipt/:event", auth, createTransferReceipt);
