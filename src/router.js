@@ -32,7 +32,7 @@ router.post("/events/createEvent", auth, createEvent);
 router.put("/events/subscribeToAnEvent/:id/:event", [auth, sameUser], subscribeToAnEvent);
 router.put("/events/unsubscribeFromEvent/:id/:event", [auth, sameUser], unsubscribeFromEvent);
 router.put("/events/editRoles/:id", auth, editRoles);
-router.put("events/editEvent/:id", [auth, eventOrganizer], editEvent);
+router.put("/events/editEvent/:id", [auth, eventOrganizer], editEvent);
 
 router.delete('/events/deleteEvent/:id', [auth, eventOrganizer], deleteEvent);
 
