@@ -130,6 +130,7 @@ export async function membersWhoHaveUploaded(eventId){
             members.push({
                 userId: member._id,
                 userName: member.name,
+                specialDiet: member.specialDiet,
                 userLastName: member.lastName,
                 transferReceipt: receiptInfo[index].transferReceipt,
                 hasReceiptApproved: receiptInfo[index].hasReceiptApproved,
@@ -140,6 +141,7 @@ export async function membersWhoHaveUploaded(eventId){
                 userId: member._id,
                 userName: member.name,
                 userLastName: member.lastName,
+                specialDiet: member.specialDiet,
                 transferReceipt: null,
                 hasReceiptApproved: null,
                 hasUploaded: false
