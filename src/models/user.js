@@ -41,12 +41,6 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        validate: {
-            validator: function(v){
-                const passwordPattern = new RegExp("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/gm");
-                return passwordPattern.test(v);
-            }
-        }
     },
 
     verificationCode: {
