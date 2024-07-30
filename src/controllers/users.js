@@ -65,10 +65,8 @@ export async function register (req, res) {
         let user = new User(req.body);
         const salt = await bcrypt.genSalt(10);
         const passwordPattern = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,}$');
-        console.log(passwordPattern.test(req.body.password))
         if (!(passwordPattern.test(req.body.password))){
-            console.log(req.body.password)
-            return res.status(400).send("Password doesn't match the requirements.")
+            return res.status(400).send("Password doesn't match the requirements.");
         }
         user.password = await bcrypt.hash(user.password, salt);
         user = await user.save();
