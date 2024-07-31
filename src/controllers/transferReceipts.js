@@ -6,9 +6,9 @@ import {saveImage} from "./images.js";
 export async function getTransferReceiptsByEvent (req, res) {
     try{
         const event = await Event.findOne(req.params.event).populate("transferReceipts");
-        return res.send(event.transferReceipts);
+        return res.status(200).json(event.transferReceipts);
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -17,12 +17,12 @@ export async function getTransferReceiptsById(req, res) {
     try{
         const transferReceipt = await TransferReceipt.findById(req.params.id);
         if (!transferReceipt) {
-            return res.status(404).send("The transfer receipt with the given ID was not found.");
+            return res.status(404).json({message: "The transfer receipt with the given ID was not found."});
         } else {
-            return res.send(transferReceipt);
+            return res.status(200).json(transferReceipt);
         }
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -34,10 +34,10 @@ export async function uploadFileTransferReceipt(req, res) {
             let transferReceipt = await TransferReceipt.findById(req.params.transferReceipt);
             transferReceipt.image = imageId;
             await transferReceipt.save();
-            return res.status(200).send({"imageId": imageId});
+            return res.status(200).json({"imageId": imageId});
         }
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -58,9 +58,9 @@ export async function createTransferReceipt(req, res) {
         const event = await Event.findById(req.params.event);
         event.transferReceipts.push(transferReceipt);
         await event.save();
-        return res.status(201).send(transferReceipt);
+        return res.status(201).json(transferReceipt);
     } catch(e) {
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -68,8 +68,8 @@ export async function createTransferReceipt(req, res) {
 export async function approveTransferReceipt(req, res) {
     try {
         let transferReceipt = await TransferReceipt.findById(req.params.id);
-        if (!transferReceipt) return res.status(404).send('The transfer receipt with the given ID was not found.');
-        if (transferReceipt.hasPaid) return res.status(400).send('The transfer receipt is already approved.')
+        if (!transferReceipt) return res.status(404).json({message: 'The transfer receipt with the given ID was not found.'});
+        if (transferReceipt.hasPaid) return res.status(400).json({message: 'The transfer receipt is already approved.'})
         transferReceipt.hasPaid = true;
         await transferReceipt.save();
         if (await isFinished(transferReceipt.event)) {
@@ -77,9 +77,9 @@ export async function approveTransferReceipt(req, res) {
             event.state = 'finished'
             await event.save()
         }
-        return res.send(transferReceipt);
+        return res.status(200).json(transferReceipt);
     } catch (e) {
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -87,15 +87,15 @@ export async function approveTransferReceipt(req, res) {
 export async function deleteTransferReceipt(req, res) {
     try{
         const transferReceipt = await TransferReceipt.findByIdAndDelete(req.params.id);
-        if (!transferReceipt) return res.status(404).send('The transfer receipt with the given ID was not found.');
+        if (!transferReceipt) return res.status(404).json({message: 'The transfer receipt with the given ID was not found.'});
         const eventId = transferReceipt.event
         const event = await Event.findById(eventId);
         const index = event.transferReceipts.indexOf(transferReceipt._id);
         event.transferReceipts.splice(index, 1);
         await event.save();
-        return res.status(200).send(transferReceipt);
+        return res.status(200).json(transferReceipt);
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 

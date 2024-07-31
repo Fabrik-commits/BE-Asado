@@ -9,7 +9,7 @@ export async function getImage (req, res) {
         res.contentType(image.mimetype);
         res.status(200).send(image.image);
     } catch {
-        res.status(500).send(e.message);
+        res.status(500).json({message: e.message});
     }
 }
 

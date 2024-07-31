@@ -7,10 +7,10 @@ import {membersWhoHaveUploaded} from "./transferReceipts.js";
 
 export async function getEvents(req, res) {
     try{
-        const events = await Event.find().sort({"datetime": -1, ":id": 1}).limit(limit);
-        return res.send(events);
+        const events = await Event.find().sort({"datetime": -1, ":id": 1});
+        return res.json(events);
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -39,7 +39,7 @@ export async function getPublicEvents(req, res){
         }
         return res.status(200).json(publicEvents);
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -54,12 +54,12 @@ export async function getEventById(req, res) {
             .populate("transferReceipts")
             .populate("purchaseReceipts");
         if (!event) {
-            return res.status(404).send("The event with the given ID was not found.");
+            return res.status(404).json({message: "The event with the given ID was not found."});
         } else {
-            return res.send(event);
+            return res.json(event);
         }
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -67,9 +67,9 @@ export async function getEventById(req, res) {
 export async function getMembersAndReceiptsInfo(req, res) {
     try{
         const answer = await membersWhoHaveUploaded(req.params.event);
-        return res.status(200).send(answer);
+        return res.status(200).json(answer);
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -79,49 +79,47 @@ export async function createEvent(req, res) {
         let event = new Event(req.body);
         event.chef = req.body.isChef ? req.body.organizer : null;
         event.shoppingDesignee = req.body.isShoppingDesignee ? req.body.organizer : null;
-        if (event.memberLimit == 1) event.state == 'full'
         event = await event.save();
         await deleteEvents()
-        return res.status(201).send(event);
+        return res.status(201).json(event);
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
 
 export async function subscribeToAnEvent(req, res) {
     try{
-        if(!req.params.event) return res.status(400).send("No event ID provided.");
+        if(!req.params.event) return res.status(400).json({message: "No event ID provided."});
         const event = await Event.findById(req.params.event);
-        if(!event) return res.status(404).send("The event with the given ID was not found.");
-        if(event.memberLimit <= event.members.length) return res.status(400).send("The event is full.")
-        if(event.state !== "available") return res.status(400).send("The event is not available for users to join");
+        if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
+        if(event.memberLimit <= event.members.length) return res.status(400).json({message: "The event is full."})
+        if(event.state !== "available") return res.status(400).json({message: "The event is not available for users to join"});
         if (event.members.includes(req.params.id) ){
-            return res.status(400).send("The user has already joined the event");
+            return res.status(400).json({message: "The user has already joined the event"});
         }
         const user = await User.findById(req.params.id);
         event.members.push(user);
         await event.save();
-        return res.status(200).send(event);
+        return res.status(200).json(event);
     } catch (e) {
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
 
 export async function unsubscribeFromEvent(req, res) {
     try {
-        if(!req.params.event) return res.status(400).send("No event ID provided.");
+        if(!req.params.event) return res.status(400).json({message: "No event ID provided."});
         const event = await Event.findById(req.params.event);
-        if(!event) return res.status(404).send("The event with the given ID was not found.");
+        if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
         const index = event.members.indexOf(req.params.id);
-        if (index === -1) return res.status(404).send("The member with the given ID is not part of the event.");
-        if (event.members.length == event.memberLimit) event.state = 'available';
+        if (index === -1) return res.status(404).json({message: "The member with the given ID is not part of the event."});
         event.members.splice(index, 1);
         await event.save();
-        res.status(200).send(event);
+        res.status(200).json(event);
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -129,13 +127,13 @@ export async function unsubscribeFromEvent(req, res) {
 export async function editRoles(req, res) {
     try {
         const event = await Event.findById(req.params.id);
-        if (!event) return res.status(404).send("The event with the given ID was not found.");
+        if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
         event.chef = req.body.chef ? req.body.chef : null;
         event.shoppingDesignee = req.body.shoppingDesignee ? req.body.shoppingDesignee : null;
         await event.save();
-        res.send(event);
+        res.status(200).json(event);
     } catch (e) {
-        res.status(500).send(e.message);
+        res.status(500).json({message: e.message});
     }
 }
 
@@ -143,15 +141,15 @@ export async function editRoles(req, res) {
 export async function editEvent (req, res) {
     try{
         const event = await Event.findById(req.params.id);
-        if (!event) return res.status(404).send("The event with the given ID was not found.");
+        if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
         event.datetime = req.body.datetime;
         event.description = req.body.description;
         event.memberLimit = req.body.memberLimit;
         event.state = req.body.state;
         event.save();
-        res.send(event);
+        res.status(200).json(event);
     } catch(e){
-        res.status(500).send(e.message);
+        res.status(500).json({message: e.message});
     }
 }
 
@@ -159,10 +157,10 @@ export async function editEvent (req, res) {
 export async function deleteEvent(req, res) {
     try{
         const event = await Event.findByIdAndRemove(req.params.id);
-        if (!event) return res.status(404).send('The event with the given ID was not found.');
-        res.send(event);
+        if (!event) return res.status(404).json({message: 'The event with the given ID was not found.'});
+        res.status(200).json(event);
     } catch(e){
-        res.status(500).send(e.message);
+        res.status(500).json(e.message);
     }
 }
 
