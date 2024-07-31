@@ -24,7 +24,7 @@ app.use(cors({
 
 app.get('/', (req, res) => {
 	res.json({
-		message: 'This is the Eat Asado API'
+		message: 'This is the FoodSpot API'
 	});
 });
 

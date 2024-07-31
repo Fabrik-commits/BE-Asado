@@ -1,5 +1,8 @@
 import {Event} from "../models/event.js";
 import {User} from "../models/user.js";
+import {TransferReceipt} from "../models/transferReceipt.js";
+import {PurchaseReceipt} from "../models/purchaseReceipt.js";
+import {Image} from "../models/image.js";
 import {membersWhoHaveUploaded} from "./transferReceipts.js";
 
 export async function getEvents(req, res) {
@@ -165,12 +168,31 @@ export async function deleteEvent(req, res) {
 
 
 async function deleteEvents(){
-    const totalEvents = await Event.count()
+    const totalEvents = await Event.count();
     if (totalEvents > 6){
-        let matches = await Event.find({"state": "finished"}).sort({datetime: "asc"})
+        let matches = await Event.find({
+                "state": {
+                    $in: ["finished", "cancelled"]
+                }
+            }).sort({datetime: "asc"});
         if (matches.length > 0) {
-            const deletedId = matches[0].id
-            const deleted = await Event.deleteOne({_id: deletedId})
+            const deletedId = matches[0].id;
+            await deleteReceipts(deletedId);
+            const deletedEvent = await Event.findByIdAndDelete(deletedId);
         }
     } 
 }
+
+async function deleteReceipts(eventId) {
+    const event = await Event.findById(eventId).populate(["transferReceipts", "purchaseReceipts"]);
+    for (const transferReceipt of event.transferReceipts){
+        await Image.findByIdAndDelete(transferReceipt.image);
+        await TransferReceipt.findByIdAndDelete(transferReceipt._id);
+    }
+    for (const purchaseReceipt of event.purchaseReceipts){
+        await Image.findByIdAndDelete(purchaseReceipt.image);
+        await PurchaseReceipt.findByIdAndDelete(purchaseReceipt._id);
+    }
+}
+
+
