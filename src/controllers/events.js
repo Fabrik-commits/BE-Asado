@@ -156,6 +156,7 @@ export async function editEvent (req, res) {
 
 export async function deleteEvent(req, res) {
     try{
+        deleteReceipts(req.params.id)
         const event = await Event.findByIdAndRemove(req.params.id);
         if (!event) return res.status(404).json({message: 'The event with the given ID was not found.'});
         res.status(200).json(event);

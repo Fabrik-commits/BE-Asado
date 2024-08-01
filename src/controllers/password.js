@@ -18,7 +18,6 @@ export async function forgot(req, res) {
     user.verificationCode = await bcrypt.hash(code.toString(), salt);
     await user.save();
     try {
-        asdfsf()
         sendMail(user.email, user.name, code);
         res.status(200).json({message: `Mail sent succesfully to ${user.email}.`});
     } catch (error) {
