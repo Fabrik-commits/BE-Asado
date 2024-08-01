@@ -5,12 +5,12 @@ import {saveImage} from "./images.js";
 
 export async function getPurchaseReceiptsByEvent(req, res) {
     try{
-        if(!req.params.event) return res.status(400).send("No event ID provided");
+        if(!req.params.event) return res.status(400).json({message: "No event ID provided"});
         const event = await Event.findById(req.params.event).populate("purchaseReceipts");
-        if(!event) return res.status(404).send("The event with the given ID was not found.");
-        return res.send(event.purchaseReceipts);
+        if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
+        return res.status(200).json(event.purchaseReceipts);
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -19,12 +19,12 @@ export async function getPurchaseReceiptById(req, res) {
     try{
         const purchaseReceipt = await PurchaseReceipt.findById(req.params.id);
         if (!purchaseReceipt) {
-            return res.status(404).send("The purchase receipt with the given ID was not found.");
+            return res.status(404).json({message: "The purchase receipt with the given ID was not found."});
         } else {
-            return res.send(purchaseReceipt);
+            return res.status(200).json(purchaseReceipt);
         }
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -36,10 +36,10 @@ export async function uploadFilePurchaseReceipt(req, res) {
             let purchaseReceipt = await PurchaseReceipt.findById(req.params.purchaseReceipt);
             purchaseReceipt.image = imageId;
             await purchaseReceipt.save()
-            return res.status(200).send({"imageId": imageId});
+            return res.status(200).json({"imageId": imageId});
         }
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -52,9 +52,9 @@ export async function createPurchaseReceipt(req, res) {
         const event = await Event.findById(req.params.event);
         event.purchaseReceipts.push(purchaseReceipt);
         await event.save();
-        return res.status(201).send(purchaseReceipt);
+        return res.status(201).json(purchaseReceipt);
     } catch(e){
-        return res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
 
@@ -62,14 +62,14 @@ export async function createPurchaseReceipt(req, res) {
 export async function deletePurchaseReceipt(req, res) {
     try {
         const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(req.params.id);
-        if (!purchaseReceipt) return res.status(404).send("The purchase receipt with the given ID was not found.");
+        if (!purchaseReceipt) return res.status(404).json({message: "The purchase receipt with the given ID was not found."});
         const eventId = purchaseReceipt.event
         const event = await Event.findById(eventId);
         const index = event.purchaseReceipts.indexOf(purchaseReceipt._id);
         event.purchaseReceipts.splice(index, 1);
         await event.save();
-        res.status(200).send(purchaseReceipt);
+        return res.status(200).json(purchaseReceipt);
     } catch (e) {
-        res.status(500).send(e.message);
+        return res.status(500).json({message: e.message});
     }
 }
