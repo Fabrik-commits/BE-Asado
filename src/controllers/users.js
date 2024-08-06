@@ -38,7 +38,7 @@ export async function isDebtor(req, res) {
                                                         "state": "closed",
                                                         "purchaseReceipts": { 
                                                             "$exists": true, 
-                                                            "$eq": [] 
+                                                            "$ne": [] 
                                                         }
         });
 
