@@ -35,7 +35,11 @@ export async function isDebtor(req, res) {
                                                         "shoppingDesignee": {
                                                             $ne: req.params.id
                                                         },
-                                                        "state": "closed"
+                                                        "state": "closed",
+                                                        "purchaseReceipts": { 
+                                                            "$exists": true, 
+                                                            "$eq": [] 
+                                                        }
         });
 
         for (const event of eventsWithoutReceipts) {
