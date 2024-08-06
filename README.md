@@ -37,7 +37,7 @@ References:
 | transferReceipts | getTransferReceiptsByEvent/:event | Gets all transferReceipts from an event providing the event's id (12 byte Object ID) | GET | event | Yes |  |
 | transferReceipts | getTransferReceiptsById/:id | Gets a single transferReceipt by its id (12 byte Object ID) | GET | id | Yes |  |
 | transferReceipts | uploadFile/:transferReceipt | Uploads a file for a transferReceipt | POST | transferReceipt | Yes | file: png/jpeg/pdf |
-| transferReceipts | createTransferReceipt/:event | Creates a transferReceipt for a certain event | POST | event | Yes | <ul><li>description: String</li> <li>amount: Number</li> <li>user: ObjectId of a member</li> <li>(paymentMethod: String)</li> <li>DON'T SEND hasPaid: Boolean or send it as false</li></ul> |
+| transferReceipts | createTransferReceipt/:event | Creates a transferReceipt for a certain event | POST | event | Yes | <ul><li>(description: String)</li> <li>amount: Number</li> <li>user: ObjectId of a member</li> <li>(paymentMethod: String)</li> <li>DON'T SEND hasPaid: Boolean or send it as false</li></ul> |
 | transferReceipts | approveTransferReceipt/:id/:event | Approves a single transferReceipt by its id (12 byte Object ID) | PUT | id, event | Yes and user token needs to be the shoppingDesignee |  |
 | transferReceipts | deleteTransferReceipt/:id | Deletes a transferReceipt by its id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the receipt owner |  |
 | users | getUsers  | Gets all users in the database | GET |  | Yes |  |
