@@ -1,6 +1,6 @@
 # BE-Asado
 
-Express.js REST API for Food-Spot.
+Express.js REST API for Food-Spot
 
 
 ## Endpoints documentation
