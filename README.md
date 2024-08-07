@@ -3,7 +3,7 @@
 Express.js REST API for Food-Spot.
 
 
-## Endpoints
+## Endpoints documentation
 
 References: 
 
