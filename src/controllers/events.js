@@ -118,6 +118,10 @@ export async function unsubscribeFromEvent(req, res) {
         if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
         const index = event.members.indexOf(req.params.id);
         if (index === -1) return res.status(404).json({message: "The member with the given ID is not part of the event."});
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(400).json({message: "The user with the given ID was not found."})
+        }
         event.members.splice(index, 1);
         await event.save();
         res.status(200).json(event);
