@@ -1,5 +1,5 @@
 import express from 'express';
-import {auth, eventOrganizer, eventParticipant, multerUpload, sameUser, shoppingDesignee, transferReceiptOwner} from './middleware/middleware.js';
+import {auth, eventOrganizer, eventParticipant, multerUpload, multerUploadImages, sameUser, shoppingDesignee, transferReceiptOwner} from './middleware/middleware.js';
 import {getEvents, getPublicEvents, getEventById, getMembersAndReceiptsInfo, createEvent, subscribeToAnEvent, unsubscribeFromEvent, editRoles, editEvent, deleteEvent} from "./controllers/events.js";
 import {getImage} from "./controllers/images.js";
 import {login} from './controllers/login.js';
@@ -73,7 +73,7 @@ router.get("/users/isDebtor/:id", auth, isDebtor);
 router.post("/users/register", register);
 
 router.put("/users/editUser/:id", [auth, sameUser], editUser);
-router.put("/users/editProfilePicture/:id", [auth, sameUser, multerUpload.single("file")], editProfilePicture);
+router.put("/users/editProfilePicture/:id", [auth, sameUser, multerUploadImages.single("file")], editProfilePicture);
 
 router.delete('/users/deleteUser/:id', [auth, sameUser] , deleteUser);
 

@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import {User} from "../models/user.js";
+import {Image} from "../models/image.js";
 import {Event} from "../models/event.js";
 import {hasUploaded} from "./transferReceipts.js";
+import {saveImage} from "./images.js";
 
 
 export async function getUsers(req, res){
@@ -100,12 +102,17 @@ export async function editUser (req, res) {
 
 export async function editProfilePicture (req, res) {
     try {
-        let user = await User.findById(req.params.id);
-        if (!user) return res.status(404).json({message: "The user with the given ID was not found."});
-        const imageId = await saveImage(req.file);
-        user.profilePicture = imageId;
-        user = await user.save();
-        return res.status(200).json(user);
+        if (req.file){
+            let user = await User.findById(req.params.id);
+            if (!user) return res.status(404).json({message: "The user with the given ID was not found."});
+            if (user.profilePicture) {
+                const deletedImage = await Image.findOneAndDelete(user.profilePicture);
+            }
+            const imageId = await saveImage(req.file);
+            user.profilePicture = imageId;
+            user = await user.save();
+            return res.status(200).json({"imageId": imageId});
+        }
     } catch (e){
         return res.status(500).json({message: e.message});
     }
