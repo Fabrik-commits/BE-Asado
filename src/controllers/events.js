@@ -99,6 +99,9 @@ export async function subscribeToAnEvent(req, res) {
             return res.status(400).json({message: "The user has already joined the event"});
         }
         const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(400).json({message: "The user with the given ID was not found."})
+        }
         event.members.push(user);
         await event.save();
         return res.status(200).json(event);
