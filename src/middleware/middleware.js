@@ -51,6 +51,7 @@ export async function eventParticipant(req, res, next){
 
 
 const MIMETYPES = ["image/jpeg", "image/png", "application/pdf"];
+const MIMETYPES_IMAGE = ["image/jpeg", "image/png", "application/pdf"];
 
 
 export const multerUpload = multer({
@@ -58,6 +59,18 @@ export const multerUpload = multer({
     fileFilter: (req, file, cb) => {
         if (MIMETYPES.includes(file.mimetype)) cb(null, true)
         else cb(new Error(`Only ${MIMETYPES.join(' - ')} mimetypes are allowed.`))
+    },
+    limits: {
+        fieldSize: 10000000
+    }
+});
+
+
+export const multerUploadImages = multer({
+    storage: multer.memoryStorage(),
+    fileFilter: (req, file, cb) => {
+        if (MIMETYPES.includes(file.mimetype)) cb(null, true)
+        else cb(new Error(`Only ${MIMETYPES_IMAGE.join(' - ')} mimetypes are allowed.`))
     },
     limits: {
         fieldSize: 10000000
