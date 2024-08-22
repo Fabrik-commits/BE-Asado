@@ -5,6 +5,7 @@ import {PurchaseReceipt} from "../models/purchaseReceipt.js";
 import {Image} from "../models/image.js";
 import {membersWhoHaveUploaded} from "./transferReceipts.js";
 
+
 export async function getEvents(req, res) {
     try{
         const events = await Event.find().sort({"datetime": -1, ":id": 1});
@@ -18,26 +19,44 @@ export async function getEvents(req, res) {
 export async function getPublicEvents(req, res){
     try{
         const events = await Event
-            .find()        
+            .find(
+                {isPrivate: {
+                    $ne: true
+                }}
+            )
             .select("datetime description state chef memberLimit members title")
             .sort({"_id": -1})
             .populate("chef", "name");
-        const publicEvents = [];
-        for (let event of events) {
-            publicEvents.push(
-                {
-                    _id: event.id,
-                    title: event.title,
-                    datetime: event.datetime,
-                    description: event.description,
-                    state: event.state,
-                    chef: event.chef ? event.chef.name : null,
-                    memberLimit: event.memberLimit,
-                    members: event.members.length,
-                }
-            );
-        }
+
+        const publicEvents = reduceEventsInformation(events);
+        
         return res.status(200).json(publicEvents);
+    } catch(e){
+        return res.status(500).json({message: e.message});
+    }
+}
+
+
+export async function getPublicAndPrivateEvents(req, res){
+    try{
+        const events = await Event
+            .find(
+                {
+                    $or: [
+                        {isPrivate: {
+                            $ne: true
+                        }},
+                        {isPrivate: true, members: req.user._id}
+                    ]
+                }
+            )
+            .select("datetime description state chef memberLimit members title")
+            .sort({"_id": -1})
+            .populate("chef", "name");
+
+        const allEvents = reduceEventsInformation(events);
+
+        return res.status(200).json(allEvents);
     } catch(e){
         return res.status(500).json({message: e.message});
     }
@@ -174,7 +193,7 @@ export async function deleteEvent(req, res) {
 
 
 async function deleteEvents(){
-    const totalEvents = await Event.count();
+    const totalEvents = await Event.count({isPrivate: false});
     if (totalEvents > 6){
         let matches = await Event.find({
                 "state": {
@@ -201,4 +220,21 @@ async function deleteReceipts(eventId) {
     }
 }
 
-
+function reduceEventsInformation (events){
+    let reducedEvents = []
+    for (let event of events) {
+        reducedEvents.push(
+            {
+                _id: event.id,
+                title: event.title,
+                datetime: event.datetime,
+                description: event.description,
+                state: event.state,
+                chef: event.chef ? event.chef.name : null,
+                memberLimit: event.memberLimit,
+                members: event.members.length,
+            }
+        );
+    }
+    return reducedEvents
+}

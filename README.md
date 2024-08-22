@@ -15,7 +15,8 @@ References:
 | Prefix | Endpoint | Description | Type | Parameters | Auth | Body requirements |
 |--|--|--|--|--|--|--|
 | events | getEvents | Gets all events in the database | GET |  | Yes |  |
-| events | getPublicEvents | Gets all events with public data only sorted by date of creation in descendent order | GET |  | No |  |
+| events | getPublicEvents | Gets all non private events with public data only sorted by date of creation in descendent order | GET |  | No |  |
+| events | getPublicAndPrivateEvents | Gets all public events and all private events that include the user with public data only sorted by date of creation in descendent order | GET |  | Yes |  |
 | events | getEventById/:id | Gets an event by its id (12 byte Object ID) | GET | id | Yes |  |
 | events | getMembersAndReceiptsInfo/:event | Returns a list of users and their transferReceipt information | GET | event | Yes |  |
 | events | createEvent | Creates an event | POST |  | Yes | <ul> <li>title: String</li> <li>description: String</li> <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>members: [ObjectId of members]</li> <li>organizer: ObjectId of a member</li> <li>(chef: ObjectId of a member)</li> <li>(shoppingDesignee: ObjectId of a member)</li></ul> |
