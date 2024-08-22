@@ -16,7 +16,7 @@ const router = express.Router();
 router.get("/events/getEvents", auth, getEvents);
 router.get("/events/getPublicEvents", getPublicEvents);
 router.get("/events/getPublicAndPrivateEvents", auth, getPublicAndPrivateEvents);
-router.get("/events/getEventById/:id", auth, getEventById);
+router.get("/events/getEventById/:id", getEventById);
 router.get("/events/getMembersAndReceiptsInfo/:event", getMembersAndReceiptsInfo);
 
 router.post("/events/createEvent", auth, createEvent);
