@@ -233,7 +233,8 @@ function reduceEventsInformation (events){
                 chef: event.chef ? event.chef.name : null,
                 memberLimit: event.memberLimit,
                 members: event.members.length,
-            }
+                isPrivate: event.isPrivate ? isPrivate : false // esto es porque eventos viejos no tienen el valor 
+            }                                                  // y asi hay backwards compatibility, SACAR CUANDO NO HAYA EVENTOS SIN ESTE ATRIBUTO
         );
     }
     return reducedEvents
