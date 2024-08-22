@@ -7,6 +7,7 @@ import {getPurchaseReceiptsByEvent, getPurchaseReceiptById, uploadFilePurchaseRe
 import {forgot, verifyCode, recover} from "./controllers/password.js";
 import {getTransferReceiptsByEvent, getTransferReceiptsById, uploadFileTransferReceipt, createTransferReceipt, approveTransferReceipt, deleteTransferReceipt} from "./controllers/transferReceipts.js";
 import {getUsers, getUserById, isDebtor, register, editUser, editProfilePicture, deleteUser} from "./controllers/users.js";
+import {createRating, getRatingFromUser} from "./controllers/ratings.js";
 
 
 const router = express.Router();
@@ -76,6 +77,11 @@ router.put("/users/editUser/:id", [auth, sameUser], editUser);
 router.put("/users/editProfilePicture/:id", [auth, sameUser, multerUpload.single("file")], editProfilePicture);
 
 router.delete('/users/deleteUser/:id', [auth, sameUser] , deleteUser);
+
+
+//ratings routes
+router.get("/ratings/getRatingFromUser/:event/:user", [auth], getRatingFromUser)
+router.post("/ratings/createRating/:event/:user", [auth], createRating)
 
 
 export default router;
