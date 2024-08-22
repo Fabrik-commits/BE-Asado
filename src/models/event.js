@@ -77,8 +77,12 @@ const eventSchema = new mongoose.Schema({
     ratings: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Rating'
-    }
+    },
 
+    isPrivate: {
+        type: Boolean,
+        default: false
+    }
 });
 
 
