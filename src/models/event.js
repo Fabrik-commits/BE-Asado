@@ -72,6 +72,11 @@ const eventSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'PurchaseReceipt',
         default: []
+    },
+
+    isPrivate: {
+        type: Boolean,
+        default: false
     }
 
 });

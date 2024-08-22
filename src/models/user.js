@@ -76,11 +76,9 @@ const userSchema = new mongoose.Schema({
     },
 
     profilePicture: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Image',
         default: null
-        //required: true
-        // type: mongoose.Schema.Types.ObjectId,
-        // ref: 'Image',
     }
 });
 
