@@ -35,6 +35,8 @@ References:
 | password | forgot | Updates verification code for password recovery and sends the recovery email | POST |  | No | <ul><li>email: String</li></ul> |
 | password | verifyCode | Verifies if the code for password recovery is correct | PUT |  | No | <ul><li>verificationCode: String</li> <li>email: String</li></ul> |
 | password | recover | Changes user's password providing the correct verification code | PUT |  | No | <ul><li>email: String</li> <li>verificationCode: String</li> <li>password: String</li></ul> |
+| ratings | getRatingFromUser/:event/:user | Gets the rating made by a user for a certain event | GET | event, user | Yes |  |
+| ratings | createRating/:event/:user | Creates (or modifies if it's been created already) a rating made by a user for a certain event | POST | event, user | Yes | score: Integer with limited values {1, 2, 3, 4, 5} |, 
 | transferReceipts | getTransferReceiptsByEvent/:event | Gets all transferReceipts from an event providing the event's id (12 byte Object ID) | GET | event | Yes |  |
 | transferReceipts | getTransferReceiptsById/:id | Gets a single transferReceipt by its id (12 byte Object ID) | GET | id | Yes |  |
 | transferReceipts | uploadFile/:transferReceipt | Uploads a file for a transferReceipt | POST | transferReceipt | Yes | file: png/jpeg/pdf |
