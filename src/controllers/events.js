@@ -235,6 +235,7 @@ async function deleteReceipts(eventId) {
 function reduceEventsInformation (events){
     let reducedEvents = []
     for (let event of events) {
+        let eventRating = event.ratings.reduce((sum, currentRating.score, 0))
         reducedEvents.push(
             {
                 _id: event.id,
@@ -245,6 +246,10 @@ function reduceEventsInformation (events){
                 chef: event.chef ? event.chef.name : null,
                 memberLimit: event.memberLimit,
                 members: event.members.length,
+                ratings: {
+                    avgScore: (eventRating / event.ratings.length),
+                    ratingsAmount: event.ratings.length
+                }
             }
         );
     }
