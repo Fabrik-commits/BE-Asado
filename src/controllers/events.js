@@ -247,7 +247,7 @@ function reduceEventsInformation (events){
                 memberLimit: event.memberLimit,
                 members: event.members.length,
                 ratings: {
-                    avgScore: (eventRating / event.ratings.length),
+                    avgScore: (event.ratings.length > 0) ? (eventRating / event.ratings.length) : 0,
                     ratingsAmount: event.ratings.length
                 },
                 isPrivate: event.isPrivate ? isPrivate : false // esto es porque eventos viejos no tienen el valor 
