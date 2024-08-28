@@ -13,6 +13,7 @@ export async function createRating(req, res) {
             rating.score = req.body.score;
             event.ratings.push(rating)
             await rating.save();
+            await event.save()
             return res.status(200).json(rating)
         } else {
             const newRating = new Rating({
@@ -21,6 +22,7 @@ export async function createRating(req, res) {
             })
             event.ratings.push(newRating)
             await newRating.save()
+            await event.save()
             return res.status(200).json(newRating)
         }
     } catch (e) {
