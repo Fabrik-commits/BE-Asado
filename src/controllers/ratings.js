@@ -11,6 +11,7 @@ export async function createRating(req, res) {
         const rating = event.ratings.find(r => r.user.equals(req.params.user));
         if (rating) {
             rating.score = req.body.score;
+            event.ratings.push(rating)
             await rating.save();
             return res.status(200).json(rating)
         } else {
@@ -18,6 +19,7 @@ export async function createRating(req, res) {
                 score: req.body.score,
                 user: req.params.user
             })
+            event.ratings.push(newRating)
             await newRating.save()
             return res.status(200).json(newRating)
         }
@@ -28,13 +30,17 @@ export async function createRating(req, res) {
 
 
 export async function getRatingFromUser(req, res) {
-    const event = await Event.findById(req.params.event).populate('ratings').exec();
-    if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
-    if (!event.members.includes(req.params.user)) return res.status(400).json({message: "The user with the given ID was not found in the event."});
-    const rating = event.ratings.find(r => r.user.equals(req.params.user));
-    if (rating) {
-        return res.status(200).json(rating)
-    } else {
-        return res.status(200).json({message: "User does not have a rating for this event."})
+    try {
+        const event = await Event.findById(req.params.event).populate('ratings').exec();
+        if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
+        if (!event.members.includes(req.params.user)) return res.status(400).json({message: "The user with the given ID was not found in the event."});
+        const rating = event.ratings.find(r => r.user.equals(req.params.user));
+        if (rating) {
+            return res.status(200).json(rating)
+        } else {
+            return res.status(200).json({message: "User does not have a rating for this event."})
+        }
+    } catch(e){
+        res.status(500).json({message: e.message});
     }
 }
