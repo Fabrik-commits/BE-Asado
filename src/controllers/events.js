@@ -235,7 +235,7 @@ async function deleteReceipts(eventId) {
 function reduceEventsInformation (events){
     let reducedEvents = []
     for (let event of events) {
-        let eventRating = event.ratings.reduce((sum, currentRating.score, 0))
+        let eventRating = event.ratings ? event.ratings.reduce((sum, currentRating.score, 0)) : 0 // esto es porque eventos viejos no tienen el atributo
         reducedEvents.push(
             {
                 _id: event.id,
@@ -247,10 +247,10 @@ function reduceEventsInformation (events){
                 memberLimit: event.memberLimit,
                 members: event.members.length,
                 ratings: {
-                    avgScore: (event.ratings.length > 0) ? (eventRating / event.ratings.length) : 0,
-                    ratingsAmount: event.ratings.length
+                    avgScore: event.ratings ? (event.ratings.length > 0 ? (eventRating / event.ratings.length) : 0) : 0, // esto es porque eventos viejos no tienen el atributo
+                    ratingsAmount: event.ratings ? event.ratings.length : 0 // esto es porque eventos viejos no tienen el atributo
                 },
-                isPrivate: event.isPrivate ? isPrivate : false // esto es porque eventos viejos no tienen el valor 
+                isPrivate: event.isPrivate ? isPrivate : false // esto es porque eventos viejos no tienen el atributo 
             }                                                  // y asi hay backwards compatibility, SACAR CUANDO NO HAYA EVENTOS SIN ESTE ATRIBUTO
         );
     }
