@@ -249,8 +249,9 @@ function reduceEventsInformation (events){
                 ratings: {
                     avgScore: (eventRating / event.ratings.length),
                     ratingsAmount: event.ratings.length
-                }
-            }
+                },
+                isPrivate: event.isPrivate ? isPrivate : false // esto es porque eventos viejos no tienen el valor 
+            }                                                  // y asi hay backwards compatibility, SACAR CUANDO NO HAYA EVENTOS SIN ESTE ATRIBUTO
         );
     }
     return reducedEvents
