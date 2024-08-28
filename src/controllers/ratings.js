@@ -10,7 +10,7 @@ export async function createRating(req, res) {
         if ((event.state == "available") || (event.state == 'cancelled')) return res.status(400).json({message: "The event is not closed or finished."})
         const rating = event.ratings.find(r => r.user.equals(req.params.user));
         if (rating) {
-            rating.value = req.body.value;
+            rating.score = req.body.score;
             await rating.save();
             return res.status(200).json(rating)
         } else {

@@ -225,9 +225,11 @@ async function deleteReceipts(eventId) {
             await PurchaseReceipt.findByIdAndDelete(purchaseReceipt._id);
         })
     );
-    await Promise.all(event.ratings.map(async (rating) => {
-        return Rating.findByIdAndDelete(rating);
-    }));
+    await Promise.all(
+        event.ratings.map(async (rating) => {
+            await Rating.findByIdAndDelete(rating);
+        })
+    );
 }
 
 function reduceEventsInformation (events){

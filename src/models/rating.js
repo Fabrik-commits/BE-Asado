@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const ratingSchema = new mongoose.Schema({
 
-    value: {
+    score: {
         type: Number,
         required: true,
         validate: {
