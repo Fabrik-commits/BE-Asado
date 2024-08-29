@@ -9,7 +9,6 @@ export async function createRating(req, res) {
         if (!event.members.includes(req.params.user)) return res.status(400).json({message: "The user with the given ID was not found in the event."});
         if ((event.state == "available") || (event.state == 'cancelled')) return res.status(400).json({message: "The event is not closed or finished."});
         const rating = event.ratings.find(r => r.user.equals(req.params.user));
-        console.log(rating.id)
         if (rating) {
             rating.score = req.body.score;
             await rating.save();
