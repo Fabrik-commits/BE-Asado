@@ -4,6 +4,7 @@ import {TransferReceipt} from "../models/transferReceipt.js";
 import {PurchaseReceipt} from "../models/purchaseReceipt.js";
 import {Image} from "../models/image.js";
 import {membersWhoHaveUploaded} from "./transferReceipts.js";
+import {Rating} from "../models/rating.js";
 
 
 export async function getEvents(req, res) {
@@ -24,9 +25,10 @@ export async function getPublicEvents(req, res){
                     $ne: true
                 }}
             )
-            .select("datetime description state chef memberLimit members title")
+            .select("datetime description state chef memberLimit members title ratings")
             .sort({"_id": -1})
-            .populate("chef", "name");
+            .populate("chef", "name")
+            .populate("ratings");
 
         const publicEvents = reduceEventsInformation(events);
         
@@ -50,9 +52,10 @@ export async function getPublicAndPrivateEvents(req, res){
                     ]
                 }
             )
-            .select("datetime description state chef memberLimit members title")
+            .select("datetime description state chef memberLimit members title ratings")
             .sort({"_id": -1})
-            .populate("chef", "name");
+            .populate("chef", "name")
+            .populate("ratings");
 
         const allEvents = reduceEventsInformation(events);
 
@@ -209,20 +212,32 @@ async function deleteEvents(){
 }
 
 async function deleteReceipts(eventId) {
-    const event = await Event.findById(eventId).populate(["transferReceipts", "purchaseReceipts"]);
-    for (const transferReceipt of event.transferReceipts){
-        await Image.findByIdAndDelete(transferReceipt.image);
-        await TransferReceipt.findByIdAndDelete(transferReceipt._id);
-    }
-    for (const purchaseReceipt of event.purchaseReceipts){
-        await Image.findByIdAndDelete(purchaseReceipt.image);
-        await PurchaseReceipt.findByIdAndDelete(purchaseReceipt._id);
-    }
+    const event = await Event.findById(eventId).populate(["transferReceipts", "purchaseReceipts", "ratings"]);
+
+    await Promise.all(
+        event.transferReceipts.map(async (transferReceipt) => {
+            await Image.findByIdAndDelete(transferReceipt.image);
+            await TransferReceipt.findByIdAndDelete(transferReceipt._id);
+        })
+    );
+
+    await Promise.all(
+        event.purchaseReceipts.map(async (purchaseReceipt) => {
+            await Image.findByIdAndDelete(purchaseReceipt.image);
+            await PurchaseReceipt.findByIdAndDelete(purchaseReceipt._id);
+        })
+    );
+    await Promise.all(
+        event.ratings.map(async (rating) => {
+            await Rating.findByIdAndDelete(rating);
+        })
+    );
 }
 
 function reduceEventsInformation (events){
     let reducedEvents = []
     for (let event of events) {
+        let eventRating = event.ratings ? event.ratings.reduce((sum, currentRating) => sum + currentRating.score, 0) : 0 // esto es porque eventos viejos no tienen el atributo
         reducedEvents.push(
             {
                 _id: event.id,
@@ -233,7 +248,11 @@ function reduceEventsInformation (events){
                 chef: event.chef ? event.chef.name : null,
                 memberLimit: event.memberLimit,
                 members: event.members.length,
-                isPrivate: event.isPrivate ? isPrivate : false // esto es porque eventos viejos no tienen el valor 
+                ratings: {
+                    avgScore: event.ratings ? (event.ratings.length > 0 ? (eventRating / event.ratings.length) : 0) : 0, // esto es porque eventos viejos no tienen el atributo
+                    ratingsAmount: event.ratings ? event.ratings.length : 0 // esto es porque eventos viejos no tienen el atributo
+                },
+                isPrivate: event.isPrivate ? isPrivate : false // esto es porque eventos viejos no tienen el atributo 
             }                                                  // y asi hay backwards compatibility, SACAR CUANDO NO HAYA EVENTOS SIN ESTE ATRIBUTO
         );
     }
