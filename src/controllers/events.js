@@ -25,9 +25,10 @@ export async function getPublicEvents(req, res){
                     $ne: true
                 }}
             )
-            .select("datetime description state chef memberLimit members title")
+            .select("datetime description state chef memberLimit members title ratings")
             .sort({"_id": -1})
-            .populate("chef", "name");
+            .populate("chef", "name")
+            .populate("ratings");
 
         const publicEvents = reduceEventsInformation(events);
         
@@ -51,9 +52,10 @@ export async function getPublicAndPrivateEvents(req, res){
                     ]
                 }
             )
-            .select("datetime description state chef memberLimit members title")
+            .select("datetime description state chef memberLimit members title ratings")
             .sort({"_id": -1})
-            .populate("chef", "name");
+            .populate("chef", "name")
+            .populate("ratings");
 
         const allEvents = reduceEventsInformation(events);
 
@@ -235,7 +237,7 @@ async function deleteReceipts(eventId) {
 function reduceEventsInformation (events){
     let reducedEvents = []
     for (let event of events) {
-        let eventRating = event.ratings ? event.ratings.reduce((sum, currentRating.score, 0)) : 0 // esto es porque eventos viejos no tienen el atributo
+        let eventRating = event.ratings ? event.ratings.reduce((sum, currentRating) => sum + currentRating.score, 0) : 0 // esto es porque eventos viejos no tienen el atributo
         reducedEvents.push(
             {
                 _id: event.id,
