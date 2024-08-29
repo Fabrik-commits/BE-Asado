@@ -7,11 +7,11 @@ export async function createRating(req, res) {
         const event = await Event.findById(req.params.event).populate('ratings').exec();
         if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
         if (!event.members.includes(req.params.user)) return res.status(400).json({message: "The user with the given ID was not found in the event."});
-        if ((event.state == "available") || (event.state == 'cancelled')) return res.status(400).json({message: "The event is not closed or finished."})
+        if ((event.state == "available") || (event.state == 'cancelled')) return res.status(400).json({message: "The event is not closed or finished."});
         const rating = event.ratings.find(r => r.user.equals(req.params.user));
+        console.log(rating.id)
         if (rating) {
             rating.score = req.body.score;
-            event.ratings.push(rating)
             await rating.save();
             await event.save()
             return res.status(200).json(rating)
