@@ -48,6 +48,7 @@ export async function createPurchaseReceipt(req, res) {
     try{
         let purchaseReceipt = new PurchaseReceipt(req.body);
         purchaseReceipt.event = req.params.event;
+        purchaseReceipt.user = req.user._id
         purchaseReceipt = await purchaseReceipt.save();
         const event = await Event.findById(req.params.event);
         event.purchaseReceipts.push(purchaseReceipt);
