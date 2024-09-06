@@ -195,6 +195,37 @@ export async function deleteEvent(req, res) {
 }
 
 
+export async function getShoppingDesigneesAmount(req, res) {
+    try {
+        if(!req.params.event) return res.status(400).json({message: "No event ID provided"});
+        const event = await Event.findById(req.params.event).select('purchaseReceipts').populate({
+            path: 'purchaseReceipts',
+            populate: {
+                path: 'user',
+                model: 'User'           
+            }
+        });
+        if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
+        const amounts = [];
+        for (const receipt in event.purchaseReceipts){
+            let existingAmount = amounts.find(a => receipt.user._id.equals(a.userId));
+            if (existingAmount){
+                existingAmount.totalAmount += receipt.amount;
+            } else {
+                amounts.push({
+                    userId: receipt.user._id,
+                    userName: receipt.user.name,
+                    totalAmount: receipt.amount
+                });
+            }
+        };
+        return res.status(200).json(amounts);
+    } catch (e) {
+        return res.status(500).json({message: e.message});
+    }
+}
+
+
 async function deleteEvents(){
     const totalEvents = await Event.count({isPrivate: false});
     if (totalEvents > 6){
