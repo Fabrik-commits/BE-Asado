@@ -100,7 +100,7 @@ export async function createEvent(req, res) {
     try{
         let event = new Event(req.body);
         event.chef = req.body.isChef ? req.body.organizer : null;
-        event.shoppingDesignee = req.body.isShoppingDesignee ? req.body.organizer : null;
+        if (req.body.isShoppingDesignee) event.shoppingDesignee.push(req.body.organizer);
         event = await event.save();
         await deleteEvents()
         return res.status(201).json(event);
@@ -158,7 +158,7 @@ export async function editRoles(req, res) {
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
         event.chef = req.body.chef ? req.body.chef : null;
-        event.shoppingDesignee = req.body.shoppingDesignee ? req.body.shoppingDesignee : null;
+        if (req.body.shoppingDesignee) event.shoppingDesignee.push(req.body.shoppingDesignee);
         await event.save();
         res.status(200).json(event);
     } catch (e) {

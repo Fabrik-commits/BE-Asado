@@ -57,7 +57,7 @@ const eventSchema = new mongoose.Schema({
     },
 
     shoppingDesignee: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: [mongoose.Schema.Types.ObjectId],
         ref: 'User',
         default: null
     },
