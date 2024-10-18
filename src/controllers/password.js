@@ -10,20 +10,15 @@ const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const BREVO_URL = process.env.BREVO_URL;
 
 export async function forgot(req, res) {
+    req.body.email = req.body.email.toLowerCase();
+    const user = await User.findOne({email: req.body.email}).exec();
+    if(!user) return res.status(404).json({message: "User does not exist."});
+    const code = Math.floor(Math.random() * 900000) + 100000;
+    const salt = await bcrypt.genSalt(10);
+    user.verificationCode = await bcrypt.hash(code.toString(), salt);
+    await user.save();
     try {
-        req.body.email = req.body.email.toLowerCase();
-        const user = await User.findOne({email: req.body.email}).exec();
-        if(!user) return res.status(404).json({message: "User does not exist."});
-        const code = Math.floor(Math.random() * 900000) + 100000;
-        const salt = await bcrypt.genSalt(10);
-        user.verificationCode = await bcrypt.hash(code.toString(), salt);
-        await user.save();
-        const dummyMessage = `<html><head></head><body><h1>A FoodSpot Password Recovery has been requested</h1></body></html>`
-        sendMail("ignaciocurtijristo@gmail.com", "Nani", dummyMessage);
-        const message = `<html><head></head><body><h1>FoodSpot | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`
-        setTimeout(() => {
-            sendMail(user.email, user.name, message)
-        }, 2000);
+        sendMail(user.email, user.name, code);
         res.status(200).json({message: `Mail sent succesfully to ${user.email}.`});
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -67,7 +62,7 @@ export async function recover(req, res) {
 }
 
 
-function sendMail(email, name, message) {
+function sendMail(email, name, code) {
     let data = JSON.stringify({
         "sender": {
             "name": "FoodSpot",
@@ -80,7 +75,7 @@ function sendMail(email, name, message) {
             }
         ],
         "subject": "FoodSpot | Password recovery",
-        "htmlContent": message
+        "htmlContent": `<html><head></head><body><h1>FoodSpot | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`
     });
     const options = {
         method: 'POST',
