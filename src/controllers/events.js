@@ -171,12 +171,15 @@ export async function editEvent (req, res) {
     try{
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
+        event.title = req.body.title;
         event.datetime = req.body.datetime;
         event.description = req.body.description;
         event.memberLimit = req.body.memberLimit;
         event.state = req.body.state;
         event.penalization = req.body.penalization;
         event.penalizationStartDate = req.body.penalizationStartDate;
+        event.isPrivate = req.body.isPrivate;
+
         event.save();
         res.status(200).json(event);
     } catch(e){
