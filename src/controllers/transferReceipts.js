@@ -54,6 +54,9 @@ export async function createTransferReceipt(req, res) {
         }
         let transferReceipt = new TransferReceipt(req.body);
         transferReceipt.event = req.params.event;
+        let date = new Date();
+        date.setHours(date.getHours() - 3);
+        transferReceipt.datetime = date.toISOString();
         transferReceipt = await transferReceipt.save();
         const event = await Event.findById(req.params.event);
         event.transferReceipts.push(transferReceipt);
