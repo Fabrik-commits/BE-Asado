@@ -177,6 +177,7 @@ export async function editEvent (req, res) {
         event.memberLimit = req.body.memberLimit;
         event.penalization = req.body.penalization;
         event.penalizationStartDate = req.body.penalizationStartDate;
+        event.state = req.body.state;
         event.isPrivate = req.body.isPrivate;
         event.save();
         res.status(200).json(event);
