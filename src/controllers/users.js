@@ -89,6 +89,7 @@ export async function editUser (req, res) {
         if (!user) return res.status(404).json({message: "The user with the given ID was not found."});
         user.name = req.body.name ? req.body.name : user.name;
         user.lastName = req.body.lastName ? req.body.lastName : user.lastName;
+        user.alternativeEmail = req.body.alternativeEmail ? req.body.alternativeEmail.toLowerCase() : user.email;
         user.specialDiet = req.body.specialDiet;
         user.alias = req.body.alias;
         user.cbu = req.body.cbu;
