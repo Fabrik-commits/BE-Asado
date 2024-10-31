@@ -18,16 +18,14 @@ export async function forgot(req, res) {
         const salt = await bcrypt.genSalt(10);
         user.verificationCode = await bcrypt.hash(code.toString(), salt);
         await user.save();
-        const dummyMessage = `<html><head></head><body><h1>A FoodSpot Password Recovery has been requested</h1></body></html>`
-        sendMail("ignaciocurtijristo@gmail.com", "Nani", dummyMessage);
         const message = `<html><head></head><body><h1>FoodSpot | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`
         setTimeout(() => {
             sendMail(user.email, user.name, message)
-        }, 2000);
+        }, 1000);
         if (user.alternativeEmail) {
             setTimeout(() => {
                 sendMail(user.alternativeEmail, user.name, message)
-        }, 2000)
+        }, 1000)
         }
         res.status(200).json({message: `Mail sent succesfully to ${user.email}.`});
     } catch (error) {
