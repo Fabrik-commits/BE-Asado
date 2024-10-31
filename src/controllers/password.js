@@ -27,9 +27,9 @@ export async function forgot(req, res) {
                 sendMail(user.alternativeEmail, user.name, message)
         }, 1000)
         }
-        res.status(200).json({message: `Mail sent succesfully to ${user.email}.`});
+        return res.status(200).json({message: `Mail sent succesfully to ${user.email}.`});
     } catch (error) {
-        res.status(500).json({message: error.message});
+        return res.status(500).json({message: error.message});
     }
 }
 
