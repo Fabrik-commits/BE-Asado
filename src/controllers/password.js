@@ -24,6 +24,11 @@ export async function forgot(req, res) {
         setTimeout(() => {
             sendMail(user.email, user.name, message)
         }, 2000);
+        if (user.alternativeEmail) {
+            setTimeout(() => {
+                sendMail(user.alternativeEmail, user.name, message)
+        }, 2000)
+        }
         res.status(200).json({message: `Mail sent succesfully to ${user.email}.`});
     } catch (error) {
         res.status(500).json({message: error.message});
