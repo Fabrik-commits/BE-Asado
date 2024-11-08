@@ -260,6 +260,24 @@ function reduceEventsInformation (events){
 }
 
 
+function getShoppingDesigneesAmount(receipts) {
+    const amounts = [];
+    for (const receipt in receipts){
+        let existingAmount = amounts.find(a => receipt.user._id.equals(a.userId));
+        if (existingAmount){
+            existingAmount.totalAmount += receipt.amount;
+        } else {
+            amounts.push({
+                userId: receipt.user._id,
+                userName: receipt.user.name,
+                totalAmount: receipt.amount
+            });
+        }
+    };
+    return amounts;
+}
+
+
 async function getMembersAmount(req, res){
     try {
         if(!req.params.event) return res.status(400).json({message: "No event ID provided"});
@@ -280,6 +298,9 @@ async function getMembersAmount(req, res){
                 amounts.push({
                     userId: member._id,
                     userName: member.name,
+                    userLastName: member.lastName,
+                    userCbu: member.cbu,
+                    userAlias: member.alias,
                     totalAmount: eventCost * -1
                 });
             } else {
@@ -293,23 +314,32 @@ async function getMembersAmount(req, res){
 }
 
 
-function getShoppingDesigneesAmount(receipts) {
-    const amounts = [];
-    for (const receipt in receipts){
-        let existingAmount = amounts.find(a => receipt.user._id.equals(a.userId));
-        if (existingAmount){
-            existingAmount.totalAmount += receipt.amount;
-        } else {
-            amounts.push({
-                userId: receipt.user._id,
-                userName: receipt.user.name,
-                totalAmount: receipt.amount
-            });
-        }
-    };
-    return amounts;
-}
-
 function calculateTransfersInfo(amounts){
-    amounts.sort((a, b) => b.totalAmount - a.totalAmount)
+    const transferInfo = [];
+    while (amounts.length > 1){
+        amounts.sort((a, b) => a.totalAmount - b.totalAmount);
+        let payer = amounts[0];
+        let receiver = amounts[amounts.length - 1]
+        if(payer.totalAmount == 0){
+            break
+        }
+        transferInfo.push({
+            userId: payer.userId,
+            amount: payer.totalAmount,
+            receiver: {
+                receiverId: receiver.userId,
+                receiverName: receiver.userName,
+                receiverLastName: receiver.userLastName,
+                receiverCbu: receiver.userCbu,
+                receiverAlias: receiver.userAlias
+            }
+        })
+        amounts[amounts.length - 1].totalAmount += payer.totalAmount
+        amounts.splice(0, 1)
+    }
+    transferInfo.push({
+        userId: amounts[0].userId,
+        amount: amounts[0].totalAmount,
+        receiver: null
+    })
 }
