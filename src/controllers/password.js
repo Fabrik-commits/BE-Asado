@@ -18,10 +18,20 @@ export async function forgot(req, res) {
     user.verificationCode = await bcrypt.hash(code.toString(), salt);
     await user.save();
     try {
-        sendMail(user.email, user.name, code);
-        res.status(200).json({message: `Mail sent succesfully to ${user.email}.`});
+        req.body.email = req.body.email.toLowerCase();
+        const user = await User.findOne({email: req.body.email}).exec();
+        if(!user) return res.status(404).json({message: "User does not exist."});
+        const code = Math.floor(Math.random() * 900000) + 100000;
+        const salt = await bcrypt.genSalt(10);
+        user.verificationCode = await bcrypt.hash(code.toString(), salt);
+        await user.save();
+        const message = `<html><head></head><body><h1>FoodSpot | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`
+        setTimeout(() => {
+            sendMail(user.email, user.name, message)
+        }, 1000);
+        return res.status(200).json({message: `Mail sent succesfully to ${user.email}.`});
     } catch (error) {
-        res.status(500).json({message: error.message});
+        return res.status(500).json({message: error.message});
     }
 }
 

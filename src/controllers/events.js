@@ -25,7 +25,7 @@ export async function getPublicEvents(req, res){
                     $ne: true
                 }}
             )
-            .select("datetime description state chef memberLimit members title ratings")
+            .select("datetime description state chef memberLimit members title ratings isPrivate penalization penalizationStartDate")
             .sort({"_id": -1})
             .populate("chef", "name")
             .populate("ratings");
@@ -52,7 +52,7 @@ export async function getPublicAndPrivateEvents(req, res){
                     ]
                 }
             )
-            .select("datetime description state chef memberLimit members title ratings")
+            .select("datetime description state chef memberLimit members title ratings isPrivate penalization penalizationStartDate")
             .sort({"_id": -1})
             .populate("chef", "name")
             .populate("ratings");
@@ -171,10 +171,14 @@ export async function editEvent (req, res) {
     try{
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
+        event.title = req.body.title;
         event.datetime = req.body.datetime;
         event.description = req.body.description;
         event.memberLimit = req.body.memberLimit;
+        event.penalization = req.body.penalization;
+        event.penalizationStartDate = req.body.penalizationStartDate;
         event.state = req.body.state;
+        event.isPrivate = req.body.isPrivate;
         event.save();
         res.status(200).json(event);
     } catch(e){
@@ -252,8 +256,10 @@ function reduceEventsInformation (events){
                     avgScore: event.ratings ? (event.ratings.length > 0 ? (eventRating / event.ratings.length) : 0) : 0, // esto es porque eventos viejos no tienen el atributo
                     ratingsAmount: event.ratings ? event.ratings.length : 0 // esto es porque eventos viejos no tienen el atributo
                 },
-                isPrivate: event.isPrivate ? isPrivate : false // esto es porque eventos viejos no tienen el atributo 
-            }                                                  // y asi hay backwards compatibility, SACAR CUANDO NO HAYA EVENTOS SIN ESTE ATRIBUTO
+                isPrivate: event.isPrivate ? event.isPrivate : false, // esto es porque eventos viejos no tienen el atributo 
+                penalization: event.penalization ? event.penalization : null, // y asi hay backwards compatibility, SACAR CUANDO NO HAYA EVENTOS SIN ESTOS ATRIBUTOS
+                penalizationStartDate: event.penalizationStartDate ? event.penalizationStartDate : null
+            }
         );
     }
     return reducedEvents
