@@ -306,7 +306,7 @@ async function getMembersAmount(req, res){
             } else {
                 existingAmount.totalAmount -= eventCost
             }
-            calculateTransfersInfo(amounts)
+            return calculateTransfersInfo(amounts)
         }
     } catch (e) {
         return res.status(500).json({message: e.message});
@@ -342,4 +342,5 @@ function calculateTransfersInfo(amounts){
         amount: amounts[0].totalAmount,
         receiver: null
     })
+    return transferInfo
 }
