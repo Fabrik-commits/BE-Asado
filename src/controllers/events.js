@@ -278,42 +278,6 @@ function getShoppingDesigneesAmount(receipts) {
 }
 
 
-async function getMembersAmount(req, res){
-    try {
-        if(!req.params.event) return res.status(400).json({message: "No event ID provided"});
-        const event = await Event.findById(req.params.event).select('purchaseReceipts members').populate({
-            path: 'purchaseReceipts',
-            populate: {
-                path: 'user',
-                model: 'User'           
-            }
-        });
-        if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
-        const amounts = getShoppingDesigneesAmount(event.purchaseReceipts);
-        const totalAmount = amounts.reduce((sum, shoppingDesigneeAmount) => sum + shoppingDesigneeAmount.totalAmount, 0);
-        const eventCost = Number((totalAmount / event.members.length).toFixed(2))
-        for (const member in event.members){
-            let existingAmount = amounts.find(a => receipt.user._id.equals(a.userId));
-            if (!existingAmount){
-                amounts.push({
-                    userId: member._id,
-                    userName: member.name,
-                    userLastName: member.lastName,
-                    userCbu: member.cbu,
-                    userAlias: member.alias,
-                    totalAmount: eventCost * -1
-                });
-            } else {
-                existingAmount.totalAmount -= eventCost
-            }
-            return calculateTransfersInfo(amounts)
-        }
-    } catch (e) {
-        return res.status(500).json({message: e.message});
-    }
-}
-
-
 function calculateTransfersInfo(amounts){
     const transferInfo = [];
     while (amounts.length > 1){
@@ -343,4 +307,41 @@ function calculateTransfersInfo(amounts){
         receiver: null
     })
     return transferInfo
+}
+
+
+export async function getMembersAmount(req, res){
+    try {
+        if(!req.params.event) return res.status(400).json({message: "No event ID provided"});
+        const event = await Event.findById(req.params.event).select('purchaseReceipts members').populate({
+            path: 'purchaseReceipts',
+            populate: {
+                path: 'user',
+                model: 'User'           
+            }
+        });
+        if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
+        const shoppingDesigneeAmounts = getShoppingDesigneesAmount(event.purchaseReceipts);
+        const totalAmount = shoppingDesigneeAmounts.reduce((sum, shoppingDesigneeAmount) => sum + shoppingDesigneeAmount.totalAmount, 0);
+        const eventCost = Number((totalAmount / event.members.length).toFixed(2))
+        for (const member in event.members){
+            let existingAmount = shoppingDesigneeAmounts.find(a => receipt.user._id.equals(a.userId));
+            if (!existingAmount){
+                shoppingDesigneeAmounts.push({
+                    userId: member._id,
+                    userName: member.name,
+                    userLastName: member.lastName,
+                    userCbu: member.cbu,
+                    userAlias: member.alias,
+                    totalAmount: eventCost * -1
+                });
+            } else {
+                existingAmount.totalAmount -= eventCost
+            }
+            const membersAmounts = calculateTransfersInfo(shoppingDesigneeAmounts)
+            return membersAmounts
+        }
+    } catch (e) {
+        return res.status(500).json({message: e.message});
+    }
 }

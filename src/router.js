@@ -1,6 +1,6 @@
 import express from 'express';
 import {auth, eventOrganizer, eventParticipant, multerUpload, multerUploadImages, sameUser, shoppingDesignee, transferReceiptOwner} from './middleware/middleware.js';
-import {getEvents, getPublicEvents, getPublicAndPrivateEvents, getEventById, getMembersAndReceiptsInfo, getShoppingDesigneesAmount, createEvent, subscribeToAnEvent, unsubscribeFromEvent, editRoles, editEvent, deleteEvent} from "./controllers/events.js";
+import {getEvents, getPublicEvents, getPublicAndPrivateEvents, getEventById, getMembersAndReceiptsInfo, getMembersAmount, createEvent, subscribeToAnEvent, unsubscribeFromEvent, editRoles, editEvent, deleteEvent} from "./controllers/events.js";
 import {getImage} from "./controllers/images.js";
 import {login} from './controllers/login.js';
 import {getPurchaseReceiptsByEvent, getPurchaseReceiptById, uploadFilePurchaseReceipt, createPurchaseReceipt, deletePurchaseReceipt} from './controllers/purchaseReceipts.js';
@@ -19,7 +19,7 @@ router.get("/events/getPublicEvents", getPublicEvents);
 router.get("/events/getPublicAndPrivateEvents", auth, getPublicAndPrivateEvents);
 router.get("/events/getEventById/:id", getEventById);
 router.get("/events/getMembersAndReceiptsInfo/:event", getMembersAndReceiptsInfo);
-router.get("/events/getShoppingDesigneesAmount/:event", auth, getShoppingDesigneesAmount)
+router.get("/events/getShoppingDesigneesAmount/:event", auth, getMembersAmount)
 
 router.post("/events/createEvent", auth, createEvent);
 
