@@ -1,5 +1,5 @@
 import express from 'express';
-import {auth, eventOrganizer, eventParticipant, multerUpload, multerUploadImages, sameUser, shoppingDesignee, transferReceiptOwner} from './middleware/middleware.js';
+import {auth, eventOrganizer, eventParticipant, multerUpload, multerUploadImages, sameUser, shoppingDesignee, transferReceiptOwner, shoppingDesigneeOrEventOrganizer} from './middleware/middleware.js';
 import {getEvents, getPublicEvents, getPublicAndPrivateEvents, getEventById, getMembersAndReceiptsInfo, createEvent, subscribeToAnEvent, unsubscribeFromEvent, editRoles, editEvent, deleteEvent} from "./controllers/events.js";
 import {getImage} from "./controllers/images.js";
 import {login} from './controllers/login.js';
@@ -25,7 +25,7 @@ router.post("/events/createEvent", auth, createEvent);
 router.put("/events/subscribeToAnEvent/:id/:event", [auth, sameUser], subscribeToAnEvent);
 router.put("/events/unsubscribeFromEvent/:id/:event", [auth, sameUser], unsubscribeFromEvent);
 router.put("/events/editRoles/:id", auth, editRoles);
-router.put("/events/editEvent/:id", [auth, eventOrganizer], editEvent);
+router.put("/events/editEvent/:id", [auth, shoppingDesigneeOrEventOrganizer], editEvent);
 
 router.delete('/events/deleteEvent/:id', [auth, eventOrganizer], deleteEvent);
 
