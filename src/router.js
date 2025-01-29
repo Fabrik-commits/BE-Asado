@@ -5,7 +5,7 @@ import {getImage} from "./controllers/images.js";
 import {login} from './controllers/login.js';
 import {getPurchaseReceiptsByEvent, getPurchaseReceiptById, uploadFilePurchaseReceipt, createPurchaseReceipt, deletePurchaseReceipt} from './controllers/purchaseReceipts.js';
 import {forgot, verifyCode, recover} from "./controllers/password.js";
-import {getTransferReceiptsByEvent, getTransferReceiptsById, uploadFileTransferReceipt, createTransferReceipt, approveTransferReceipt, deleteTransferReceipt} from "./controllers/transferReceipts.js";
+import {getTransferReceiptsByEvent, getTransferReceiptsById, uploadFileTransferReceipt, createTransferReceipt, approvePaymentWithoutReceipt, approveTransferReceipt, deleteTransferReceipt} from "./controllers/transferReceipts.js";
 import {getUsers, getUserById, isDebtor, register, editUser, editProfilePicture, deleteUser} from "./controllers/users.js";
 import {createRating, getRatingFromUser} from "./controllers/ratings.js";
 
@@ -61,6 +61,7 @@ router.get("/transferReceipts/getTransferReceiptsById/:id", auth, getTransferRec
 
 router.post("/transferReceipts/uploadFile/:transferReceipt", [auth, multerUpload.single('file')], uploadFileTransferReceipt);
 router.post("/transferReceipts/createTransferReceipt/:event", auth, createTransferReceipt);
+router.post("/transferReceipts/approvePaymentWithoutReceipt/:event/:user", auth, approvePaymentWithoutReceipt);
 
 router.put('/transferReceipts/approveTransferReceipt/:id/:event', [auth, shoppingDesignee], approveTransferReceipt);
 
