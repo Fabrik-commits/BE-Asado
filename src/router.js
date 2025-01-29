@@ -61,7 +61,7 @@ router.get("/transferReceipts/getTransferReceiptsById/:id", auth, getTransferRec
 
 router.post("/transferReceipts/uploadFile/:transferReceipt", [auth, multerUpload.single('file')], uploadFileTransferReceipt);
 router.post("/transferReceipts/createTransferReceipt/:event", auth, createTransferReceipt);
-router.post("/transferReceipts/approvePaymentWithoutReceipt/:event/:user", auth, approvePaymentWithoutReceipt);
+router.post("/transferReceipts/approvePaymentWithoutReceipt/:event/:user", [auth, shoppingDesignee], approvePaymentWithoutReceipt);
 
 router.put('/transferReceipts/approveTransferReceipt/:id/:event', [auth, shoppingDesignee], approveTransferReceipt);
 
