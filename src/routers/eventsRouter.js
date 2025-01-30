@@ -1,0 +1,43 @@
+import express from "express";
+import {
+  getEvents,
+  getPublicEvents,
+  getPublicAndPrivateEvents,
+  getEventById,
+  getMembersAndReceiptsInfo,
+  createEvent,
+  subscribeToAnEvent,
+  unsubscribeFromEvent,
+  editRoles,
+  editEvent,
+  deleteEvent,
+} from "../controllers/events.js";
+import { auth, sameUser, eventOrganizer } from "../middleware/middleware.js";
+
+const eventRouter = express.Router();
+
+// events routes
+eventRouter.get("/getEvents", auth, getEvents);
+eventRouter.get("/getPublicEvents", getPublicEvents);
+eventRouter.get("/getPublicAndPrivateEvents", auth, getPublicAndPrivateEvents);
+eventRouter.get("/getEventById/:id", getEventById);
+eventRouter.get("/getMembersAndReceiptsInfo/:event", getMembersAndReceiptsInfo);
+
+eventRouter.post("/createEvent", auth, createEvent);
+
+eventRouter.put(
+  "/subscribeToAnEvent/:id/:event",
+  [auth, sameUser],
+  subscribeToAnEvent
+);
+eventRouter.put(
+  "/unsubscribeFromEvent/:id/:event",
+  [auth, sameUser],
+  unsubscribeFromEvent
+);
+eventRouter.put("/editRoles/:id", auth, editRoles);
+eventRouter.put("/editEvent/:id", [auth, eventOrganizer], editEvent);
+
+eventRouter.delete("/deleteEvent/:id", [auth, eventOrganizer], deleteEvent);
+
+export default eventRouter;
