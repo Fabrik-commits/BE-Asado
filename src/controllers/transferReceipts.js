@@ -85,6 +85,10 @@ export async function approvePaymentWithoutReceipt(req, res) {
         const event = await Event.findById(req.params.event);
         event.transferReceipts.push(transferReceipt);
         await event.save();
+        if (await isFinished(req.params.event)) {
+            event.state = 'finished'
+            await event.save();
+        }
         return res.status(201).json(transferReceipt);
     } catch(e){
         return res.status(500).json({message: e.message});
