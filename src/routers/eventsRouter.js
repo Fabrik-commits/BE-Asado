@@ -68,7 +68,7 @@ eventRouter.put(
 );
 
 eventRouter.put(
-  "/events/editEvent/:id", 
+  "/editEvent/:id", 
   [auth, shoppingDesigneeOrEventOrganizer], 
   editEvent
 );
