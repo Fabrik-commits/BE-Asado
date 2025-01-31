@@ -16,19 +16,45 @@ import {
 
 const usersRouter = express.Router();
 
-usersRouter.get("/getUsers", auth, getUsers);
-usersRouter.get("/getUserById/:id", auth, getUserById);
-usersRouter.get("/isDebtor/:id", auth, isDebtor);
+usersRouter.get(
+  "/getUsers", 
+  auth, 
+  getUsers
+);
 
-usersRouter.post("/register", register);
+usersRouter.get(
+  "/getUserById/:id", 
+  auth, 
+  getUserById
+);
 
-usersRouter.put("/editUser/:id", [auth, sameUser], editUser);
+usersRouter.get(
+  "/isDebtor/:id", 
+  auth, 
+  isDebtor
+);
+
+usersRouter.post(
+  "/register", 
+  register
+);
+
+usersRouter.put(
+  "/editUser/:id", 
+  [auth, sameUser], 
+  editUser
+);
+
 usersRouter.put(
   "/editProfilePicture/:id",
   [auth, sameUser, multerUploadImages.single("file")],
   editProfilePicture
 );
 
-usersRouter.delete("/deleteUser/:id", [auth, sameUser], deleteUser);
+usersRouter.delete(
+  "/deleteUser/:id", 
+  [auth, sameUser], 
+  deleteUser
+);
 
 export default usersRouter;

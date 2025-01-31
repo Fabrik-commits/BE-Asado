@@ -6,7 +6,7 @@ import {
   createPurchaseReceipt,
   deletePurchaseReceipt,
 } from "../controllers/purchaseReceipts.js";
-import { auth, shoppingDesignee } from "../middleware/middleware.js";
+import { auth, shoppingDesignee, eventParticipant, multerUpload } from "../middleware/middleware.js";
 
 const purchaseReceiptRouter = express.Router();
 
@@ -15,6 +15,7 @@ purchaseReceiptRouter.get(
   [auth, eventParticipant],
   getPurchaseReceiptsByEvent
 );
+
 purchaseReceiptRouter.get(
   "/getPurchaseReceiptById/:id/:event",
   [auth, eventParticipant],
@@ -26,6 +27,7 @@ purchaseReceiptRouter.post(
   [auth, multerUpload.single("file")],
   uploadFilePurchaseReceipt
 );
+
 purchaseReceiptRouter.post(
   "/createPurchaseReceipt/:event",
   [auth, shoppingDesignee],

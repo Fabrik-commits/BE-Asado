@@ -72,7 +72,7 @@ export async function recover(req, res) {
 }
 
 
-function sendMail(email, name, code) {
+function sendMail(email, name, message) {
     let data = JSON.stringify({
         "sender": {
             "name": "FoodSpot",
@@ -85,7 +85,7 @@ function sendMail(email, name, code) {
             }
         ],
         "subject": "FoodSpot | Password recovery",
-        "htmlContent": `<html><head></head><body><h1>FoodSpot | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`
+        "htmlContent": message
     });
     const options = {
         method: 'POST',

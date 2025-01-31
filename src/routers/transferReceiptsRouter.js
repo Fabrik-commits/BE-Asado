@@ -4,6 +4,7 @@ import {
   getTransferReceiptsById,
   uploadFileTransferReceipt,
   createTransferReceipt,
+  approvePaymentWithoutReceipt,
   approveTransferReceipt,
   deleteTransferReceipt,
 } from "../controllers/transferReceipts.js";
@@ -20,6 +21,7 @@ transferReceiptRouter.get(
   [auth, shoppingDesignee],
   getTransferReceiptsByEvent
 );
+
 transferReceiptRouter.get(
   "/getTransferReceiptsById/:id",
   auth,
@@ -31,10 +33,17 @@ transferReceiptRouter.post(
   [auth, multerUpload.single("file")],
   uploadFileTransferReceipt
 );
+
 transferReceiptRouter.post(
   "/createTransferReceipt/:event",
   auth,
   createTransferReceipt
+);
+
+transferReceiptRouter.post(
+  "/transferReceipts/approvePaymentWithoutReceipt/:event/:user", 
+  [auth, shoppingDesignee], 
+  approvePaymentWithoutReceipt
 );
 
 transferReceiptRouter.put(
