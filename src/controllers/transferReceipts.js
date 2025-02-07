@@ -45,9 +45,10 @@ export async function uploadFileTransferReceipt(req, res) {
 export async function createTransferReceipt(req, res) {
     try {
         const hasUploadedValue = await hasUploaded(req.body.user, req.params.event)
+        const event = await Event.findById(req.params.event);
+        if (event.state !== "readyForPayment") return res.status(400).json({message: "You can only create transfer receipts when the event is ready for payment."});
         if (hasUploadedValue.hasUploaded){
             let oldTransferReceipt = await TransferReceipt.findByIdAndRemove(hasUploadedValue.transferReceipt);
-            let event = await Event.findById(req.params.event);
             const index = event.transferReceipts.indexOf(oldTransferReceipt);
             event.transferReceipts.splice(index, 1);
             await event.save();
@@ -58,7 +59,6 @@ export async function createTransferReceipt(req, res) {
         date.setHours(date.getHours() - 3);
         transferReceipt.datetime = date.toISOString();
         transferReceipt = await transferReceipt.save();
-        const event = await Event.findById(req.params.event);
         event.transferReceipts.push(transferReceipt);
         await event.save();
         return res.status(201).json(transferReceipt);
@@ -121,6 +121,7 @@ export async function deleteTransferReceipt(req, res) {
         if (!transferReceipt) return res.status(404).json({message: 'The transfer receipt with the given ID was not found.'});
         const eventId = transferReceipt.event
         const event = await Event.findById(eventId);
+        if (event.state !== "readyForPayment") return res.status(400).json({message: "You can only create transfer receipts when the event is ready for payment."});
         const index = event.transferReceipts.indexOf(transferReceipt._id);
         event.transferReceipts.splice(index, 1);
         await event.save();

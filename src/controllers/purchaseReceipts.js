@@ -46,10 +46,11 @@ export async function uploadFilePurchaseReceipt(req, res) {
 
 export async function createPurchaseReceipt(req, res) {
     try{
+        const event = await Event.findById(req.params.event);
+        if (event.state !== "closed") return res.status(400).json({message: "Purchase receipts can only be uploaded when the event is closed"});
         let purchaseReceipt = new PurchaseReceipt(req.body);
         purchaseReceipt.event = req.params.event;
         purchaseReceipt = await purchaseReceipt.save();
-        const event = await Event.findById(req.params.event);
         event.purchaseReceipts.push(purchaseReceipt);
         await event.save();
         return res.status(201).json(purchaseReceipt);
@@ -65,6 +66,7 @@ export async function deletePurchaseReceipt(req, res) {
         if (!purchaseReceipt) return res.status(404).json({message: "The purchase receipt with the given ID was not found."});
         const eventId = purchaseReceipt.event
         const event = await Event.findById(eventId);
+        if (event.state !== "closed") return res.status(400).json({message: "Purchase receipts can only be uploaded when the event is closed"});
         const index = event.purchaseReceipts.indexOf(purchaseReceipt._id);
         event.purchaseReceipts.splice(index, 1);
         await event.save();

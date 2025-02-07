@@ -144,6 +144,7 @@ export async function unsubscribeFromEvent(req, res) {
         if (!user) {
             return res.status(400).json({message: "The user with the given ID was not found."})
         }
+        if(event.state == "closed" || event.state == "readyForPayment") return res.status(400).json({message: "The user can't unsubscribe from the event if it's closed or ready for payment."});
         event.members.splice(index, 1);
         await event.save();
         res.status(200).json(event);
