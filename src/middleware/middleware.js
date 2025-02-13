@@ -94,8 +94,12 @@ export async function shoppingDesignee(req, res, next){
         if (!isValidId(req.user._id) || !isValidId(req.params.event)) return res.status(400).json({message: "Invalid ObjectID"});
         const event = await Event.findById(req.params.event);
         if (!event) return res.status(404).json({message: "The event with the given ID does not exist."});
-        if (event.shoppingDesignee.toString() !== req.user._id) return res.status(403).json({message: "Access denied. The user is not the event's shopping designee."});
-        next();
+        const designee = event.shoppingDesignee.find(s => s.toString() == req.user._id);
+        if (designee) {
+            next();
+        } else {
+            return res.status(403).json({message: "Access denied. User is not a shopping designee."});
+        }
     } catch(e) {
         res.status(500).json({message: e.message});
     }

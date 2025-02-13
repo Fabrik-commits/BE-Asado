@@ -100,7 +100,7 @@ export async function createEvent(req, res) {
     try{
         let event = new Event(req.body);
         event.chef = req.body.isChef ? req.body.organizer : null;
-        event.shoppingDesignee = req.body.isShoppingDesignee ? req.body.organizer : null;
+        if (req.body.isShoppingDesignee) event.shoppingDesignee.push(req.body.organizer);
         event = await event.save();
         await deleteEvents()
         return res.status(201).json(event);
@@ -159,7 +159,7 @@ export async function editRoles(req, res) {
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
         event.chef = req.body.chef ? req.body.chef : null;
-        event.shoppingDesignee = req.body.shoppingDesignee ? req.body.shoppingDesignee : null;
+        if (req.body.shoppingDesignee) event.shoppingDesignee.push(req.body.shoppingDesignee);
         await event.save();
         res.status(200).json(event);
     } catch (e) {
@@ -216,6 +216,7 @@ async function deleteEvents(){
     } 
 }
 
+
 async function deleteReceipts(eventId) {
     const event = await Event.findById(eventId).populate(["transferReceipts", "purchaseReceipts", "ratings"]);
 
@@ -238,6 +239,7 @@ async function deleteReceipts(eventId) {
         })
     );
 }
+
 
 function reduceEventsInformation (events){
     let reducedEvents = []
@@ -264,4 +266,104 @@ function reduceEventsInformation (events){
         );
     }
     return reducedEvents
+}
+
+
+function getShoppingDesigneesAmount(receipts) {
+    const amounts = [];
+    for (const receipt of receipts){
+        let existingAmount = amounts.find(a => receipt.user._id.equals(a.userId));
+        if (existingAmount){
+            existingAmount.totalAmount += receipt.amount;
+        } else {
+            amounts.push({
+                userId: receipt.user._id,
+                userName: receipt.user.name,
+                userLastName: receipt.user.lastName,
+                userCbu: receipt.user.cbu,
+                userAlias: receipt.user.alias,
+                totalAmount: receipt.amount
+            });
+        }
+    };
+    return amounts;
+}
+
+
+function calculateTransfersInfo(amounts){
+    const transferInfo = [];
+
+    while(amounts.length > 0){
+        amounts.sort((a, b) => a.totalAmount - b.totalAmount);
+        let payer = amounts[0];
+        if(payer.totalAmount == 0){
+            transferInfo.push({
+                userId: payer.userId,
+                userName: payer.userName,
+                amount: payer.totalAmount,
+                receiver: null
+            });
+            amounts.splice(0, 1);
+            continue
+        }
+        let receiver = amounts[amounts.length - 1];
+        transferInfo.push({
+            userId: payer.userId,
+            userName: payer.userName,
+            amount: payer.totalAmount * -1,
+            receiver: {
+                receiverId: receiver.userId,
+                receiverName: receiver.userName,
+                receiverLastName: receiver.userLastName,
+                receiverCbu: receiver.userCbu,
+                receiverAlias: receiver.userAlias
+            }
+        });
+        amounts[amounts.length - 1].totalAmount += payer.totalAmount;
+        amounts.splice(0, 1);
+    };
+    return transferInfo;
+}
+
+
+export async function getMembersAmount(req, res){
+    try {
+        if(!req.params.event) return res.status(400).json({message: "No event ID provided"});
+        const event = await Event.findById(req.params.event).select('purchaseReceipts members').populate([
+            {
+                path: 'purchaseReceipts',
+                populate: {
+                    path: 'user',
+                    model: 'User'
+                }
+            },
+            {
+                path: 'members',
+                model: "User"
+            }
+        ]);
+        if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
+        const shoppingDesigneeAmounts = getShoppingDesigneesAmount(event.purchaseReceipts);
+        const totalAmount = shoppingDesigneeAmounts.reduce((sum, shoppingDesigneeAmount) => sum + shoppingDesigneeAmount.totalAmount, 0);
+        const eventCost = Number((totalAmount / event.members.length).toFixed(2));
+        for (const member of event.members){
+            let existingAmount = shoppingDesigneeAmounts.find(a => member._id.equals(a.userId));
+            if (!existingAmount){
+                shoppingDesigneeAmounts.push({
+                    userId: member._id,
+                    userName: member.name,
+                    userLastName: member.lastName,
+                    userCbu: member.cbu,
+                    userAlias: member.alias,
+                    totalAmount: eventCost * -1
+                });
+            } else {
+                existingAmount.totalAmount -= eventCost;
+            }
+        }
+        const membersAmounts = calculateTransfersInfo(shoppingDesigneeAmounts);
+        return res.status(200).json(membersAmounts);
+    } catch (e) {
+        return res.status(500).json({message: e.message});
+    }
 }

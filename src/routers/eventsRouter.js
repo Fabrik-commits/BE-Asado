@@ -5,6 +5,7 @@ import {
   getPublicAndPrivateEvents,
   getEventById,
   getMembersAndReceiptsInfo,
+  getMembersAmount,
   createEvent,
   subscribeToAnEvent,
   unsubscribeFromEvent,
@@ -42,6 +43,11 @@ eventRouter.get(
   "/getMembersAndReceiptsInfo/:event", 
   getMembersAndReceiptsInfo
 );
+
+eventRouter.get(
+  "/getMembersAmount/:event",
+  getMembersAmount
+)
 
 eventRouter.post(
   "/createEvent", 
