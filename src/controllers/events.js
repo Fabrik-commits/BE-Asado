@@ -276,6 +276,9 @@ function getShoppingDesigneesAmount(receipts) {
             amounts.push({
                 userId: receipt.user._id,
                 userName: receipt.user.name,
+                userLastName: member.lastName,
+                userCbu: member.cbu,
+                userAlias: member.alias,
                 totalAmount: receipt.amount
             });
         }
@@ -323,7 +326,7 @@ export async function getMembersAmount(req, res){
             path: 'purchaseReceipts',
             populate: {
                 path: 'user',
-                model: 'User'           
+                model: 'User'
             }
         });
         if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
