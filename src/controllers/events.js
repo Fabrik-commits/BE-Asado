@@ -268,7 +268,7 @@ function reduceEventsInformation (events){
 
 function getShoppingDesigneesAmount(receipts) {
     const amounts = [];
-    for (const receipt in receipts){
+    for (const receipt of receipts){
         let existingAmount = amounts.find(a => receipt.user._id.equals(a.userId));
         if (existingAmount){
             existingAmount.totalAmount += receipt.amount;
@@ -276,9 +276,9 @@ function getShoppingDesigneesAmount(receipts) {
             amounts.push({
                 userId: receipt.user._id,
                 userName: receipt.user.name,
-                userLastName: member.lastName,
-                userCbu: member.cbu,
-                userAlias: member.alias,
+                userLastName: receipt.user.lastName,
+                userCbu: receipt.user.cbu,
+                userAlias: receipt.user.alias,
                 totalAmount: receipt.amount
             });
         }
@@ -292,7 +292,7 @@ function calculateTransfersInfo(amounts){
     while (amounts.length > 1){
         amounts.sort((a, b) => a.totalAmount - b.totalAmount);
         let payer = amounts[0];
-        let receiver = amounts[amounts.length - 1]
+        let receiver = amounts[amounts.length - 1];
         if(payer.totalAmount == 0){
             break
         }
@@ -306,16 +306,16 @@ function calculateTransfersInfo(amounts){
                 receiverCbu: receiver.userCbu,
                 receiverAlias: receiver.userAlias
             }
-        })
-        amounts[amounts.length - 1].totalAmount += payer.totalAmount
-        amounts.splice(0, 1)
+        });
+        amounts[amounts.length - 1].totalAmount += payer.totalAmount;
+        amounts.splice(0, 1);
     }
     transferInfo.push({
         userId: amounts[0].userId,
         amount: amounts[0].totalAmount,
         receiver: null
-    })
-    return transferInfo
+    });
+    return transferInfo;
 }
 
 
@@ -332,9 +332,9 @@ export async function getMembersAmount(req, res){
         if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
         const shoppingDesigneeAmounts = getShoppingDesigneesAmount(event.purchaseReceipts);
         const totalAmount = shoppingDesigneeAmounts.reduce((sum, shoppingDesigneeAmount) => sum + shoppingDesigneeAmount.totalAmount, 0);
-        const eventCost = Number((totalAmount / event.members.length).toFixed(2))
-        for (const member in event.members){
-            let existingAmount = shoppingDesigneeAmounts.find(a => receipt.user._id.equals(a.userId));
+        const eventCost = Number((totalAmount / event.members.length).toFixed(2));
+        for (const member of event.members){
+            let existingAmount = shoppingDesigneeAmounts.find(a => member._id.equals(a.userId));
             if (!existingAmount){
                 shoppingDesigneeAmounts.push({
                     userId: member._id,
@@ -345,10 +345,10 @@ export async function getMembersAmount(req, res){
                     totalAmount: eventCost * -1
                 });
             } else {
-                existingAmount.totalAmount -= eventCost
+                existingAmount.totalAmount -= eventCost;
             }
-            const membersAmounts = calculateTransfersInfo(shoppingDesigneeAmounts)
-            return membersAmounts
+            const membersAmounts = calculateTransfersInfo(shoppingDesigneeAmounts);
+            return res.status(200).json(membersAmounts);
         }
     } catch (e) {
         return res.status(500).json({message: e.message});
