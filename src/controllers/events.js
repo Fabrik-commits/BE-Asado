@@ -292,12 +292,6 @@ function getShoppingDesigneesAmount(receipts) {
 function calculateTransfersInfo(amounts){
     const transferInfo = [];
 
-
-
-
-
-
-
     while(amounts.length > 0){
         amounts.sort((a, b) => a.totalAmount - b.totalAmount);
         let payer = amounts[0];
