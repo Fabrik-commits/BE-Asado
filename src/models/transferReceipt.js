@@ -38,6 +38,11 @@ const transferReceiptSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Event',
         required: true
+    },
+
+    datetime: {
+        type: Date,
+        required: true
     }
 });
 

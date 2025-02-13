@@ -38,6 +38,20 @@ const userSchema = new mongoose.Schema({
         }
     },
 
+    alternativeEmail: {
+        type: String,
+        validate: {
+            validator: function (v) {
+                if (!v) return false;
+                let username, domain, rest
+                [username, domain, ...rest] = v.split("@");
+                if (rest.length) return false;
+                return true
+            },
+            message: (props) => `${props.value} is not a valid endava email.`
+        }
+    },
+
     password: {
         type: String,
         required: true,

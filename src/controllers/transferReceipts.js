@@ -54,12 +54,43 @@ export async function createTransferReceipt(req, res) {
         }
         let transferReceipt = new TransferReceipt(req.body);
         transferReceipt.event = req.params.event;
+        let date = new Date();
+        date.setHours(date.getHours() - 3);
+        transferReceipt.datetime = date.toISOString();
         transferReceipt = await transferReceipt.save();
         const event = await Event.findById(req.params.event);
         event.transferReceipts.push(transferReceipt);
         await event.save();
         return res.status(201).json(transferReceipt);
     } catch(e) {
+        return res.status(500).json({message: e.message});
+    }
+}
+
+export async function approvePaymentWithoutReceipt(req, res) {
+    try{
+        const hasUploadedValue = await hasUploaded(req.params.user, req.params.event);
+        if (hasUploadedValue.hasUploaded){
+            return res.status(400).json({message: "The user has uploaded a transfer receipt"});
+        }
+        let transferReceipt = new TransferReceipt();
+        let date = new Date();
+        date.setHours(date.getHours() - 3);
+        transferReceipt.datetime = date.toISOString();
+        transferReceipt.amount = 0
+        transferReceipt.event = req.params.event
+        transferReceipt.user = req.params.user
+        transferReceipt.hasPaid = true
+        transferReceipt = await transferReceipt.save();
+        const event = await Event.findById(req.params.event);
+        event.transferReceipts.push(transferReceipt);
+        await event.save();
+        if (await isFinished(req.params.event)) {
+            event.state = 'finished'
+            await event.save();
+        }
+        return res.status(201).json(transferReceipt);
+    } catch(e){
         return res.status(500).json({message: e.message});
     }
 }

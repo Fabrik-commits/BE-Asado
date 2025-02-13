@@ -19,11 +19,11 @@ References:
 | events | getPublicAndPrivateEvents | Gets all public events and all private events that include the user with public data only sorted by date of creation in descendent order | GET |  | Yes |  |
 | events | getEventById/:id | Gets an event by its id (12 byte Object ID) | GET | id | Yes |  |
 | events | getMembersAndReceiptsInfo/:event | Returns a list of users and their transferReceipt information | GET | event | Yes |  |
-| events | createEvent | Creates an event | POST |  | Yes | <ul> <li>title: String</li> <li>description: String</li> <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>members: [ObjectId of members]</li> <li>organizer: ObjectId of a member</li> <li>(chef: ObjectId of a member)</li> <li>(shoppingDesignee: ObjectId of a member)</li></ul> |
+| events | createEvent | Creates an event | POST |  | Yes | <ul> <li>title: String</li> <li>description: String</li> <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>members: [ObjectId of members]</li> <li>organizer: ObjectId of a member</li> <li>(chef: ObjectId of a member)</li> <li>(shoppingDesignee: ObjectId of a member)</li><li>isPrivate: Boolean</li><li>penalization: Number</li><li>penalizationStartDate: Date</li></ul> |
 | events | subscribeToAnEvent/:id/:event | Subscribes a user by id for a certain event providing the event's id (12 byte Object ID) | PUT | id, event | Yes and user token needs to be the user to subscribe |  |
 | events | unsubscribeFromEvent/:id/:event | Removes a user by id for a certain event providing the event's id (12 byte Object ID) | PUT | id, event | Yes and user token needs to be the user to remove |  |
 | events | editRoles/:id | Edits an event's chef and shopping designee by its id (12 byte Object ID) | PUT | id | Yes | <ul><li>chef: ObjectId of a member</li> <li>shoppingDesignee: ObjectId of a member</li> </ul> |
-| events | editEvent/:id | Edits an event by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the organizer's | <ul><li>title: String, <li>description: String, <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>state: String with limited values {full, closed, available, cancelled, finished}</li> </ul> |
+| events | editEvent/:id | Edits an event by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the organizer's | <ul><li>title: String</li><li>description: String<li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>isPrivate: Boolean</li><li>penalization: Number</li><li>penalizationStartDate: Date</li></ul> |
 | events | deleteEvent/:id | Deletes an event by its id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the organizer's |  |
 | images | getImage/:id | Gets an image by its id (12 byte Object ID) | GET | id | Yes |  |
 | - | login | Logs a user and returns the auth token | POST |  | No | <ul><li>email: String</li> <li>password: String</li></ul> |
@@ -41,6 +41,7 @@ References:
 | transferReceipts | getTransferReceiptsById/:id | Gets a single transferReceipt by its id (12 byte Object ID) | GET | id | Yes |  |
 | transferReceipts | uploadFile/:transferReceipt | Uploads a file for a transferReceipt | POST | transferReceipt | Yes | file: png/jpeg/pdf |
 | transferReceipts | createTransferReceipt/:event | Creates a transferReceipt for a certain event | POST | event | Yes | <ul><li>(description: String)</li> <li>amount: Number</li> <li>user: ObjectId of a member</li> <li>(paymentMethod: String)</li> <li>DON'T SEND hasPaid: Boolean or send it as false</li></ul> |
+| transferReceipts | approvePaymentWithoutReceipt/:event/:user | Creates and approves a transferReceipt for a certain event for a user that hasn't uploaded a receipt yet | POST | event | Yes |  |
 | transferReceipts | approveTransferReceipt/:id/:event | Approves a single transferReceipt by its id (12 byte Object ID) | PUT | id, event | Yes and user token needs to be the shoppingDesignee |  |
 | transferReceipts | deleteTransferReceipt/:id | Deletes a transferReceipt by its id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the receipt owner |  |
 | users | getUsers  | Gets all users in the database | GET |  | Yes |  |

@@ -82,6 +82,15 @@ const eventSchema = new mongoose.Schema({
     isPrivate: {
         type: Boolean,
         default: false
+    },
+
+    penalization: {
+        type: Number,
+        default: null
+    },
+
+    penalizationStartDate: {
+        type: Date
     }
 });
 
