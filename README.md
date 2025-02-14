@@ -19,6 +19,7 @@ References:
 | events | getPublicAndPrivateEvents | Gets all public events and all private events that include the user with public data only sorted by date of creation in descendent order | GET |  | Yes |  |
 | events | getEventById/:id | Gets an event by its id (12 byte Object ID) | GET | id | Yes |  |
 | events | getMembersAndReceiptsInfo/:event | Returns a list of users and their transferReceipt information | GET | event | Yes |  |
+| events | /getMembersAmount/:event | Returns a list of users, with the amount to pay and the receiver of that payment | GET | event | Yes |  |
 | events | createEvent | Creates an event | POST |  | Yes | <ul> <li>title: String</li> <li>description: String</li> <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>members: [ObjectId of members]</li> <li>organizer: ObjectId of a member</li> <li>(chef: ObjectId of a member)</li> <li>(shoppingDesignee: ObjectId of a member)</li><li>isPrivate: Boolean</li><li>penalization: Number</li><li>penalizationStartDate: Date</li></ul> |
 | events | subscribeToAnEvent/:id/:event | Subscribes a user by id for a certain event providing the event's id (12 byte Object ID) | PUT | id, event | Yes and user token needs to be the user to subscribe |  |
 | events | unsubscribeFromEvent/:id/:event | Removes a user by id for a certain event providing the event's id (12 byte Object ID) | PUT | id, event | Yes and user token needs to be the user to remove |  |
