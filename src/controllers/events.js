@@ -113,7 +113,7 @@ export async function createEvent(req, res) {
 export async function subscribeToAnEvent(req, res) {
     try{
         if(!req.params.event) return res.status(400).json({message: "No event ID provided."});
-        const event = await Event.findById(req.params.event);
+        const event = await Event.findById(req.params.event).populate("purchaseReceipts");
         if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
         if(event.memberLimit <= event.members.length) return res.status(400).json({message: "The event is full."})
         if(event.state !== "available") return res.status(400).json({message: "The event is not available for users to join"});
@@ -123,6 +123,10 @@ export async function subscribeToAnEvent(req, res) {
         const user = await User.findById(req.params.id);
         if (!user) {
             return res.status(400).json({message: "The user with the given ID was not found."})
+        }
+        for (const receipt of event.purchaseReceipts){
+            receipt.participants.push(user._id)
+            await receipt.save()
         }
         event.members.push(user);
         await event.save();
@@ -136,7 +140,7 @@ export async function subscribeToAnEvent(req, res) {
 export async function unsubscribeFromEvent(req, res) {
     try {
         if(!req.params.event) return res.status(400).json({message: "No event ID provided."});
-        const event = await Event.findById(req.params.event);
+        const event = await Event.findById(req.params.event).populate("purchaseReceipts");
         if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
         const index = event.members.indexOf(req.params.id);
         if (index === -1) return res.status(404).json({message: "The member with the given ID is not part of the event."});
@@ -145,6 +149,10 @@ export async function unsubscribeFromEvent(req, res) {
             return res.status(400).json({message: "The user with the given ID was not found."})
         }
         if(event.state == "closed" || event.state == "readyForPayment") return res.status(400).json({message: "The user can't unsubscribe from the event if it's closed or ready for payment."});
+        for (const receipt of event.purchaseReceipts) {
+            receipt.participants = receipt.participants.filter((participantId) => !participantId.equals(user._id));
+            await receipt.save();
+        }
         event.members.splice(index, 1);
         await event.save();
         res.status(200).json(event);
