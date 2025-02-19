@@ -25,10 +25,15 @@ const purchaseReceiptSchema = new mongoose.Schema({
         required: true
     },
 
-    user: {
+    shoppingDesignee: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+
+    participants: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'User'
     }
 
 });

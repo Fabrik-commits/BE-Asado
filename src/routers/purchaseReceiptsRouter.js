@@ -2,6 +2,7 @@ import express from "express";
 import {
   getPurchaseReceiptsByEvent,
   getPurchaseReceiptById,
+  assignMembersToReceipt,
   uploadFilePurchaseReceipt,
   createPurchaseReceipt,
   deletePurchaseReceipt,
@@ -21,6 +22,12 @@ purchaseReceiptRouter.get(
   [auth, eventParticipant],
   getPurchaseReceiptById
 );
+
+purchaseReceiptRouter.put(
+  "/assignMembersToReceipt/:id",
+  [auth, shoppingDesignee],
+  assignMembersToReceipt
+)
 
 purchaseReceiptRouter.post(
   "/uploadFile/:purchaseReceipt",

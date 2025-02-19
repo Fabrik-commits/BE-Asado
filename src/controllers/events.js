@@ -222,14 +222,14 @@ async function deleteReceipts(eventId) {
 
     await Promise.all(
         event.transferReceipts.map(async (transferReceipt) => {
-            await Image.findByIdAndDelete(transferReceipt.image);
+            if (transferReceipt.image) await Image.findByIdAndDelete(transferReceipt.image);
             await TransferReceipt.findByIdAndDelete(transferReceipt._id);
         })
     );
 
     await Promise.all(
         event.purchaseReceipts.map(async (purchaseReceipt) => {
-            await Image.findByIdAndDelete(purchaseReceipt.image);
+            if (purchaseReceipt.image) await Image.findByIdAndDelete(purchaseReceipt.image);
             await PurchaseReceipt.findByIdAndDelete(purchaseReceipt._id);
         })
     );
@@ -272,16 +272,16 @@ function reduceEventsInformation (events){
 function getShoppingDesigneesAmount(receipts) {
     const amounts = [];
     for (const receipt of receipts){
-        let existingAmount = amounts.find(a => receipt.user._id.equals(a.userId));
+        let existingAmount = amounts.find(a => receipt.shoppingDesignee._id.equals(a.userId));
         if (existingAmount){
             existingAmount.totalAmount += receipt.amount;
         } else {
             amounts.push({
-                userId: receipt.user._id,
-                userName: receipt.user.name,
-                userLastName: receipt.user.lastName,
-                userCbu: receipt.user.cbu,
-                userAlias: receipt.user.alias,
+                userId: receipt.shoppingDesignee._id,
+                userName: receipt.shoppingDesignee.name,
+                userLastName: receipt.shoppingDesignee.lastName,
+                userCbu: receipt.shoppingDesignee.cbu,
+                userAlias: receipt.shoppingDesignee.alias,
                 totalAmount: receipt.amount
             });
         }
@@ -325,6 +325,27 @@ function calculateTransfersInfo(amounts){
     return transferInfo;
 }
 
+function assignCosts(receipts){
+    const userCosts = []
+    for (const receipt of receipts){
+        const receiptCostPerUser = Number((receipt.amount / receipt.participants.length).toFixed(2));
+        for (const user of receipt.participants){
+            let existingCost = userCosts.find(a => user._id.equals(a.userId));
+            if (existingCost){
+                existingCost.totalCost += receiptCostPerUser;
+            } else {
+                userCosts.push(
+                    {
+                        userId: user._id,
+                        totalCost: receiptCostPerUser
+                    }
+                );
+            }
+        }
+    }
+    return userCosts;
+}
+
 
 export async function getMembersAmount(req, res){
     try {
@@ -332,10 +353,16 @@ export async function getMembersAmount(req, res){
         const event = await Event.findById(req.params.event).select('purchaseReceipts members').populate([
             {
                 path: 'purchaseReceipts',
-                populate: {
-                    path: 'user',
-                    model: 'User'
-                }
+                populate: [
+                        {
+                            path: 'shoppingDesignee',
+                            model: 'User'
+                        },
+                        {
+                            path: 'participants',
+                            model: 'User'
+                        },
+                ]
             },
             {
                 path: 'members',
@@ -343,26 +370,27 @@ export async function getMembersAmount(req, res){
             }
         ]);
         if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
-        const shoppingDesigneeAmounts = getShoppingDesigneesAmount(event.purchaseReceipts);
-        const totalAmount = shoppingDesigneeAmounts.reduce((sum, shoppingDesigneeAmount) => sum + shoppingDesigneeAmount.totalAmount, 0);
-        const eventCost = Number((totalAmount / event.members.length).toFixed(2));
+        const userAmounts = getShoppingDesigneesAmount(event.purchaseReceipts);
+        const userCosts = assignCosts(event.purchaseReceipts)
+
         for (const member of event.members){
-            let existingAmount = shoppingDesigneeAmounts.find(a => member._id.equals(a.userId));
+            const userCost = userCosts.find(a => member._id.equals(a.userId)).totalCost;
+            let existingAmount = userAmounts.find(a => member._id.equals(a.userId));
             if (!existingAmount){
-                shoppingDesigneeAmounts.push({
+                userAmounts.push({
                     userId: member._id,
                     userName: member.name,
                     userLastName: member.lastName,
                     userCbu: member.cbu,
                     userAlias: member.alias,
-                    totalAmount: eventCost * -1
+                    totalAmount: userCost * -1
                 });
             } else {
-                existingAmount.totalAmount -= eventCost;
+                existingAmount.totalAmount -= userCost;
             }
         }
-        const membersAmounts = calculateTransfersInfo(shoppingDesigneeAmounts);
-        return res.status(200).json(membersAmounts);
+        const transferInfo = calculateTransfersInfo(userAmounts);
+        return res.status(200).json(transferInfo);
     } catch (e) {
         return res.status(500).json({message: e.message});
     }
