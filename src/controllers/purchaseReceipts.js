@@ -51,7 +51,7 @@ export async function createPurchaseReceipt(req, res) {
         let purchaseReceipt = new PurchaseReceipt(req.body);
         purchaseReceipt.event = req.params.event;
         purchaseReceipt.shoppingDesignee = req.user._id
-        purchaseReceipt.participants = event.members
+        purchaseReceipt.participants = req.body.participants ? req.body.participants : event.members 
         purchaseReceipt = await purchaseReceipt.save();
         event.purchaseReceipts.push(purchaseReceipt);
         await event.save();

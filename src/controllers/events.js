@@ -332,7 +332,7 @@ function assignCosts(receipts){
         for (const user of receipt.participants){
             let existingCost = userCosts.find(a => user._id.equals(a.userId));
             if (existingCost){
-                existingCost.totalCost += receipt.amount;
+                existingCost.totalCost += receiptCostPerUser;
             } else {
                 userCosts.push(
                     {
