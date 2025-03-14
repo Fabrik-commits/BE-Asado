@@ -188,7 +188,6 @@ export async function editEvent (req, res) {
         event.penalizationStartDate = req.body.penalizationStartDate;
         event.state = req.body.state;
         event.isPrivate = req.body.isPrivate;
-        if ((event.shoppingDesignee.length == 0 || !event.chef) && event.state !== 'available') return res.status(400).json({message: "The event has no chef or has no shopping designees."})
         event.save();
         res.status(200).json(event);
     } catch(e){
