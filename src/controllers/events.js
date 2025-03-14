@@ -167,7 +167,7 @@ export async function editRoles(req, res) {
         const event = await Event.findById(req.params.id);
         if (!event) return res.status(404).json({message: "The event with the given ID was not found."});
         event.chef = req.body.chef ? req.body.chef : null;
-        if (req.body.shoppingDesignee) event.shoppingDesignee.push(req.body.shoppingDesignee);
+        event.shoppingDesignee = req.body.shoppingDesignee;
         await event.save();
         res.status(200).json(event);
     } catch (e) {
