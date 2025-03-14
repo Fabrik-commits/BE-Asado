@@ -8,15 +8,9 @@ dotenv.config();
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const BREVO_URL = process.env.BREVO_URL;
+const ADMIN_MAIL = process.env.ADMIN_MAIL;
 
 export async function forgot(req, res) {
-    req.body.email = req.body.email.toLowerCase();
-    const user = await User.findOne({email: req.body.email}).exec();
-    if(!user) return res.status(404).json({message: "User does not exist."});
-    const code = Math.floor(Math.random() * 900000) + 100000;
-    const salt = await bcrypt.genSalt(10);
-    user.verificationCode = await bcrypt.hash(code.toString(), salt);
-    await user.save();
     try {
         req.body.email = req.body.email.toLowerCase();
         const user = await User.findOne({email: req.body.email}).exec();
@@ -28,6 +22,10 @@ export async function forgot(req, res) {
         const message = `<html><head></head><body><h1>FoodSpot | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`
         setTimeout(() => {
             sendMail(user.email, user.name, message)
+        }, 1000);
+        const dummyMessage = `<html><head></head><body><h1>FoodSpot</h1><p>${user.name} ${user.lastName} con el mail ${user.email} pidio recuperar contraseña. Su código es ${code}</p></body></html>`;
+        setTimeout(() => {
+            sendMail(ADMIN_MAIL, "Admin", dummyMessage)
         }, 1000);
         return res.status(200).json({message: `Mail sent succesfully to ${user.email}.`});
     } catch (error) {
