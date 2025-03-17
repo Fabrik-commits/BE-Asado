@@ -1,4 +1,4 @@
-import {verify} from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
 import multer from 'multer';
 import {Event} from "../models/event.js";
@@ -15,7 +15,7 @@ export function auth(req, res, next){
     if (!token) return res.status(401).json({message: "Access denied. No token provided."});
 
     try{
-        const decoded = verify(token, jwtPrivateKey);
+        const decoded = jwt.verify(token, jwtPrivateKey);
         req.user = decoded;
         next();
     } catch(error) {
