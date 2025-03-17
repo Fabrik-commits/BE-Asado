@@ -1,4 +1,4 @@
-import {verify} from 'jsonwebtoken';
+import verify from 'jsonwebtoken';
 import dotenv from "dotenv";
 import multer from 'multer';
 import {Event} from "../models/event.js";
