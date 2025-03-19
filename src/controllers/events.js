@@ -379,6 +379,7 @@ export async function getMembersAmount(req, res){
             }
         ]);
         if(!event) return res.status(404).json({message: "The event with the given ID was not found."});
+        if (event.purchaseReceipts.length == 0) return res.status(400).json({message: "The event has no purchase receipts."})
         const userAmounts = getShoppingDesigneesAmount(event.purchaseReceipts);
         const userCosts = assignCosts(event.purchaseReceipts)
 
