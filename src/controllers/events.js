@@ -193,7 +193,7 @@ export async function unsubscribeFromEvent(req, res) {
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "The user with the given ID was not found." });
     }
-    if (event.state == "closed" || event.state == "readyForPayment")
+    if (event.state == "closed" || event.state == "readyforpayment")
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         message:
           "The user can't unsubscribe from the event if it's closed or ready for payment.",

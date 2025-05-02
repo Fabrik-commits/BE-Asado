@@ -61,7 +61,7 @@ export async function createTransferReceipt(req, res) {
   try {
     const hasUploadedValue = await hasUploaded(req.body.user, req.params.event);
     const event = await Event.findById(req.params.event);
-    if (event.state !== "readyForPayment")
+    if (event.state !== "readyforpayment")
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         message: cannotCreateTransferReceiptMessage,
       });
@@ -161,7 +161,7 @@ export async function deleteTransferReceipt(req, res) {
       });
     const eventId = transferReceipt.event;
     const event = await Event.findById(eventId);
-    if (event.state !== "readyForPayment")
+    if (event.state !== "readyforpayment")
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         message: cannotCreateTransferReceiptMessage,
       });
