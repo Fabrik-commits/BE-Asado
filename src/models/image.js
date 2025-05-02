@@ -1,23 +1,13 @@
 import mongoose from "mongoose";
 
-
 const imageSchema = new mongoose.Schema({
+  name: { type: String },
 
-    name: {
-        type: String
-    },
+  mimetype: { type: String },
 
-    mimetype: {
-        type: String
-    },
-
-    image: {
-        type: Buffer
-    }
-
+  image: { type: Buffer },
 });
 
-const Image = mongoose.model('Image', imageSchema);
+const Image = mongoose.model("Image", imageSchema);
 
-
-export {imageSchema as imageSchema, Image as Image};
+export { imageSchema as imageSchema, Image as Image };

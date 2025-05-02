@@ -1,101 +1,80 @@
 import mongoose from "mongoose";
 
-
 const eventSchema = new mongoose.Schema({
+  title: { type: String, required: true },
 
-    title: {
-        type: String,
-        required: true
-    },
+  datetime: { type: Date, required: true },
 
-    datetime: {
-        type: Date,
-        required: true
-    },
+  description: { type: String, required: true },
 
-    description: {
-        type: String,
-        required: true
-    },
+  memberLimit: { type: Number, required: true },
 
-    memberLimit: {
-        type: Number,
-        required: true
-    },
-
-    state: {
-        type: String,
-        required: true,
-        default: "available",
-        validate: {
-            validator: function(v){
-                const valid_states = ["closed", "available", "readyforpayment", "cancelled", "finished"];
-                if (!v) return false;
-                if (!valid_states.includes(v.toLowerCase())){
-                    return false;
-                }
-                return true;
-            } 
+  state: {
+    type: String,
+    required: true,
+    default: "available",
+    validate: {
+      validator: function (v) {
+        const valid_states = [
+          "closed",
+          "available",
+          "readyforpayment",
+          "cancelled",
+          "finished",
+        ];
+        if (!v) return false;
+        if (!valid_states.includes(v.toLowerCase())) {
+          return false;
         }
+        return true;
+      },
     },
+  },
 
-    members: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'User'
-    },
+  members: { type: [mongoose.Schema.Types.ObjectId], ref: "User" },
 
-    chef: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null
-    },
+  chef: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
 
-    organizer: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
+  organizer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 
-    shoppingDesignee: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'User',
-        default: null
-    },
+  shoppingDesignee: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "User",
+    default: null,
+  },
 
-    transferReceipts: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'TransferReceipt',
-        default: []
-    },
+  transferReceipts: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "TransferReceipt",
+    default: [],
+  },
 
-    purchaseReceipts: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'PurchaseReceipt',
-        default: []
-    },
+  purchaseReceipts: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "PurchaseReceipt",
+    default: [],
+  },
 
-    ratings: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: 'Rating'
-    },
+  ratings: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Rating",
+  },
 
-    isPrivate: {
-        type: Boolean,
-        default: false
-    },
+  isPrivate: { type: Boolean, default: false },
 
-    penalization: {
-        type: Number,
-        default: null
-    },
+  penalization: { type: Number, default: null },
 
-    penalizationStartDate: {
-        type: Date
-    }
+  penalizationStartDate: { type: Date },
 });
 
+const event = mongoose.model("Event", eventSchema);
 
-const event = mongoose.model('Event', eventSchema);
-
-
-export {event as Event};
+export { event as Event };
