@@ -1,11 +1,12 @@
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 import { Image } from "../models/image.js";
 import { extname } from "path";
+import { isValidId } from "../utils/utils.js"
 
 export async function getImage(req, res) {
   try {
     const id = req.params.id;
-    if (!id) return res.status(STATUS_CODES.BAD_REQUEST).json({message: "No id was provided."})
+    if (!isValidId(id)) return res.status(STATUS_CODES.BAD_REQUEST).json({message: "No valid id was provided."})
     const image = await Image.findById(id);
     if (!image) return res.status(STATUS_CODES.BAD_REQUEST).json({message: "No image was found."})
     res.contentType(image.mimetype);
