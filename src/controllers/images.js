@@ -6,6 +6,7 @@ export async function getImage(req, res) {
   try {
     const id = req.params.id;
     const image = await Image.findById(id);
+    if (!image) return res.status(STATUS_CODES.BAD_REQUEST).json({message: "No image was found."})
     res.contentType(image.mimetype);
     res.status(STATUS_CODES.OK).send(image.image);
   } catch {
