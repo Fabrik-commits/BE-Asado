@@ -5,11 +5,12 @@ import { extname } from "path";
 export async function getImage(req, res) {
   try {
     const id = req.params.id;
+    if (!id) return res.status(STATUS_CODES.BAD_REQUEST).json({message: "No id was provided."})
     const image = await Image.findById(id);
     if (!image) return res.status(STATUS_CODES.BAD_REQUEST).json({message: "No image was found."})
     res.contentType(image.mimetype);
     res.status(STATUS_CODES.OK).send(image.image);
-  } catch {
+  } catch(e) {
     res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
   }
 }
