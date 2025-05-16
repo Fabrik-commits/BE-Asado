@@ -2,6 +2,7 @@ import { TransferReceipt } from "../models/transferReceipt.js";
 import { Event } from "../models/event.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
+import { getShoppingDesigneesAmount, assignCosts, calculateTransfersInfo } from "../controllers/events.js";
 
 const transferReceiptNotFoundMessage =
   "The transfer receipt with the given ID was not found.";
@@ -176,7 +177,7 @@ export async function deleteTransferReceipt(req, res) {
   }
 }
 
-export async function isFinished(eventId) {
+export async function oldIsFinished(eventId) {
   const event = await Event.findById(eventId).populate("transferReceipts");
   if (event.members.length - 1 > event.transferReceipts.length) return false;
   for (let receipt of event.transferReceipts) {
@@ -186,6 +187,55 @@ export async function isFinished(eventId) {
   }
   return true;
 }
+
+
+export async function isFinished(eventId) {
+  const event = await Event.findById(eventId)
+    .populate({
+      path: "transferReceipts",
+    })
+    .populate({
+      path: "purchaseReceipts",
+      populate: [
+        { path: "shoppingDesignee", model: "User" },
+        { path: "participants", model: "User" },
+      ],
+    })
+    .populate({ path: "members", model: "User" });
+
+  const receipts = event.purchaseReceipts;
+  const userAmounts = getShoppingDesigneesAmount(receipts);
+  const userCosts = assignCosts(receipts);
+
+  for (const member of event.members) {
+    const userCostEntry = userCosts.find((c) => c.userId.equals(member._id));
+    const userCost = userCostEntry ? userCostEntry.totalCost : 0;
+    let existingAmount = userAmounts.find((a) => member._id.equals(a.userId));
+
+    if (!existingAmount) {
+      userAmounts.push({
+        userId: member._id,
+        userName: member.name,
+        userLastName: member.lastName,
+        userCbu: member.cbu,
+        userAlias: member.alias,
+        totalAmount: -userCost,
+      });
+    } else {
+      existingAmount.totalAmount -= userCost;
+    }
+  }
+
+  const transferInfo = calculateTransfersInfo(userAmounts);
+  const expectedTransfers = transferInfo.filter((t) => t.receiver !== null);
+
+  const approvedTransfers = event.transferReceipts.filter(
+    (r) => r.hasPaid === true
+  );
+
+  return expectedTransfers.length === approvedTransfers.length;
+}
+
 
 export async function membersWhoHaveUploaded(eventId) {
   const event = await Event.findById(eventId).populate(
