@@ -161,7 +161,7 @@ export async function deleteTransferReceipt(req, res) {
       });
     const eventId = transferReceipt.event;
     const event = await Event.findById(eventId);
-    if (event.state !== "readyForPayment")
+    if (event.state !== "readyforpayment")
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         message: cannotCreateTransferReceiptMessage,
       });

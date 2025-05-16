@@ -2,7 +2,9 @@ import bcrypt from "bcrypt";
 import { User } from "../models/user.js";
 import { Image } from "../models/image.js";
 import { Event } from "../models/event.js";
+import { TransferReceipt } from "../models/transferReceipt.js";
 import { hasUploaded } from "./transferReceipts.js";
+import {getShoppingDesigneesAmount, assignCosts, calculateTransfersInfo} from "./events.js"
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 
@@ -41,10 +43,87 @@ export async function getUserById(req, res) {
 export async function isDebtor(req, res) {
   try {
     const userId = req.params.id;
+
+    const events = await Event.find({
+      members: userId,
+      state: "readyforpayment",
+    })
+      .populate({
+        path: "purchaseReceipts",
+        populate: [
+          { path: "shoppingDesignee", model: "User" },
+          { path: "participants", model: "User" },
+        ],
+      })
+      .populate({ path: "members", model: "User" });
+
+    for (const event of events) {
+      const receipts = event.purchaseReceipts;
+
+      const userAmounts = getShoppingDesigneesAmount(receipts);
+      const userCosts = assignCosts(receipts);
+
+      for (const member of event.members) {
+        const userCostEntry = userCosts.find((c) => c.userId.equals(member._id));
+        const userCost = userCostEntry ? userCostEntry.totalCost : 0;
+        let existingAmount = userAmounts.find((a) => member._id.equals(a.userId));
+
+        if (!existingAmount) {
+          userAmounts.push({
+            userId: member._id,
+            userName: member.name,
+            userLastName: member.lastName,
+            userCbu: member.cbu,
+            userAlias: member.alias,
+            totalAmount: -userCost,
+          });
+        } else {
+          existingAmount.totalAmount -= userCost;
+        }
+      }
+
+      const transferInfo = calculateTransfersInfo(userAmounts);
+      const userTransfer = transferInfo.find(
+        (t) => t.userId.equals(userId) && t.receiver
+      );
+
+      if (userTransfer) {
+        const receipt = await TransferReceipt.findOne({
+          event: event._id,
+          user: userId,
+        });
+
+        if (!receipt) {
+          return res.status(STATUS_CODES.OK).json({
+            eventId: event._id,
+            reason: "Transfer Receipt hasn't been uploaded yet.",
+          });
+        } else if (!receipt.hasPaid) {
+          return res.status(STATUS_CODES.OK).json({
+            eventId: event._id,
+            reason: "Transfer Receipt is not approved.",
+          });
+        }
+      }
+    }
+
+    return res.status(STATUS_CODES.OK).json({
+      eventId: null,
+      reason: "User has no debts.",
+    });
+  } catch (e) {
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      message: e.message,
+    });
+  }
+}
+
+export async function oldIsDebtor(req, res) {
+  try {
+    const userId = req.params.id;
     const eventsWithoutReceipts = await Event.find({
       members: userId,
-      shoppingDesignee: { $ne: userId },
-      state: "closed",
+      state: "readyforpayment",
       purchaseReceipts: { $exists: true, $ne: [] },
     });
 
@@ -78,6 +157,11 @@ export async function isDebtor(req, res) {
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
       .json({ message: e.message });
   }
+}
+
+async function hasToPay(userId, eventId) {
+  const event = await Event.findOne(eventId).populate("purchaseReceipts");
+
 }
 
 export async function register(req, res) {
