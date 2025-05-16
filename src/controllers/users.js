@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { User } from "../models/user.js";
 import { Image } from "../models/image.js";
 import { Event } from "../models/event.js";
+import { TransferReceipt } from "../models/transferReceipt.js";
 import { hasUploaded } from "./transferReceipts.js";
 import {getShoppingDesigneesAmount, assignCosts, calculateTransfersInfo} from "./events.js"
 import { saveImage } from "./images.js";
@@ -39,7 +40,7 @@ export async function getUserById(req, res) {
   }
 }
 
-export async function newIsDebtor(req, res) {
+export async function isDebtor(req, res) {
   try {
     const userId = req.params.id;
 
@@ -89,8 +90,7 @@ export async function newIsDebtor(req, res) {
       if (userTransfer) {
         const receipt = await TransferReceipt.findOne({
           event: event._id,
-          sender: userId,
-          receiver: userTransfer.receiver.receiverId,
+          user: userId,
         });
 
         if (!receipt) {
@@ -101,7 +101,7 @@ export async function newIsDebtor(req, res) {
         } else if (!receipt.hasPaid) {
           return res.status(STATUS_CODES.OK).json({
             eventId: event._id,
-            reason: "Transfer receipt not approved.",
+            reason: "Transfer Receipt is not approved.",
           });
         }
       }
@@ -118,7 +118,7 @@ export async function newIsDebtor(req, res) {
   }
 }
 
-export async function isDebtor(req, res) {
+export async function oldIsDebtor(req, res) {
   try {
     const userId = req.params.id;
     const eventsWithoutReceipts = await Event.find({
