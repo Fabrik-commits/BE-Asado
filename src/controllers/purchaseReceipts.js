@@ -9,9 +9,21 @@ export async function getPurchaseReceiptsByEvent(req, res) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "No event ID provided" });
-    const event = await Event.findById(req.params.event).populate(
-      "purchaseReceipts"
-    );
+    const event = await Event.findById(req.params.event).populate([
+        {
+          path: "purchaseReceipts",
+          populate: [
+            {
+              path: "shoppingDesignee",
+              model: "User",
+            },
+            {
+              path: "participants",
+              model: "User",
+            },
+          ],
+        }
+      ]);
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
