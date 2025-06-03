@@ -354,7 +354,7 @@ function reduceEventsInformation(events) {
   return reducedEvents;
 }
 
-function getShoppingDesigneesAmount(receipts) {
+export function getShoppingDesigneesAmount(receipts) {
   const amounts = [];
   for (const receipt of receipts) {
     let existingAmount = amounts.find((a) =>
@@ -376,7 +376,7 @@ function getShoppingDesigneesAmount(receipts) {
   return amounts;
 }
 
-function calculateTransfersInfo(amounts) {
+export function calculateTransfersInfo(amounts) {
   const transferInfo = [];
 
   while (amounts.length > 0) {
@@ -411,7 +411,7 @@ function calculateTransfersInfo(amounts) {
   return transferInfo;
 }
 
-function assignCosts(receipts) {
+export function assignCosts(receipts) {
   const userCosts = [];
   for (const receipt of receipts) {
     const receiptCostPerUser = Number(

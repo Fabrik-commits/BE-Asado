@@ -9,9 +9,21 @@ export async function getPurchaseReceiptsByEvent(req, res) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "No event ID provided" });
-    const event = await Event.findById(req.params.event).populate(
-      "purchaseReceipts"
-    );
+    const event = await Event.findById(req.params.event).populate([
+        {
+          path: "purchaseReceipts",
+          populate: [
+            {
+              path: "shoppingDesignee",
+              model: "User",
+            },
+            {
+              path: "participants",
+              model: "User",
+            },
+          ],
+        }
+      ]);
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -90,10 +102,16 @@ export async function createPurchaseReceipt(req, res) {
 
 export async function assignMembersToReceipt(req, res) {
   try {
-    const purchaseReceipt = await PurchaseReceipt.findById(req.params.id);
-    purchaseReceipt.participants = req.body.participants;
-    await purchaseReceipt.save();
-    res.status(STATUS_CODES.OK).json({ purchaseReceipt });
+    for (const receipt of req.body.receipts) {
+      const purchaseReceipt = await PurchaseReceipt.findById(receipt.id);
+      if (!purchaseReceipt)
+        return res
+          .status(STATUS_CODES.NOT_FOUND)
+          .json({ message: "One or more purchase receipts were not found"});
+      purchaseReceipt.participants = receipt.participants;
+      await purchaseReceipt.save();
+    }
+    res.status(STATUS_CODES.OK).json({ message: "Participants assigned to receipts successfully" });
   } catch (e) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
