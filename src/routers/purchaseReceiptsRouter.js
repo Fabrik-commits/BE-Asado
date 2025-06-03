@@ -24,8 +24,8 @@ purchaseReceiptRouter.get(
 );
 
 purchaseReceiptRouter.put(
-  "/assignMembersToReceipt/:id",
-  [auth, shoppingDesignee],
+  "/assignMembersToReceipt",
+  [auth],
   assignMembersToReceipt
 )
 
