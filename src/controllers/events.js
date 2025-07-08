@@ -361,7 +361,7 @@ export function getShoppingDesigneesAmount(receipts) {
       receipt.shoppingDesignee._id.equals(a.userId)
     );
     if (existingAmount) {
-      existingAmount.totalAmount += receipt.amount;
+      existingAmount.totalAmount = Math.trunc(existingAmount.totalAmount + receipt.amount);
     } else {
       amounts.push({
         userId: receipt.shoppingDesignee._id,
@@ -396,7 +396,7 @@ export function calculateTransfersInfo(amounts) {
     transferInfo.push({
       userId: payer.userId,
       userName: payer.userName,
-      amount: payer.totalAmount * -1,
+      amount: Math.trunc(payer.totalAmount * -1),
       receiver: {
         receiverId: receiver.userId,
         receiverName: receiver.userName,
@@ -405,7 +405,7 @@ export function calculateTransfersInfo(amounts) {
         receiverAlias: receiver.userAlias,
       },
     });
-    amounts[amounts.length - 1].totalAmount += payer.totalAmount;
+    amounts[amounts.length - 1].totalAmount =  Math.trunc(amounts[amounts.length - 1].totalAmount + payer.totalAmount);
     amounts.splice(0, 1);
   }
   return transferInfo;
@@ -429,6 +429,7 @@ export function assignCosts(receipts) {
       }
     }
   }
+  console.log(userCosts);
   return userCosts;
 }
 
