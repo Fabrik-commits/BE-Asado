@@ -1,4 +1,4 @@
-0# BE-Asado
+# BE-Asado
 
 Express.js REST API for Food-Spot
 
