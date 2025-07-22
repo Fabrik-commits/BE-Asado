@@ -15,9 +15,9 @@ References:
 | Prefix | Endpoint | Description | Type | Parameters | Auth | Body requirements | Response |
 |--|--|--|--|--|--|--|--|
 | events | getEvents | Gets all events in the database | GET |  | Yes |  | [Event] |
-| events | getPublicEvents | Gets all non private events with public data only sorted by date of creation in descendent order | GET |  | No |  | [Event] where private is False (does not return organizer, members is just the amount of members) |
-| events | getPublicAndPrivateEvents | Gets all public events and all private events that include the user with public data only sorted by date of creation in descendent order | GET |  | Yes |  | [Event] where private is False (does not return organizer, members is just the amount of members) |
-| events | getEventById/:id | Gets an event by its id (12 byte Object ID) | GET | id | Yes |  | 
+| events | getPublicEvents | Gets all non private events with public data only sorted by date of creation in descendent order | GET |  | No |  | [Event] (does not return organizer, members is just the amount of members, chef is just the chef name), ratings is an object with avgScore(Number) and ratingsAmount(Number) |
+| events | getPublicAndPrivateEvents | Gets all public events and all private events that include the user with public data only sorted by date of creation in descendent order | GET |  | Yes |  | [Event] (does not return organizer, members is just the amount of members, chef is just the chef name), ratings is an object with avgScore(Number) and ratingsAmount(Number) |
+| events | getEventById/:id | Gets an event by its id (12 byte Object ID) | GET | id | Yes |  | Event |
 | events | getMembersAndReceiptsInfo/:event | Returns a list of users and their transferReceipt information | GET | event | Yes |  |
 | events | createEvent | Creates an event | POST |  | Yes | <ul> <li>title: String</li> <li>description: String</li> <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>members: [ObjectId of a member]</li> <li>organizer: ObjectId of a member</li> <li>(chef: ObjectId of a member)</li> <li>(shoppingDesignee: ObjectId of a member)</li><li>isPrivate: Boolean</li><li>penalization: Number</li><li>penalizationStartDate: Date</li></ul> |
 | events | getMembersAmount/:event | Returns a list of users, with the amount to pay and the receiver of that payment | GET | event | Yes |  |
