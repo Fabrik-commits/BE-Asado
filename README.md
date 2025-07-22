@@ -60,68 +60,68 @@ References:
 
 ### Event
 
-title: String, required: true
-datetime: Date, required: true
-description: String, required: true
-memberLimit: Number, required: true
-state: String, required: true, default: "available", must be one of
+- title: String, required: true
+- datetime: Date, required: true
+- description: String, required: true
+- memberLimit: Number, required: true
+- state: String, required: true, default: "available", must be one of
   – "closed"
   – "available"
   – "readyforpayment"
   – "cancelled"
   – "finished"
-members: [ObjectId], ref: "User"
-chef: ObjectId, ref: "User", default: null
-organizer: ObjectId, ref: "User", required: true
-shoppingDesignee: [ObjectId], ref: "User", default: null
-transferReceipts: [ObjectId], ref: "TransferReceipt", default: []
-purchaseReceipts: [ObjectId], ref: "PurchaseReceipt", default: []
-ratings: [ObjectId], ref: "Rating"
-isPrivate: Boolean, default: false
-penalization: Number, default: null
-penalizationStartDate: Date
+- members: [ObjectId], ref: "User"
+- chef: ObjectId, ref: "User", default: null
+- organizer: ObjectId, ref: "User", required: true
+- shoppingDesignee: [ObjectId], ref: "User", default: null
+- transferReceipts: [ObjectId], ref: "TransferReceipt", default: []
+- purchaseReceipts: [ObjectId], ref: "PurchaseReceipt", default: []
+- ratings: [ObjectId], ref: "Rating"
+- isPrivate: Boolean, default: false
+- penalization: Number, default: null
+- penalizationStartDate: Date
 
 
 ### Image
 
-name: String
-mimetype: String
-image: Buffer
+- name: String
+- mimetype: String
+- image: Buffer
 
 ### PurchaseReceipt
 
-image: ObjectId, ref: "Image", default: null
-description: String, required: true
-amount: Number, required: true
-event: ObjectId, ref: "Event", required: true
-shoppingDesignee: ObjectId, ref: "User", required: true
-participants: [ObjectId], ref: "User"
+- image: ObjectId, ref: "Image", default: null
+- description: String, required: true
+- amount: Number, required: true
+- event: ObjectId, ref: "Event", required: true
+- shoppingDesignee: ObjectId, ref: "User", required: true
+- participants: [ObjectId], ref: "User"
 
 ### Rating
 
-score: Number, required: true
-user: ObjectId, ref: "User"
+- score: Number, required: true
+- user: ObjectId, ref: "User"
 
 ### TransferReceipt
 
-image: ObjectId, ref: "Image", default: null
-description: String
-amount: Number, required: true
-hasPaid: Boolean, default: false
-paymentMethod: String, default: null
-user: ObjectId, ref: "User", required: true
-event: ObjectId, ref: "Event", required: true
-datetime: Date, required: true
+- image: ObjectId, ref: "Image", default: null
+- description: String
+- amount: Number, required: true
+- hasPaid: Boolean, default: false
+- paymentMethod: String, default: null
+- user: ObjectId, ref: "User", required: true
+- event: ObjectId, ref: "Event", required: true
+- datetime: Date, required: true
 
 ### User
 
-name: String, required: true
-lastName: String
-email: String, required: true, unique: true
-alternativeEmail: String
-password: String, required: true
-verificationCode: String, default: null
-cbu: String, default: null
-alias: String, default: null
-specialDiet: [String], required: true
-profilePicture: ObjectId, ref: "Image", default: null
+- name: String, required: true
+- lastName: String
+- email: String, required: true, unique: true
+- alternativeEmail: String
+- password: String, required: true
+- verificationCode: String, default: null
+- cbu: String, default: null
+- alias: String, default: null
+- specialDiet: [String], required: true
+- profilePicture: ObjectId, ref: "Image", default: null
