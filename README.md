@@ -12,12 +12,12 @@ References:
  - {values} = the argument only admits values inside curly brackets
 
 
-| Prefix | Endpoint | Description | Type | Parameters | Auth | Body requirements |
-|--|--|--|--|--|--|--|
-| events | getEvents | Gets all events in the database | GET |  | Yes |  |
-| events | getPublicEvents | Gets all non private events with public data only sorted by date of creation in descendent order | GET |  | No |  |
-| events | getPublicAndPrivateEvents | Gets all public events and all private events that include the user with public data only sorted by date of creation in descendent order | GET |  | Yes |  |
-| events | getEventById/:id | Gets an event by its id (12 byte Object ID) | GET | id | Yes |  |
+| Prefix | Endpoint | Description | Type | Parameters | Auth | Body requirements | Response |
+|--|--|--|--|--|--|--|--|
+| events | getEvents | Gets all events in the database | GET |  | Yes |  | [Event] |
+| events | getPublicEvents | Gets all non private events with public data only sorted by date of creation in descendent order | GET |  | No |  | [Event] where private is False (does not return organizer, members is just the amount of members) |
+| events | getPublicAndPrivateEvents | Gets all public events and all private events that include the user with public data only sorted by date of creation in descendent order | GET |  | Yes |  | [Event] where private is False (does not return organizer, members is just the amount of members) |
+| events | getEventById/:id | Gets an event by its id (12 byte Object ID) | GET | id | Yes |  | 
 | events | getMembersAndReceiptsInfo/:event | Returns a list of users and their transferReceipt information | GET | event | Yes |  |
 | events | createEvent | Creates an event | POST |  | Yes | <ul> <li>title: String</li> <li>description: String</li> <li>datetime: Date</li> <li>memberLimit: Number (Integer)</li> <li>members: [ObjectId of a member]</li> <li>organizer: ObjectId of a member</li> <li>(chef: ObjectId of a member)</li> <li>(shoppingDesignee: ObjectId of a member)</li><li>isPrivate: Boolean</li><li>penalization: Number</li><li>penalizationStartDate: Date</li></ul> |
 | events | getMembersAmount/:event | Returns a list of users, with the amount to pay and the receiver of that payment | GET | event | Yes |  |
@@ -54,3 +54,74 @@ References:
 | users | editUser/:id | Edits a user by its id (12 byte Object ID) | PUT | id | Yes and user token needs to be the user to edit| <ul><li>name: String</li> <li>lastName: String</li> <li>profilePicture: String</li> <li>[specialDiet: String with limited values {celiac, hypertensive, vegan, vegetarian}]</li> <li>cbu: String</li> <li>alias: String</li> </ul> |
 | users | deleteUser/:id | Deletes a user by id (12 byte Object ID) | DELETE | id | Yes and user token needs to be the user to delete |  |
 
+
+
+## Document structure
+
+### Event
+
+title: String, required: true
+datetime: Date, required: true
+description: String, required: true
+memberLimit: Number, required: true
+state: String, required: true, default: "available", must be one of
+  – "closed"
+  – "available"
+  – "readyforpayment"
+  – "cancelled"
+  – "finished"
+members: [ObjectId], ref: "User"
+chef: ObjectId, ref: "User", default: null
+organizer: ObjectId, ref: "User", required: true
+shoppingDesignee: [ObjectId], ref: "User", default: null
+transferReceipts: [ObjectId], ref: "TransferReceipt", default: []
+purchaseReceipts: [ObjectId], ref: "PurchaseReceipt", default: []
+ratings: [ObjectId], ref: "Rating"
+isPrivate: Boolean, default: false
+penalization: Number, default: null
+penalizationStartDate: Date
+
+
+### Image
+
+name: String
+mimetype: String
+image: Buffer
+
+### PurchaseReceipt
+
+image: ObjectId, ref: "Image", default: null
+description: String, required: true
+amount: Number, required: true
+event: ObjectId, ref: "Event", required: true
+shoppingDesignee: ObjectId, ref: "User", required: true
+participants: [ObjectId], ref: "User"
+
+### Rating
+
+score: Number, required: true
+user: ObjectId, ref: "User"
+
+### TransferReceipt
+
+image: ObjectId, ref: "Image", default: null
+description: String
+amount: Number, required: true
+hasPaid: Boolean, default: false
+paymentMethod: String, default: null
+user: ObjectId, ref: "User", required: true
+event: ObjectId, ref: "Event", required: true
+datetime: Date, required: true
+
+### User
+
+name: String, required: true
+lastName: String
+email: String, required: true, unique: true
+alternativeEmail: String
+password: String, required: true
+verificationCode: String, default: null
+cbu: String, default: null
+alias: String, default: null
+specialDiet: [String], required: true
+profilePicture: ObjectId, ref: "Image", default: null
