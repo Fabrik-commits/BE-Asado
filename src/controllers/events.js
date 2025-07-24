@@ -354,39 +354,18 @@ function reduceEventsInformation(events) {
   return reducedEvents;
 }
 
-export function getShoppingDesigneesAmount(receipts) {
-  const amounts = [];
-  for (const receipt of receipts) {
-    let existingAmount = amounts.find((a) =>
-      receipt.shoppingDesignee._id.equals(a.userId)
-    );
-    if (existingAmount) {
-      existingAmount.totalAmount = Math.trunc(existingAmount.totalAmount + receipt.amount);
-    } else {
-      amounts.push({
-        userId: receipt.shoppingDesignee._id,
-        userName: receipt.shoppingDesignee.name,
-        userLastName: receipt.shoppingDesignee.lastName,
-        userCbu: receipt.shoppingDesignee.cbu,
-        userAlias: receipt.shoppingDesignee.alias,
-        totalAmount: receipt.amount,
-      });
-    }
-  }
-  return amounts;
-}
 
 export function calculateTransfersInfo(amounts) {
   const transferInfo = [];
 
   while (amounts.length > 0) {
-    amounts.sort((a, b) => a.totalAmount - b.totalAmount);
+    amounts.sort((a, b) => a.totalCost - b.totalCost);
     let payer = amounts[0];
-    if (payer.totalAmount == 0) {
+    if (payer.totalCost == 0) {
       transferInfo.push({
         userId: payer.userId,
         userName: payer.userName,
-        amount: payer.totalAmount,
+        amount: payer.totalCost,
         receiver: null,
       });
       amounts.splice(0, 1);
@@ -396,7 +375,7 @@ export function calculateTransfersInfo(amounts) {
     transferInfo.push({
       userId: payer.userId,
       userName: payer.userName,
-      amount: Math.trunc(payer.totalAmount * -1),
+      amount: payer.totalCost,
       receiver: {
         receiverId: receiver.userId,
         receiverName: receiver.userName,
@@ -405,33 +384,65 @@ export function calculateTransfersInfo(amounts) {
         receiverAlias: receiver.userAlias,
       },
     });
-    amounts[amounts.length - 1].totalAmount =  Math.trunc(amounts[amounts.length - 1].totalAmount + payer.totalAmount);
+    const finalAmount = Number(
+      (amounts[amounts.length - 1].totalCost + payer.totalCost).toFixed(2)
+    )
+    amounts[amounts.length - 1].totalCost = finalAmount
     amounts.splice(0, 1);
   }
   return transferInfo;
 }
 
-export function assignCosts(receipts) {
-  const userCosts = [];
+
+export function assignEventValues(receipts) {
+  const userBalances = [];
   for (const receipt of receipts) {
     const receiptCostPerUser = Number(
       (receipt.amount / receipt.participants.length).toFixed(2)
     );
-    for (const user of receipt.participants) {
-      let existingCost = userCosts.find((a) => user._id.equals(a.userId));
-      if (existingCost) {
-        existingCost.totalCost += receiptCostPerUser;
+    console.log(receiptCostPerUser + "   " +    receipt.description + "    " +  receipt.shoppingDesignee.name)
+    for (const participant of receipt.participants) {
+      console.log(participant.name)
+      let participantEntry = userBalances.find((a) => participant._id.equals(a.userId));
+      if (participantEntry) {
+        participantEntry.totalCost = Number(
+          (participantEntry.totalCost - receiptCostPerUser).toFixed(2)
+        );
       } else {
-        userCosts.push({
-          userId: user._id,
-          totalCost: receiptCostPerUser,
+        userBalances.push({
+          userId: participant._id,
+          userName: participant.name,
+          userLastName: participant.lastName,
+          userCbu: participant.cbu,
+          userAlias: participant.alias,
+          totalCost: - receiptCostPerUser,
         });
       }
     }
+    const cleanReceiptAmount = Number(
+      (receiptCostPerUser * receipt.participants.length).toFixed(2)
+    );
+    const designeeEntry = userBalances.find((a) =>
+      receipt.shoppingDesignee._id.equals(a.userId)
+    );
+    if (designeeEntry) {
+      designeeEntry.totalCost = Number(
+        (designeeEntry.totalCost + cleanReceiptAmount).toFixed(2)
+      );
+    } else {
+      userBalances.push({
+        userId: receipt.shoppingDesignee._id,
+        userName: receipt.shoppingDesignee.name,
+        userLastName: receipt.shoppingDesignee.lastName,
+        userCbu: receipt.shoppingDesignee.cbu,
+        userAlias: receipt.shoppingDesignee.alias,
+        totalCost: cleanReceiptAmount,
+      });
+    }
   }
-  console.log(userCosts);
-  return userCosts;
+  return userBalances;
 }
+
 
 export async function getMembersAmount(req, res) {
   try {
@@ -468,28 +479,8 @@ export async function getMembersAmount(req, res) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "The event has no purchase receipts." });
-    const userAmounts = getShoppingDesigneesAmount(event.purchaseReceipts);
-    const userCosts = assignCosts(event.purchaseReceipts);
-
-    for (const member of event.members) {
-      const userCost = userCosts.find((a) =>
-        member._id.equals(a.userId)
-      ).totalCost;
-      let existingAmount = userAmounts.find((a) => member._id.equals(a.userId));
-      if (!existingAmount) {
-        userAmounts.push({
-          userId: member._id,
-          userName: member.name,
-          userLastName: member.lastName,
-          userCbu: member.cbu,
-          userAlias: member.alias,
-          totalAmount: userCost * -1,
-        });
-      } else {
-        existingAmount.totalAmount -= userCost;
-      }
-    }
-    const transferInfo = calculateTransfersInfo(userAmounts);
+    const userBalances = assignEventValues(event.purchaseReceipts)
+    const transferInfo = calculateTransfersInfo(userBalances);
     return res.status(STATUS_CODES.OK).json(transferInfo);
   } catch (e) {
     return res
