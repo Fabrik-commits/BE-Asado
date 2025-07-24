@@ -4,7 +4,7 @@ import { Image } from "../models/image.js";
 import { Event } from "../models/event.js";
 import { TransferReceipt } from "../models/transferReceipt.js";
 import { hasUploaded } from "./transferReceipts.js";
-import {getShoppingDesigneesAmount, assignCosts, calculateTransfersInfo} from "./events.js"
+import { assignEventValues, calculateTransfersInfo } from "./events.js"
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 
@@ -58,31 +58,10 @@ export async function isDebtor(req, res) {
       .populate({ path: "members", model: "User" });
 
     for (const event of events) {
-      const receipts = event.purchaseReceipts;
 
-      const userAmounts = getShoppingDesigneesAmount(receipts);
-      const userCosts = assignCosts(receipts);
+      const userBalances = assignEventValues(event.purchaseReceipts)
+      const transferInfo = calculateTransfersInfo(userBalances);
 
-      for (const member of event.members) {
-        const userCostEntry = userCosts.find((c) => c.userId.equals(member._id));
-        const userCost = userCostEntry ? userCostEntry.totalCost : 0;
-        let existingAmount = userAmounts.find((a) => member._id.equals(a.userId));
-
-        if (!existingAmount) {
-          userAmounts.push({
-            userId: member._id,
-            userName: member.name,
-            userLastName: member.lastName,
-            userCbu: member.cbu,
-            userAlias: member.alias,
-            totalAmount: -userCost,
-          });
-        } else {
-          existingAmount.totalAmount -= userCost;
-        }
-      }
-
-      const transferInfo = calculateTransfersInfo(userAmounts);
       const userTransfer = transferInfo.find(
         (t) => t.userId.equals(userId) && t.receiver
       );
