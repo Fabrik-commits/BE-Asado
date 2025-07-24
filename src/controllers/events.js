@@ -375,7 +375,7 @@ export function calculateTransfersInfo(amounts) {
     transferInfo.push({
       userId: payer.userId,
       userName: payer.userName,
-      amount: payer.totalCost,
+      amount: payer.totalCost * -1,
       receiver: {
         receiverId: receiver.userId,
         receiverName: receiver.userName,
@@ -384,10 +384,10 @@ export function calculateTransfersInfo(amounts) {
         receiverAlias: receiver.userAlias,
       },
     });
-    const finalAmount = Number(
+    const updatedAmount = Number(
       (amounts[amounts.length - 1].totalCost + payer.totalCost).toFixed(2)
     )
-    amounts[amounts.length - 1].totalCost = finalAmount
+    amounts[amounts.length - 1].totalCost = updatedAmount
     amounts.splice(0, 1);
   }
   return transferInfo;
@@ -400,7 +400,7 @@ export function assignEventValues(receipts) {
     const receiptCostPerUser = Number(
       (receipt.amount / receipt.participants.length).toFixed(2)
     );
-    console.log(receiptCostPerUser + "   " +    receipt.description + "    " +  receipt.shoppingDesignee.name)
+    console.log("Total Amount: " + receipt.amount + ". Per User: " + receiptCostPerUser + ". Designee: " +  receipt.shoppingDesignee.name)
     for (const participant of receipt.participants) {
       console.log(participant.name)
       let participantEntry = userBalances.find((a) => participant._id.equals(a.userId));
