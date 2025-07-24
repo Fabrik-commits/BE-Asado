@@ -385,7 +385,7 @@ export function calculateTransfersInfo(amounts) {
       },
     });
     const finalAmount = Number(
-      (amounts[amounts.length - 1].totalCost + payer.totalCost).toFixed(2)
+      (-(amounts[amounts.length - 1].totalCost + payer.totalCost)).toFixed(2)
     )
     amounts[amounts.length - 1].totalCost = finalAmount
     amounts.splice(0, 1);
