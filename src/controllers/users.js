@@ -182,10 +182,16 @@ export async function editUser(req, res) {
     user.lastName = req.body.lastName ? req.body.lastName : user.lastName;
     user.alternativeEmail = req.body.alternativeEmail
       ? req.body.alternativeEmail.toLowerCase()
-      : user.email;
+      : null;
     user.specialDiet = req.body.specialDiet;
     user.alias = req.body.alias;
     user.cbu = req.body.cbu;
+    user.notifications = {
+      newEvent: req.body.notifications?.newEvent ?? user.notifications.newEvent,
+      eventStart: req.body.notifications?.eventStart ?? user.notifications.eventStart,
+      penalizationStart: req.body.notifications?.penalizationStart ?? user.notifications.penalizationStart,
+      penalizationOneWeek: req.body.notifications?.penalizationOneWeek ?? user.notifications.penalizationOneWeek,
+    };
     user = await user.save();
     return res.status(STATUS_CODES.OK).json(user);
   } catch (e) {
