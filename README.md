@@ -124,4 +124,10 @@ References:
 - cbu: String, default: null
 - alias: String, default: null
 - specialDiet: [String], required: true
+-   notifications: {
+    newEvent: { type: Boolean, default: false },
+    eventStart: { type: Boolean, default: false },
+    penalizationStart: { type: Boolean, default: false },
+    penalizationOneWeek: { type: Boolean, default: false },
+  },
 - profilePicture: ObjectId, ref: "Image", default: null
