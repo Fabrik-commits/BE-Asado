@@ -20,7 +20,6 @@ const userSchema = new mongoose.Schema({
         [username, domain, ...rest] = v.split("@");
         if (rest.length) return false;
         if (domain !== "endava.com") return false;
-        // if (username.split(".").length < 2) return false;
         return true;
       },
       message: (props) => `${props.value} is not a valid endava email.`,
@@ -37,7 +36,7 @@ const userSchema = new mongoose.Schema({
         if (rest.length) return false;
         return true;
       },
-      message: (props) => `${props.value} is not a valid endava email.`,
+      message: (props) => `${props.value} is not a valid email.`,
     },
   },
 
@@ -64,6 +63,13 @@ const userSchema = new mongoose.Schema({
         return true;
       },
     },
+  },
+
+  notifications: {
+    newEvent: { type: Boolean, default: false },
+    eventStart: { type: Boolean, default: false },
+    penalizationStart: { type: Boolean, default: false },
+    penalizationOneWeek: { type: Boolean, default: false },
   },
 
   profilePicture: {

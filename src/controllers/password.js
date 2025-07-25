@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import https from "https";
 import { User } from "../models/user.js";
-import { adminMail, brevo } from "../config.js";
+import { adminMail } from "../config.js";
+import { sendMail } from "../utils/utils.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 
 const nonExistentUserMessage = "User does not exist.";
@@ -96,39 +96,4 @@ export async function recover(req, res) {
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
       .json({ message: error.message });
   }
-}
-
-function sendMail(email, name, message) {
-  let data = JSON.stringify({
-    sender: {
-      name: "FoodSpot",
-      email: "food-spot-no-reply@vercel.app",
-    },
-    to: [
-      {
-        email: email,
-        name: name,
-      },
-    ],
-    subject: "FoodSpot | Password recovery",
-    htmlContent: message,
-  });
-  const options = {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "api-key": brevo.apiKey,
-      "Content-Type": "application/json",
-      "Content-Length": data.length,
-    },
-  };
-
-  let req = https.request(brevo.url, options, (res) => {
-    res.on("data", (d) => {});
-  });
-  req.on("error", (e) => {
-    throw e;
-  });
-  req.write(data);
-  req.end();
 }
