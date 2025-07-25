@@ -6,6 +6,7 @@ import { Image } from "../models/image.js";
 import { membersWhoHaveUploaded } from "./transferReceipts.js";
 import { Rating } from "../models/rating.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
+import { notifyNewEvent } from "./notifications.js";
 
 const eventNotFoundMessage = "The event with the given ID was not found.";
 
@@ -115,6 +116,7 @@ export async function createEvent(req, res) {
       event.shoppingDesignee.push(req.body.organizer);
     event = await event.save();
     await deleteEvents();
+    await notifyNewEvent(event.id);
     return res.status(STATUS_CODES.CREATED).json(event);
   } catch (e) {
     return res
