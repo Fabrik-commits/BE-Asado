@@ -3,7 +3,7 @@ import { brevo } from "../config.js";
 import https from "https";
 
 
-function sendMail(email, name, message) {
+function sendMail(email, subject, name, message) {
   let data = JSON.stringify({
     sender: {
       name: "FoodSpot",
@@ -15,7 +15,7 @@ function sendMail(email, name, message) {
         name: name,
       },
     ],
-    subject: "FoodSpot | Password recovery",
+    subject: subject,
     htmlContent: message,
   });
   const options = {

@@ -11,8 +11,9 @@ export async function notifyNewEvent(eventId) {
         for (const user of users) {
             const email = user.alternativeEmail ? user.alternativeEmail : user.email;
             setTimeout(() => {
-                sendMail(email, user.name, message);
+                sendMail(email, "FoodSpot | New Event", user.name, message);
             }, 1000);
+            console.log(`Notification sent to ${user.name} (${email}) for new event ${eventId}`);
         }
         return;
     } catch (error) {

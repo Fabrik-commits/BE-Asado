@@ -4,7 +4,7 @@ import { Image } from "../models/image.js";
 import { Event } from "../models/event.js";
 import { TransferReceipt } from "../models/transferReceipt.js";
 import { hasUploaded } from "./transferReceipts.js";
-import { assignEventValues, calculateTransfersInfo } from "./events.js"
+import { assignEventValues, calculateTransfersInfo } from "./events.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 
