@@ -9,7 +9,10 @@ const nonExistentUserMessage = "User does not exist.";
 export async function forgot(req, res) {
   try {
     req.body.email = req.body.email.toLowerCase();
-    const user = await User.findOne({ email: req.body.email }).exec();
+    let user = await User.findOne({ email: req.body.email }).exec();
+    if (!user) {
+      user = await User.findOne({ alternativeEmail: req.body.email }).exec();
+    }
     if (!user)
       return res
         .status(STATUS_CODES.NOT_FOUND)
