@@ -20,10 +20,8 @@ const reminderSchema = new mongoose.Schema({
       validator: function (v) {
         const valid_types = ["eventStart", "penalizationStart", "penalizationOneWeek"];
         if (!v) return false;
-        for (const type of v) {
-          if (!valid_types.includes(type.toLowerCase())) {
-            return false;
-          }
+        if (!valid_types.includes(v)) {
+          return false;
         }
         return true;
       },

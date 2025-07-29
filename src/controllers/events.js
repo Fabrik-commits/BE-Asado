@@ -3,8 +3,9 @@ import { User } from "../models/user.js";
 import { TransferReceipt } from "../models/transferReceipt.js";
 import { PurchaseReceipt } from "../models/purchaseReceipt.js";
 import { Image } from "../models/image.js";
-import { membersWhoHaveUploaded } from "./transferReceipts.js";
 import { Rating } from "../models/rating.js";
+import { Reminder } from "../models/reminder.js";
+import { membersWhoHaveUploaded } from "./transferReceipts.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 import { notifyNewEvent } from "./notifications.js";
 
@@ -108,6 +109,73 @@ export async function getMembersAndReceiptsInfo(req, res) {
   }
 }
 
+async function updateReminders(event) {
+  const reminders = await Reminder.find({ event: event._id });
+  if (reminders.length == 0) {
+    const eventStartReminder = new Reminder({
+      event: event._id,
+      type: "eventStart",
+      datetime: new Date(event.datetime - 30 * 60 * 1000), // 30 minutes before the event
+    });
+    await eventStartReminder.save();
+    if (event.penalizationStartDate) {
+      const penalizationReminderDate = new Date(event.penalizationStartDate);
+      penalizationReminderDate.setDate(penalizationReminderDate.getDate() - 1);
+      penalizationReminderDate.setHours(20, 0, 0, 0); // 8 PM the day before penalization starts
+      const penalizationStartReminder = new Reminder({
+        event: event._id,
+        type: "penalizationStart",
+        datetime: penalizationReminderDate, 
+      });
+      await penalizationStartReminder.save();
+      const penalizationOneWeekReminder = new Reminder({
+        event: event._id,
+        type: "penalizationOneWeek",
+        datetime: new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000) // one week after penalization start
+      });
+      await penalizationOneWeekReminder.save();
+    }
+  }
+  else {
+    const eventStartReminder = reminders.find(
+      (reminder) => reminder.type === "eventStart"
+    );
+    eventStartReminder.datetime = new Date(event.datetime - 30 * 60 * 1000); // 30 minutes before the event
+    await eventStartReminder.save();
+
+    if (event.penalizationStartDate) {
+      const penalizationStartReminder = reminders.find(
+        (reminder) => reminder.type === "penalizationStart"
+      );
+      const penalizationReminderDate = new Date(event.penalizationStartDate);
+      penalizationReminderDate.setDate(penalizationReminderDate.getDate() - 1);
+      penalizationReminderDate.setHours(20, 0, 0, 0); // 8 PM the day before penalization starts
+      if (!penalizationStartReminder) {
+        const newPenalizationStartReminder = new Reminder({
+          event: event._id,
+          type: "penalizationStart",
+          datetime: penalizationReminderDate
+        });
+        await newPenalizationStartReminder.save();
+        const newPenalizationOneWeekReminder = new Reminder({
+          event: event._id,
+          type: "penalizationOneWeek",
+          datetime: new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000) // one week after penalization start
+        });
+        await newPenalizationOneWeekReminder.save();
+      } else {
+        penalizationStartReminder.datetime = penalizationReminderDate;
+        await penalizationStartReminder.save();
+        const penalizationOneWeekReminder = reminders.find(
+          (reminder) => reminder.type === "penalizationOneWeek"
+        );
+        penalizationOneWeekReminder.datetime = new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000); // one week after penalization start
+        await penalizationOneWeekReminder.save();
+      }
+    }
+  }
+}
+
 export async function createEvent(req, res) {
   try {
     let event = new Event(req.body);
@@ -116,6 +184,7 @@ export async function createEvent(req, res) {
       event.shoppingDesignee.push(req.body.organizer);
     event = await event.save();
     await deleteEvents();
+    await updateReminders(event);
     await notifyNewEvent(event.id);
     return res.status(STATUS_CODES.CREATED).json(event);
   } catch (e) {
@@ -254,24 +323,34 @@ export async function editEvent(req, res) {
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         message: "The event has no chef or has no shopping designees.",
       });
-    event.save();
-    res.status(STATUS_CODES.OK).json(event);
+    await event.save();
+    await updateReminders(event);
+    return res.status(STATUS_CODES.OK).json(event);
   } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+  }
+}
+
+async function deleteReminders(eventId) {
+  try {
+    await Reminder.deleteMany({ event: eventId });
+  } catch (e) {
+    console.error("Error deleting reminders:", e);
   }
 }
 
 export async function deleteEvent(req, res) {
   try {
-    deleteReceipts(req.params.id);
     const event = await Event.findByIdAndRemove(req.params.id);
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: eventNotFoundMessage });
-    res.status(STATUS_CODES.OK).json(event);
+    await deleteReceipts(event._id);
+    await deleteReminders(event._id);
+    return res.status(STATUS_CODES.OK).json(event);
   } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(e.message);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
   }
 }
 

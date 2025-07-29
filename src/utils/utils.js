@@ -61,7 +61,7 @@ function removeElementfromArray(array , index = 0){
     return halfBeforeElement.concat(halfAfterElement);
 }
 
-export async function getEventsDebtors(eventId) {
+async function getEventsDebtors(eventId) {
   const event = await Event.findById(eventId).populate("members transferReceipts purchaseReceipts");
   
   if (!event) {

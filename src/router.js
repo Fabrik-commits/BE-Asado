@@ -7,6 +7,7 @@ import passwordRouter from "./routers/passwordsRouter.js";
 import transferReceiptRouter from "./routers/transferReceiptsRouter.js";
 import usersRouter from "./routers/usersRouter.js";
 import ratingsRouter from "./routers/ratingsRouter.js";
+import cronRouter from "./routers/cronRouter.js";
 
 const router = express.Router();
 
@@ -33,5 +34,8 @@ router.use("/users", usersRouter);
 
 //ratings routes
 router.use("/ratings", ratingsRouter);
+
+//cron job route
+router.use("/cron", cronRouter);
 
 export default router;

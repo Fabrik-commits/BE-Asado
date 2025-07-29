@@ -93,7 +93,7 @@ export async function notifyPenalizationOneWeek(eventId) {
   }
 }
 
-export async function reminderCheck() {
+export async function reminderCheck(req, res) {
   try {
       const date = new Date();
       date.setHours(date.getHours() - 3);
@@ -114,8 +114,8 @@ export async function reminderCheck() {
         }
         await Reminder.findByIdAndDelete(reminder._id);
       }
-      return { status: STATUS_CODES.OK, data: reminders };
+      return res.status(STATUS_CODES.OK).json({ data: reminders });
   } catch (error) {
-      return { status: STATUS_CODES.INTERNAL_SERVER_ERROR, message: error.message };
+      return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error.message });
   }
 }
