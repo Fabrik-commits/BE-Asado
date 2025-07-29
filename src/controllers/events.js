@@ -341,13 +341,14 @@ async function deleteReminders(eventId) {
 
 export async function deleteEvent(req, res) {
   try {
-    const event = await Event.findByIdAndRemove(req.params.id);
+    const event = await Event.findById(req.params.id);
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: eventNotFoundMessage });
     await deleteReceipts(event._id);
     await deleteReminders(event._id);
+    await Event.findByIdAndDelete(req.params.id);
     return res.status(STATUS_CODES.OK).json(event);
   } catch (e) {
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
