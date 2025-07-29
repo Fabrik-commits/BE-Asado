@@ -9,10 +9,8 @@ const nonExistentUserMessage = "User does not exist.";
 export async function forgot(req, res) {
   try {
     req.body.email = req.body.email.toLowerCase();
-    let user = await User.findOne({ email: req.body.email }).exec();
-    if (!user) {
-      user = await User.findOne({ alternativeEmail: req.body.email }).exec();
-    }
+    let user = await User.findOne({ email: req.body.email });
+    if (!user) user = await User.findOne({ alternativeEmail: req.body.email });
     if (!user)
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -23,13 +21,11 @@ export async function forgot(req, res) {
     await user.save();
     const email = user.alternativeEmail ? user.alternativeEmail : user.email;
     const subject = "FoodSpot | Password recovery";
-    const dummyMessage = `<html><head></head><body><h1>FoodSpot</h1><p>${user.name} ${user.lastName} con el mail ${user.email} pidio recuperar contraseña. Su código es ${code}</p></body></html>`;
-    await sendEmail(adminMail, subject, "Admin", dummyMessage);
     const message = `<html><head></head><body><h1>FoodSpot | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`;
     await sendEmail(email, subject, user.name, message);
     return res
       .status(STATUS_CODES.OK)
-      .json({ message: `Mail sent succesfully to ${user.email}.` });
+      .json({ message: `Mail sent succesfully to ${email}.` });
   } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
