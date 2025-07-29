@@ -1,9 +1,12 @@
 import mongoose from "mongoose";
 import { brevo } from "../config.js";
 import https from "https";
+import { Event } from "../models/event.js";
+import { User } from "../models/user.js";
+import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
 
 
-function sendMail(email, name, message) {
+function sendEmail(email, subject, name, html) {
   let data = JSON.stringify({
     sender: {
       name: "FoodSpot",
@@ -15,8 +18,8 @@ function sendMail(email, name, message) {
         name: name,
       },
     ],
-    subject: "FoodSpot | Password recovery",
-    htmlContent: message,
+    subject: subject,
+    htmlContent: html,
   });
   const options = {
     method: "POST",
@@ -28,14 +31,15 @@ function sendMail(email, name, message) {
     },
   };
 
-  let req = https.request(brevo.url, options, (res) => {
-    res.on("data", (d) => {});
+  return new Promise((resolve, reject) => {
+    const req = https.request(brevo.url, options, (res) => {
+      res.on("data", (d) => {});
+      res.on("end", () => resolve(res));
+    });
+    req.on("error", reject);
+    req.write(data);
+    req.end();
   });
-  req.on("error", (e) => {
-    throw e;
-  });
-  req.write(data);
-  req.end();
 }
 
 
@@ -58,5 +62,31 @@ function removeElementfromArray(array , index = 0){
     return halfBeforeElement.concat(halfAfterElement);
 }
 
+async function getEventsDebtors(eventId) {
+  const event = await Event.findById(eventId).populate("members transferReceipts purchaseReceipts");
+  
+  if (!event) {
+    throw new Error(`Event with ID ${eventId} not found.`);
+  }
+  
+  const userBalances = assignEventValues(event.purchaseReceipts);
+  const transferInfo = calculateTransfersInfo(userBalances);
+  const expectedTransfers = transferInfo.filter(t => t.receiver !== null);
 
-export {isValidId, removeElementfromArray, sendMail};
+  const debtorUsers = await Promise.all(
+    expectedTransfers.map(async transfer => {
+      const receipt = event.transferReceipts.find(r => r.user.equals(transfer.userId));
+      if (!receipt) {
+        return await User.findById(transfer.userId);
+      }
+      return null;
+    })
+  );
+
+  const debtors = debtorUsers.filter(user => user !== null);
+  return debtors;
+}
+
+
+
+export {isValidId, removeElementfromArray, sendEmail, getEventsDebtors};
