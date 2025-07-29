@@ -59,7 +59,7 @@ export async function isDebtor(req, res) {
 
     for (const event of events) {
 
-      const userBalances = assignEventValues(event.purchaseReceipts)
+      const userBalances = assignEventValues(event.purchaseReceipts);
       const transferInfo = calculateTransfersInfo(userBalances);
 
       const userTransfer = transferInfo.find(
@@ -232,6 +232,27 @@ export async function deleteUser(req, res) {
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: userNotFoundMessage });
     return res.status(STATUS_CODES.OK).json(user);
+  } catch (e) {
+    return res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ message: e.message });
+  }
+}
+
+export async function updateUsers(req, res) {
+  try {
+    const users = await User.updateMany({}, { 
+      $set: { 
+        notifications: { 
+          newEvent: false, 
+          eventStart: false, 
+          penalizationStart: false, 
+          penalizationOneWeek: false, 
+        }, 
+        alternativeEmail: null 
+      } 
+    });
+    return res.status(STATUS_CODES.OK).json(users);
   } catch (e) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
