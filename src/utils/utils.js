@@ -6,7 +6,7 @@ import { User } from "../models/user.js";
 import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
 
 
-function sendMail(email, subject, name, message) {
+function sendEmail(email, subject, name, html) {
   let data = JSON.stringify({
     sender: {
       name: "FoodSpot",
@@ -19,7 +19,7 @@ function sendMail(email, subject, name, message) {
       },
     ],
     subject: subject,
-    htmlContent: message,
+    htmlContent: html,
   });
   const options = {
     method: "POST",
@@ -31,14 +31,15 @@ function sendMail(email, subject, name, message) {
     },
   };
 
-  let req = https.request(brevo.url, options, (res) => {
-    res.on("data", (d) => {});
+  return new Promise((resolve, reject) => {
+    const req = https.request(brevo.url, options, (res) => {
+      res.on("data", (d) => {});
+      res.on("end", () => resolve(res));
+    });
+    req.on("error", reject);
+    req.write(data);
+    req.end();
   });
-  req.on("error", (e) => {
-    throw e;
-  });
-  req.write(data);
-  req.end();
 }
 
 
@@ -88,4 +89,4 @@ async function getEventsDebtors(eventId) {
 
 
 
-export {isValidId, removeElementfromArray, sendMail, getEventsDebtors};
+export {isValidId, removeElementfromArray, sendEmail, getEventsDebtors};
