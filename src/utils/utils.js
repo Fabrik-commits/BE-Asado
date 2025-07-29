@@ -1,9 +1,12 @@
 import mongoose from "mongoose";
 import { brevo } from "../config.js";
 import https from "https";
+import { Event } from "../models/event.js";
+import { User } from "../models/user.js";
+import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
 
 
-function sendMail(email, name, message) {
+function sendMail(email, subject, name, message) {
   let data = JSON.stringify({
     sender: {
       name: "FoodSpot",
@@ -15,7 +18,7 @@ function sendMail(email, name, message) {
         name: name,
       },
     ],
-    subject: "FoodSpot | Password recovery",
+    subject: subject,
     htmlContent: message,
   });
   const options = {
@@ -58,5 +61,31 @@ function removeElementfromArray(array , index = 0){
     return halfBeforeElement.concat(halfAfterElement);
 }
 
+async function getEventsDebtors(eventId) {
+  const event = await Event.findById(eventId).populate("members transferReceipts purchaseReceipts");
+  
+  if (!event) {
+    throw new Error(`Event with ID ${eventId} not found.`);
+  }
+  
+  const userBalances = assignEventValues(event.purchaseReceipts);
+  const transferInfo = calculateTransfersInfo(userBalances);
+  const expectedTransfers = transferInfo.filter(t => t.receiver !== null);
 
-export {isValidId, removeElementfromArray, sendMail};
+  const debtorUsers = await Promise.all(
+    expectedTransfers.map(async transfer => {
+      const receipt = event.transferReceipts.find(r => r.user.equals(transfer.userId));
+      if (!receipt) {
+        return await User.findById(transfer.userId);
+      }
+      return null;
+    })
+  );
+
+  const debtors = debtorUsers.filter(user => user !== null);
+  return debtors;
+}
+
+
+
+export {isValidId, removeElementfromArray, sendMail, getEventsDebtors};
