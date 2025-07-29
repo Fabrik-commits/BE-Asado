@@ -365,6 +365,7 @@ async function deleteEvents() {
     }).sort({ datetime: "asc" });
     if (matches.length > 0) {
       const deletedId = matches[0].id;
+      await deleteReminders(deletedId);
       await deleteReceipts(deletedId);
       const deletedEvent = await Event.findByIdAndDelete(deletedId);
     }
