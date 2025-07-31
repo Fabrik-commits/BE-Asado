@@ -188,7 +188,9 @@ export async function createEvent(req, res) {
     event = await event.save();
     await deleteEvents();
     await updateReminders(event);
-    await notifyNewEvent(event.id);
+    if (!event.isPrivate) {
+      await notifyNewEvent(event.id);
+    }
     return res.status(STATUS_CODES.CREATED).json(event);
   } catch (e) {
     return res
