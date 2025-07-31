@@ -19,7 +19,7 @@ export function passwordRecoveryTemplate(code, footerImageUrl = "https://i.ibb.c
       </div>
       <div style="
         width:100%;
-        text-align:left;
+        text-align:center;
         padding-top:20px;
       ">
         <img
@@ -56,7 +56,7 @@ export function newEventTemplate(eventId, footerImageUrl = "https://i.ibb.co/Zz3
       </div>
       <div style="
         width:100%;
-        text-align:left;
+        text-align:center;
         padding-top:20px;
       ">
         <img
@@ -93,7 +93,7 @@ export function eventStartTemplate(eventId, footerImageUrl = "https://i.ibb.co/Z
       </div>
       <div style="
         width:100%;
-        text-align:left;
+        text-align:center;
         padding-top:20px;
       ">
         <img
@@ -132,7 +132,7 @@ export function penalizationStartTemplate(eventId, penalization, footerImageUrl 
       </div>
       <div style="
         width:100%;
-        text-align:left;
+        text-align:center;
         padding-top:20px;
       ">
         <img
@@ -171,7 +171,7 @@ export function penalizationOneWeekTemplate(eventId, penalization, footerImageUr
       </div>
       <div style="
         width:100%;
-        text-align:left;
+        text-align:center;
         padding-top:20px;
       ">
         <img
