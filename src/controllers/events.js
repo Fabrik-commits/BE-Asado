@@ -140,8 +140,11 @@ async function updateReminders(event) {
     const eventStartReminder = reminders.find(
       (reminder) => reminder.type === "eventStart"
     );
-    eventStartReminder.datetime = new Date(event.datetime - 30 * 60 * 1000); // 30 minutes before the event
-    await eventStartReminder.save();
+
+    if (eventStartReminder) {
+      eventStartReminder.datetime = new Date(event.datetime - 30 * 60 * 1000); // 30 minutes before the event
+      await eventStartReminder.save();
+    }
 
     if (event.penalizationStartDate) {
       const penalizationStartReminder = reminders.find(
@@ -483,9 +486,7 @@ export function assignEventValues(receipts) {
     const receiptCostPerUser = Number(
       (receipt.amount / receipt.participants.length).toFixed(2)
     );
-    console.log("Total Amount: " + receipt.amount + ". Per User: " + receiptCostPerUser + ". Designee: " +  receipt.shoppingDesignee.name)
     for (const participant of receipt.participants) {
-      console.log(participant.name)
       let participantEntry = userBalances.find((a) => participant._id.equals(a.userId));
       if (participantEntry) {
         participantEntry.totalCost = Number(
