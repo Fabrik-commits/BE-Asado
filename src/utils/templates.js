@@ -11,11 +11,11 @@ export function passwordRecoveryTemplate(code, footerImageUrl = "https://i.ibb.c
       </style>
     </head>
     <body>
-      <div class="header"><h1>FoodSpot | Password Recovery</h1></div>
+      <div class="header"><h1>FoodSpot | Recuperar contraseña</h1></div>
       <div class="content">
-        <p>Please use the code below to reset your password:</p>
+        <p>Utiliza el siguiente código para recuperar tu contraseña:</p>
         <span class="code">${code}</span>
-        <p>If you didn’t request this, simply ignore this email.</p>
+        <p>Si no solicitaste esto, simplemente ignora este correo.</p>
       </div>
       <div style="
         width:100%;
@@ -50,10 +50,10 @@ export function newEventTemplate(eventId, footerImageUrl = "https://i.ibb.co/Zz3
       </style>
     </head>
     <body>
-      <div class="header"><h1>FoodSpot | New Event</h1></div>
+      <div class="header"><h1>FoodSpot | Nuevo Evento</h1></div>
       <div class="content">
-        <p>A new event has been created. Click below to view:</p>
-        <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">View Event</a>
+        <p>Se ha creado un nuevo evento. Haz clic a continuación para unirte:</p>
+        <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Ver Evento</a>
       </div>
       <div style="
         width:100%;
@@ -88,10 +88,10 @@ export function eventStartTemplate(eventId, footerImageUrl = "https://i.ibb.co/Z
       </style>
     </head>
     <body>
-      <div class="header"><h1>FoodSpot | Event Starting Soon</h1></div>
+      <div class="header"><h1>FoodSpot | El evento está a punto de comenzar</h1></div>
       <div class="content">
-        <p>Your event is about to begin. Click below to join:</p>
-        <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Join Event</a>
+        <p>Uno de tus eventos está a punto de comenzar. Haz clic a continuación para verlo:</p>
+        <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Ver Evento</a>
       </div>
       <div style="
         width:100%;
@@ -127,11 +127,11 @@ export function penalizationStartTemplate(eventId, penalization, footerImageUrl 
       </style>
     </head>
     <body>
-      <div class="header"><h1>FoodSpot | Penalization Starts Today</h1></div>
+      <div class="header"><h1>FoodSpot | Hoy comienza la penalización</h1></div>
       <div class="content">
-        <p>A fee of <span class="highlight">${penalization} per day</span> has begun on your event balance.</p>
-        <p>Please settle your amount:</p>
-        <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">View Details</a>
+        <p>Se aplicará una tarifa de <span class="highlight">$${penalization} por día</span> para un evento en el que participas.</p>
+        <p>Por favor, salda tu deuda:</p>
+        <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Ver Evento</a>
       </div>
       <div style="
         width:100%;
@@ -167,11 +167,11 @@ export function penalizationOneWeekTemplate(eventId, penalization, footerImageUr
       </style>
     </head>
     <body>
-      <div class="header"><h1>FoodSpot | 1 Week of Penalization</h1></div>
+      <div class="header"><h1>FoodSpot | La penalización ha estado en curso durante una semana</h1></div>
       <div class="content">
-        <p>Penalization of <span class="highlight">${penalization} per day</span> has been applied for one week.</p>
-        <p>Please review and clear your balance:</p>
-        <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">View Event</a>
+        <p>Se ha aplicado una penalización de <span class="highlight">$${penalization} por día</span> durante una semana.</p>
+        <p>Por favor, revisa y salda tu deuda:</p>
+        <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Ver Evento</a>
       </div>
       <div style="
         width:100%;

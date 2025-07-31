@@ -21,7 +21,7 @@ export async function forgot(req, res) {
     user.verificationCode = await bcrypt.hash(code.toString(), salt);
     await user.save();
     const email = user.alternativeEmail ? user.alternativeEmail : user.email;
-    const subject = "FoodSpot | Password recovery";
+    const subject = "FoodSpot | Recuperar contraseña";
     const message = passwordRecoveryTemplate(code);
 
     await sendEmail(email, subject, user.name, message);

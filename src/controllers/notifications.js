@@ -13,8 +13,7 @@ export async function notifyNewEvent(eventId) {
 
   for (const user of users) {
       const email = user.alternativeEmail ? user.alternativeEmail : user.email;
-      await sendEmail(email, "FoodSpot | New Event", user.name, message);
-      console.log(`Notification sent to ${user.name} (${email}) for new event ${eventId}`);
+      await sendEmail(email, "FoodSpot | Nuevo evento", user.name, message);
   }
 }
 
@@ -30,8 +29,7 @@ export async function notifyEventStart(eventId) {
     for (const user of event.members) {
       if (!user.notifications.eventStart) continue;
       const email = user.alternativeEmail ? user.alternativeEmail : user.email;
-      await sendEmail(email, "FoodSpot | Event is starting", user.name, message);
-      console.log(`Notification sent to ${user.name} (${email}) for event ${eventId} start`);
+      await sendEmail(email, "FoodSpot | El evento está por empezar", user.name, message);
     }
     return;
   } catch (error) {
@@ -53,7 +51,7 @@ export async function notifyPenalizationStart(eventId) {
     for (const user of debtors) {
       if (!user.notifications.penalizationStart) continue;
       const email = user.alternativeEmail ? user.alternativeEmail : user.email;
-      await sendEmail(email, "FoodSpot | Penalization is starting", user.name, message);
+      await sendEmail(email, "FoodSpot | La penalización está por empezar", user.name, message);
       console.log(`Notification sent to ${user.name} (${email}) for event ${eventId} penalization start`);
     }
   } catch (error) {
@@ -75,7 +73,7 @@ export async function notifyPenalizationOneWeek(eventId) {
     for (const user of debtors) {
       if (!user.notifications.penalizationOneWeek) continue;
       const email = user.alternativeEmail ? user.alternativeEmail : user.email;
-      await sendEmail(email, "FoodSpot | Penalization has been going for one week", user.name, message);
+      await sendEmail(email, "FoodSpot | La penalización ha estado en curso durante una semana", user.name, message);
       console.log(`Notification sent to ${user.name} (${email}) for event ${eventId} penalization one week`);
     }
   } catch (error) {
@@ -92,15 +90,12 @@ export async function reminderCheck(req, res) {
         switch (reminder.type) {
           case "eventStart":
               await notifyEventStart(reminder.event);
-              console.log(`Notification sent for event start reminder for event ${reminder.event}`);
               break;
           case "penalizationStart":
               await notifyPenalizationStart(reminder.event);
-              console.log(`Notification sent for penalization start reminder for event ${reminder.event}`);
               break;
           case "penalizationOneWeek":
               await notifyPenalizationOneWeek(reminder.event);
-              console.log(`Notification sent for penalization one week reminder for event ${reminder.event}`);
               break;
           default:
               break;
