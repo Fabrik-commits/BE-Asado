@@ -30,7 +30,7 @@ export async function notifyEventStart(eventId) {
     for (const user of event.members) {
       if (!user.notifications.eventStart) continue;
       const email = user.alternativeEmail ? user.alternativeEmail : user.email;
-      await sendEmail(email, "FoodSpot | El evento está por empezar", user.name, message);
+      await sendEmail(email, "FoodSpot | El evento esta por empezar", user.name, message);
     }
     return;
   } catch (error) {
@@ -52,7 +52,7 @@ export async function notifyPenalizationStart(eventId) {
     for (const user of debtors) {
       if (!user.notifications.penalizationStart) continue;
       const email = user.alternativeEmail ? user.alternativeEmail : user.email;
-      await sendEmail(email, "FoodSpot | La penalización está por empezar", user.name, message);
+      await sendEmail(email, "FoodSpot | La penalizacion esta por empezar", user.name, message);
       console.log(`Notification sent to ${user.name} (${email}) for event ${eventId} penalization start`);
     }
   } catch (error) {
@@ -74,7 +74,7 @@ export async function notifyPenalizationOneWeek(eventId) {
     for (const user of debtors) {
       if (!user.notifications.penalizationOneWeek) continue;
       const email = user.alternativeEmail ? user.alternativeEmail : user.email;
-      await sendEmail(email, "FoodSpot | La penalización ha estado en curso durante una semana", user.name, message);
+      await sendEmail(email, "FoodSpot | La penalizacion ha estado en curso durante una semana", user.name, message);
       console.log(`Notification sent to ${user.name} (${email}) for event ${eventId} penalization one week`);
     }
   } catch (error) {
