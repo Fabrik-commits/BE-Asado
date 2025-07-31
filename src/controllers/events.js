@@ -187,10 +187,8 @@ export async function createEvent(req, res) {
       event.shoppingDesignee.push(req.body.organizer);
     event = await event.save();
     await deleteEvents();
+    await notifyNewEvent(event.id);
     await updateReminders(event);
-    if (!event.isPrivate) {
-      await notifyNewEvent(event.id);
-    }
     return res.status(STATUS_CODES.CREATED).json(event);
   } catch (e) {
     return res

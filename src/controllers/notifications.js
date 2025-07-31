@@ -14,6 +14,7 @@ export async function notifyNewEvent(eventId) {
   for (const user of users) {
       const email = user.alternativeEmail ? user.alternativeEmail : user.email;
       await sendEmail(email, "FoodSpot | Nuevo evento", user.name, message);
+      console.log(`Notification sent to ${user.name} (${email}) for new event ${eventId}`);
   }
 }
 
@@ -90,12 +91,15 @@ export async function reminderCheck(req, res) {
         switch (reminder.type) {
           case "eventStart":
               await notifyEventStart(reminder.event);
+              console.log(`Notification sent for event start reminder for event ${reminder.event}`);
               break;
           case "penalizationStart":
               await notifyPenalizationStart(reminder.event);
+              console.log(`Notification sent for penalization start reminder for event ${reminder.event}`);
               break;
           case "penalizationOneWeek":
               await notifyPenalizationOneWeek(reminder.event);
+              console.log(`Notification sent for penalization one week reminder for event ${reminder.event}`);
               break;
           default:
               break;
