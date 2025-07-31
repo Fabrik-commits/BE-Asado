@@ -29,6 +29,7 @@ export function passwordRecoveryTemplate(code, footerImageUrl = "https://i.ibb.c
             display:block;
             max-width:100px;
             height:auto;
+            margin: 0 auto;
           "
         />
       </div>
@@ -66,6 +67,7 @@ export function newEventTemplate(eventId, footerImageUrl = "https://i.ibb.co/Zz3
             display:block;
             max-width:100px;
             height:auto;
+            margin: 0 auto;
           "
         />
       </div>
@@ -103,6 +105,7 @@ export function eventStartTemplate(eventId, footerImageUrl = "https://i.ibb.co/Z
             display:block;
             max-width:100px;
             height:auto;
+            margin: 0 auto;
           "
         />
       </div>
@@ -142,6 +145,7 @@ export function penalizationStartTemplate(eventId, penalization, footerImageUrl 
             display:block;
             max-width:100px;
             height:auto;
+            margin: 0 auto;
           "
         />
       </div>
@@ -181,6 +185,7 @@ export function penalizationOneWeekTemplate(eventId, penalization, footerImageUr
             display:block;
             max-width:100px;
             height:auto;
+            margin: 0 auto;
           "
         />
       </div>
