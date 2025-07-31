@@ -3,6 +3,7 @@ import { User } from "../models/user.js";
 import { adminMail } from "../config.js";
 import { sendEmail } from "../utils/utils.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
+import { passwordRecoveryTemplate } from "../utils/templates.js";
 
 const nonExistentUserMessage = "User does not exist.";
 
@@ -21,7 +22,8 @@ export async function forgot(req, res) {
     await user.save();
     const email = user.alternativeEmail ? user.alternativeEmail : user.email;
     const subject = "FoodSpot | Password recovery";
-    const message = `<html><head></head><body><h1>FoodSpot | Password recovery</h1><p>If you requested a password change insert this code into the prompted page:</p><h4>${code}</h4><p>If you didn't request a password change you can ignore this email.</p></body></html>`;
+    const message = passwordRecoveryTemplate(code);
+    
     await sendEmail(email, subject, user.name, message);
     return res
       .status(STATUS_CODES.OK)
