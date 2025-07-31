@@ -23,7 +23,7 @@ export async function forgot(req, res) {
     const email = user.alternativeEmail ? user.alternativeEmail : user.email;
     const subject = "FoodSpot | Password recovery";
     const message = passwordRecoveryTemplate(code);
-    
+
     await sendEmail(email, subject, user.name, message);
     return res
       .status(STATUS_CODES.OK)

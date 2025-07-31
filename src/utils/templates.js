@@ -1,4 +1,4 @@
-export function passwordRecoveryTemplate(code) {
+export function passwordRecoveryTemplate(code, footerImageUrl = "public/pictures/logo.png") {
   return `
     <html>
     <head>
@@ -17,12 +17,27 @@ export function passwordRecoveryTemplate(code) {
         <span class="code">${code}</span>
         <p>If you didn’t request this, simply ignore this email.</p>
       </div>
+      <div style="
+        width:100%;
+        text-align:left;
+        padding-top:20px;
+      ">
+        <img
+          src="${footerImageUrl}"
+          alt="Footnote graphic"
+          style="
+            display:block;
+            max-width:100px;
+            height:auto;
+          "
+        />
+      </div>
     </body>
     </html>
   `;
 }
 
-export function newEventTemplate(eventId) {
+export function newEventTemplate(eventId, footerImageUrl = "public/pictures/logo.png") {
   return `
     <html>
     <head>
@@ -39,12 +54,27 @@ export function newEventTemplate(eventId) {
         <p>A new event has been created. Click below to view:</p>
         <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">View Event</a>
       </div>
+      <div style="
+        width:100%;
+        text-align:left;
+        padding-top:20px;
+      ">
+        <img
+          src="${footerImageUrl}"
+          alt="Footnote graphic"
+          style="
+            display:block;
+            max-width:100px;
+            height:auto;
+          "
+        />
+      </div>
     </body>
     </html>
   `;
 }
 
-export function eventStartTemplate(eventId) {
+export function eventStartTemplate(eventId, footerImageUrl = "public/pictures/logo.png") {
   return `
     <html>
     <head>
@@ -61,12 +91,27 @@ export function eventStartTemplate(eventId) {
         <p>Your event is about to begin. Click below to join:</p>
         <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Join Event</a>
       </div>
+      <div style="
+        width:100%;
+        text-align:left;
+        padding-top:20px;
+      ">
+        <img
+          src="${footerImageUrl}"
+          alt="Footnote graphic"
+          style="
+            display:block;
+            max-width:100px;
+            height:auto;
+          "
+        />
+      </div>
     </body>
     </html>
   `;
 }
 
-export function penalizationStartTemplate(eventId, penalization) {
+export function penalizationStartTemplate(eventId, penalization, footerImageUrl = "public/pictures/logo.png") {
   return `
     <html>
     <head>
@@ -85,12 +130,27 @@ export function penalizationStartTemplate(eventId, penalization) {
         <p>Please settle your amount:</p>
         <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">View Details</a>
       </div>
+      <div style="
+        width:100%;
+        text-align:left;
+        padding-top:20px;
+      ">
+        <img
+          src="${footerImageUrl}"
+          alt="Footnote graphic"
+          style="
+            display:block;
+            max-width:100px;
+            height:auto;
+          "
+        />
+      </div>
     </body>
     </html>
   `;
 }
 
-export function penalizationOneWeekTemplate(eventId, penalization) {
+export function penalizationOneWeekTemplate(eventId, penalization, footerImageUrl = "public/pictures/logo.png") {
   return `
     <html>
     <head>
@@ -108,6 +168,21 @@ export function penalizationOneWeekTemplate(eventId, penalization) {
         <p>Penalization of <span class="highlight">${penalization} per day</span> has been applied for one week.</p>
         <p>Please review and clear your balance:</p>
         <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">View Event</a>
+      </div>
+      <div style="
+        width:100%;
+        text-align:left;
+        padding-top:20px;
+      ">
+        <img
+          src="${footerImageUrl}"
+          alt="Footnote graphic"
+          style="
+            display:block;
+            max-width:100px;
+            height:auto;
+          "
+        />
       </div>
     </body>
     </html>
