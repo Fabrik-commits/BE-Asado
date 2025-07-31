@@ -14,7 +14,7 @@ export function passwordRecoveryTemplate(code) {
       <div class="header"><h1>FoodSpot | Password Recovery</h1></div>
       <div class="content">
         <p>Please use the code below to reset your password:</p>
-        <span class="code">\${code}</span>
+        <span class="code">${code}</span>
         <p>If you didn’t request this, simply ignore this email.</p>
       </div>
     </body>
@@ -37,7 +37,7 @@ export function newEventTemplate(eventId) {
       <div class="header"><h1>FoodSpot | New Event</h1></div>
       <div class="content">
         <p>A new event has been created. Click below to view:</p>
-        <a class="button" href="https://food-spot.vercel.app/event/\${eventId}">View Event</a>
+        <a class="button" href="https://food-spot.vercel.app/event/${eventId}">View Event</a>
       </div>
     </body>
     </html>
@@ -59,7 +59,7 @@ export function eventStartTemplate(eventId) {
       <div class="header"><h1>FoodSpot | Event Starting Soon</h1></div>
       <div class="content">
         <p>Your event is about to begin. Click below to join:</p>
-        <a class="button" href="https://food-spot.vercel.app/event/\${eventId}">Join Event</a>
+        <a class="button" href="https://food-spot.vercel.app/event/${eventId}">Join Event</a>
       </div>
     </body>
     </html>
@@ -81,9 +81,9 @@ export function penalizationStartTemplate(eventId, penalization) {
     <body>
       <div class="header"><h1>FoodSpot | Penalization Starts Today</h1></div>
       <div class="content">
-        <p>A fee of <span class="highlight">$\${event.penalization} per day</span> has begun on your event balance.</p>
+        <p>A fee of <span class="highlight">${penalization} per day</span> has begun on your event balance.</p>
         <p>Please settle your amount:</p>
-        <a class="button" href="https://food-spot.vercel.app/event/\${eventId}">View Details</a>
+        <a class="button" href="https://food-spot.vercel.app/event/${eventId}">View Details</a>
       </div>
     </body>
     </html>
@@ -105,9 +105,9 @@ export function penalizationOneWeekTemplate(eventId, penalization) {
     <body>
       <div class="header"><h1>FoodSpot | 1 Week of Penalization</h1></div>
       <div class="content">
-        <p>Penalization of <span class="highlight">$\${event.penalization} per day</span>has been applied for one week.</p>
+        <p>Penalization of <span class="highlight">${penalization} per day</span> has been applied for one week.</p>
         <p>Please review and clear your balance:</p>
-        <a class="button" href="https://food-spot.vercel.app/event/\${eventId}">View Event</a>
+        <a class="button" href="https://food-spot.vercel.app/event/${eventId}">View Event</a>
       </div>
     </body>
     </html>
