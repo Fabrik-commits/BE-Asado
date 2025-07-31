@@ -11,9 +11,9 @@ export function passwordRecoveryTemplate(code, footerImageUrl = "https://i.ibb.c
       </style>
     </head>
     <body>
-      <div class="header"><h1>FoodSpot | Recuperar contraseña</h1></div>
+      <div class="header"><h1>FoodSpot | Recuperar contrasena</h1></div>
       <div class="content">
-        <p>Utiliza el siguiente código para recuperar tu contraseña:</p>
+        <p>Utiliza el siguiente codigo para recuperar tu contrasena:</p>
         <span class="code">${code}</span>
         <p>Si no solicitaste esto, simplemente ignora este correo.</p>
       </div>
@@ -52,7 +52,7 @@ export function newEventTemplate(eventId, footerImageUrl = "https://i.ibb.co/Zz3
     <body>
       <div class="header"><h1>FoodSpot | Nuevo Evento</h1></div>
       <div class="content">
-        <p>Se ha creado un nuevo evento. Haz clic a continuación para unirte:</p>
+        <p>Se ha creado un nuevo evento. Haz clic a continuacion para unirte:</p>
         <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Ver Evento</a>
       </div>
       <div style="
@@ -88,9 +88,9 @@ export function eventStartTemplate(eventId, footerImageUrl = "https://i.ibb.co/Z
       </style>
     </head>
     <body>
-      <div class="header"><h1>FoodSpot | El evento está a punto de comenzar</h1></div>
+      <div class="header"><h1>FoodSpot | El evento esta a punto de comenzar</h1></div>
       <div class="content">
-        <p>Uno de tus eventos está a punto de comenzar. Haz clic a continuación para verlo:</p>
+        <p>Uno de tus eventos esta a punto de comenzar. Haz clic a continuacion para verlo:</p>
         <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Ver Evento</a>
       </div>
       <div style="
@@ -127,9 +127,9 @@ export function penalizationStartTemplate(eventId, penalization, footerImageUrl 
       </style>
     </head>
     <body>
-      <div class="header"><h1>FoodSpot | Hoy comienza la penalización</h1></div>
+      <div class="header"><h1>FoodSpot | Hoy comienza la penalizacion</h1></div>
       <div class="content">
-        <p>Se aplicará una tarifa de <span class="highlight">$${penalization} por día</span> para un evento en el que participas.</p>
+        <p>Se aplicara una tarifa de <span class="highlight">$${penalization} por dia</span> para un evento en el que participas.</p>
         <p>Por favor, salda tu deuda:</p>
         <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Ver Evento</a>
       </div>
@@ -167,9 +167,9 @@ export function penalizationOneWeekTemplate(eventId, penalization, footerImageUr
       </style>
     </head>
     <body>
-      <div class="header"><h1>FoodSpot | La penalización ha estado en curso durante una semana</h1></div>
+      <div class="header"><h1>FoodSpot | La penalizacion ha estado en curso durante una semana</h1></div>
       <div class="content">
-        <p>Se ha aplicado una penalización de <span class="highlight">$${penalization} por día</span> durante una semana.</p>
+        <p>Se ha aplicado una penalizacion de <span class="highlight">$${penalization} por dia</span> durante una semana.</p>
         <p>Por favor, revisa y salda tu deuda:</p>
         <a style="color: #FFFFFF !important;" class="button" href="https://food-spot.vercel.app/event/${eventId}">Ver Evento</a>
       </div>
