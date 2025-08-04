@@ -316,7 +316,7 @@ export async function editEvent(req, res) {
     event.description = req.body.description;
     event.memberLimit = req.body.memberLimit;
     event.penalization = req.body.penalization;
-    event.penalizationStartDate = req.body.penalizationStartDate;
+    event.penalizationStartDate = req.body.penalizationStartDate ? req.body.penalization > 0 : null;
     event.state = req.body.state;
     event.isPrivate = req.body.isPrivate;
     if (
