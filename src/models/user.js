@@ -28,9 +28,10 @@ const userSchema = new mongoose.Schema({
 
   alternativeEmail: {
     type: String,
+    default: null,
     validate: {
       validator: function (v) {
-        if (!v) return false;
+        if (v == null) return false;
         let username, domain, rest;
         [username, domain, ...rest] = v.split("@");
         if (rest.length) return false;
