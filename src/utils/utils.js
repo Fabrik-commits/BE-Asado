@@ -7,37 +7,38 @@ import { assignEventValues, calculateTransfersInfo } from "../controllers/events
 
 
 function sendEmail(email, subject, name, html) {
-  let data = JSON.stringify({
-    sender: {
-      name: "FoodSpot",
-      email: "food-spot-no-reply@vercel.app",
-    },
-    to: [
-      {
-        email: email,
-        name: name,
-      },
-    ],
-    subject: subject,
-    htmlContent: html,
+  const payload = JSON.stringify({
+    sender: { name: "FoodSpot", email: "food-spot-no-reply@vercel.app" },
+    to: [{ email, name }],
+    subject,
+    htmlContent
   });
+
+  const byteLength = Buffer.byteLength(payload, "utf8");
+
   const options = {
     method: "POST",
     headers: {
       Accept: "application/json",
       "api-key": brevo.apiKey,
-      "Content-Type": "application/json",
-      "Content-Length": data.length,
-    },
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": byteLength
+    }
   };
 
   return new Promise((resolve, reject) => {
     const req = https.request(brevo.url, options, (res) => {
-      res.on("data", (d) => {});
-      res.on("end", () => resolve(res));
+      res.on("data", () => {});
+      res.on("end", () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve();
+        } else {
+          reject(new Error(`Brevo error: ${res.statusCode}`));
+        }
+      });
     });
     req.on("error", reject);
-    req.write(data);
+    req.write(payload, "utf8");
     req.end();
   });
 }
