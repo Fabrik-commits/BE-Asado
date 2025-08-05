@@ -31,8 +31,8 @@ export async function notifyEventStart(eventId) {
       if (!user.notifications.eventStart) continue;
       const email = user.alternativeEmail ? user.alternativeEmail : user.email;
       await sendEmail(email, "FoodSpot | Tu evento comienza pronto", user.name, message);
+      console.log(`Notification sent to ${user.name} (${email}) for event ${eventId} start`);
     }
-    return;
   } catch (error) {
     console.log(error.message);
   }
