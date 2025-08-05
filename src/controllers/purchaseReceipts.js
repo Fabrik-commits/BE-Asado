@@ -121,7 +121,7 @@ export async function assignMembersToReceipt(req, res) {
 
 export async function deletePurchaseReceipt(req, res) {
   try {
-    const purchaseReceipt = await PurchaseReceipt.findByIdAndDelete(
+    const purchaseReceipt = await PurchaseReceipt.findById(
       req.params.id
     );
     if (!purchaseReceipt)
@@ -137,11 +137,12 @@ export async function deletePurchaseReceipt(req, res) {
         .status(STATUS_CODES.BAD_REQUEST)
         .json({
           message:
-            "Purchase receipts can only be uploaded when the event is closed",
+            "Purchase receipts can only be uploaded or deleted when the event is closed",
         });
     const index = event.purchaseReceipts.indexOf(purchaseReceipt._id);
     event.purchaseReceipts.splice(index, 1);
     await event.save();
+    await PurchaseReceipt.findByIdAndDelete(req.params.id);
     return res.status(STATUS_CODES.OK).json(purchaseReceipt);
   } catch (e) {
     return res
