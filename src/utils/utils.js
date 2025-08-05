@@ -6,7 +6,7 @@ import { User } from "../models/user.js";
 import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
 
 
-function sendEmail(email, subject, name, html) {
+function sendEmail(email, subject, name, htmlContent) {
   const payload = JSON.stringify({
     sender: { name: "FoodSpot", email: "food-spot-no-reply@vercel.app" },
     to: [{ email, name }],
