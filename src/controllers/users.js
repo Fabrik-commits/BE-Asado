@@ -8,6 +8,7 @@ import { assignEventValues, calculateTransfersInfo } from "./events.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 
+
 const userNotFoundMessage = "The user with the given ID was not found.";
 
 export async function getUsers(req, res) {
@@ -232,27 +233,6 @@ export async function deleteUser(req, res) {
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: userNotFoundMessage });
     return res.status(STATUS_CODES.OK).json(user);
-  } catch (e) {
-    return res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ message: e.message });
-  }
-}
-
-export async function updateUsers(req, res) {
-  try {
-    const users = await User.updateMany({}, { 
-      $set: { 
-        notifications: { 
-          newEvent: false, 
-          eventStart: false, 
-          penalizationStart: false, 
-          penalizationOneWeek: false, 
-        }, 
-        alternativeEmail: null 
-      } 
-    });
-    return res.status(STATUS_CODES.OK).json(users);
   } catch (e) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
