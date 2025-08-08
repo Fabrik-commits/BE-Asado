@@ -8,7 +8,7 @@ import { assignEventValues, calculateTransfersInfo } from "../controllers/events
 
 function sendEmail(email, subject, name, htmlContent) {
   const payload = JSON.stringify({
-    sender: { name: "FoodSpot", email: "food-spot-no-reply@vercel.app" },
+    sender: { name: "FoodSpot", email: "food-spot-no-reply@5865554.brevosend.com" },
     to: [{ email, name }],
     subject,
     htmlContent
