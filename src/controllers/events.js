@@ -32,7 +32,7 @@ export async function getPublicEvents(req, res) {
       .select(
         "datetime description state chef memberLimit members title ratings isPrivate penalization penalizationStartDate"
       )
-      .sort({ _id: -1 })
+      .sort({ datetime: -1 })
       .populate("chef", "name")
       .populate("ratings");
 
@@ -61,7 +61,7 @@ export async function getPublicAndPrivateEvents(req, res) {
       .select(
         "datetime description state chef memberLimit members title ratings isPrivate penalization penalizationStartDate"
       )
-      .sort({ _id: -1 })
+      .sort({ datetime: -1 })
       .populate("chef", "name")
       .populate("ratings");
 
