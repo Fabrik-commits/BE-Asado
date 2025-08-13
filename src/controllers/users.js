@@ -7,6 +7,7 @@ import { hasUploaded } from "./transferReceipts.js";
 import { assignEventValues, calculateTransfersInfo } from "./events.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
+import e from "express";
 
 
 const userNotFoundMessage = "The user with the given ID was not found.";
@@ -57,9 +58,8 @@ export async function isDebtor(req, res) {
         ],
       })
       .populate({ path: "members", model: "User" });
-
+    const debtorEvents = [];
     for (const event of events) {
-
       const userBalances = assignEventValues(event.purchaseReceipts);
       const transferInfo = calculateTransfersInfo(userBalances);
 
@@ -73,24 +73,14 @@ export async function isDebtor(req, res) {
           user: userId,
         });
 
-        if (!receipt) {
-          return res.status(STATUS_CODES.OK).json({
-            eventId: event._id,
-            reason: "Transfer Receipt hasn't been uploaded yet.",
-          });
-        } else if (!receipt.hasPaid) {
-          return res.status(STATUS_CODES.OK).json({
-            eventId: event._id,
-            reason: "Transfer Receipt is not approved.",
-          });
+        if (!receipt || !receipt.hasPaid) {
+          debtorEvents.push(event._id);
+        } else {
+          console.log("User has paid in event: ", event._id);
         }
       }
     }
-
-    return res.status(STATUS_CODES.OK).json({
-      eventId: null,
-      reason: "User has no debts.",
-    });
+    return res.status(STATUS_CODES.OK).json(debtorEvents);
   } catch (e) {
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       message: e.message,
