@@ -75,8 +75,6 @@ export async function isDebtor(req, res) {
 
         if (!receipt || !receipt.hasPaid) {
           debtorEvents.push(event._id);
-        } else {
-          console.log("User has paid in event: ", event._id);
         }
       }
     }
