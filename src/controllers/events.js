@@ -30,7 +30,7 @@ export async function getPublicEvents(req, res) {
       },
     })
       .select(
-        "datetime description state chef memberLimit members title ratings isPrivate penalization penalizationStartDate"
+        "datetime description state chef shoppingDesignee memberLimit members title ratings isPrivate penalization penalizationStartDate"
       )
       .sort({ datetime: -1 })
       .populate("chef", "name")
@@ -59,7 +59,7 @@ export async function getPublicAndPrivateEvents(req, res) {
       ],
     })
       .select(
-        "datetime description state chef memberLimit members title ratings isPrivate penalization penalizationStartDate"
+        "datetime description state chef shoppingDesignee memberLimit members title ratings isPrivate penalization penalizationStartDate"
       )
       .sort({ datetime: -1 })
       .populate("chef", "name")
@@ -430,6 +430,7 @@ function reduceEventsInformation(events) {
       description: event.description,
       state: event.state,
       chef: event.chef ? event.chef.name : null,
+      shoppingDesignee: event.shoppingDesignee,
       memberLimit: event.memberLimit,
       members: event.members.length,
       ratings: {
