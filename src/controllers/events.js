@@ -34,7 +34,8 @@ export async function getPublicEvents(req, res) {
       )
       .sort({ datetime: -1 })
       .populate("chef", "name")
-      .populate("ratings");
+      .populate("ratings")
+      .populate("shoppingDesignee");
 
     const publicEvents = reduceEventsInformation(events);
 
@@ -63,7 +64,8 @@ export async function getPublicAndPrivateEvents(req, res) {
       )
       .sort({ datetime: -1 })
       .populate("chef", "name")
-      .populate("ratings");
+      .populate("ratings")
+      .populate("shoppingDesignee");
 
     const allEvents = reduceEventsInformation(events);
 
