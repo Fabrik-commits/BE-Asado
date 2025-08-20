@@ -1,22 +1,23 @@
 import mongoose from "mongoose";
 import { brevo } from "../config.js";
 import https from "https";
+import { IEventWithMembersTransferReceiptsPurchaseReceipts } from "../models/interfaces.js";
 import { Event } from "../models/event.js";
 import { User } from "../models/user.js";
 import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
 
 
-function sendEmail(email, subject, name, htmlContent) {
-  const payload = JSON.stringify({
+function sendEmail(email: string, subject: string, name: string, htmlContent: string): Promise<void> {
+  const payload: string = JSON.stringify({
     sender: { name: "FoodSpot", email: "food-spot-no-reply@5865554.brevosend.com" },
     to: [{ email, name }],
     subject,
     htmlContent
   });
 
-  const byteLength = Buffer.byteLength(payload, "utf8");
+  const byteLength: number = Buffer.byteLength(payload, "utf8");
 
-  const options = {
+  const options: any = {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -44,32 +45,32 @@ function sendEmail(email, subject, name, htmlContent) {
 }
 
 
-function isValidId(id){
-    if (mongoose.Types.ObjectId.isValid(id)){
-        if ((String)(new mongoose.Types.ObjectId(id)) == id){
-            return true;
-        }
+function isValidId(id: string): boolean {
+  if (mongoose.Types.ObjectId.isValid(id)){
+    if ((String)(new mongoose.Types.ObjectId(id)) == id){
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
 
-function removeElementfromArray(array , index = 0){
+function removeElementfromArray(array: any[], index: number = 0): any[] {
     if (typeof array != "object" || !Array.isArray(array)){
         throw new Error("array should be an Array.");
     }
-    const halfBeforeElement = array.slice(0, index);
-    const halfAfterElement = array.slice(index + 1);
+    const halfBeforeElement: any[] = array.slice(0, index);
+    const halfAfterElement: any[] = array.slice(index + 1);
     return halfBeforeElement.concat(halfAfterElement);
 }
 
-async function getEventsDebtors(eventId) {
-  const event = await Event.findById(eventId).populate("members transferReceipts purchaseReceipts");
-  
+async function getEventsDebtors(eventId: string): Promise<any[]> {
+  const event: IEventWithMembersTransferReceiptsPurchaseReceipts | null = await Event.findById(eventId).populate("members transferReceipts purchaseReceipts");
+
   if (!event) {
     throw new Error(`Event with ID ${eventId} not found.`);
   }
-  
+
   const userBalances = assignEventValues(event.purchaseReceipts);
   const transferInfo = calculateTransfersInfo(userBalances);
   const expectedTransfers = transferInfo.filter(t => t.receiver !== null);

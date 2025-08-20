@@ -1,4 +1,4 @@
-export function passwordRecoveryTemplate(code, footerImageUrl = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png") {
+export function passwordRecoveryTemplate(code: string, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
   return `
     <html>
     <head>
@@ -38,7 +38,7 @@ export function passwordRecoveryTemplate(code, footerImageUrl = "https://i.ibb.c
   `;
 }
 
-export function newEventTemplate(eventId, footerImageUrl = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png") {
+export function newEventTemplate(eventId: string, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
   return `
     <html>
     <head>
@@ -76,7 +76,7 @@ export function newEventTemplate(eventId, footerImageUrl = "https://i.ibb.co/Zz3
   `;
 }
 
-export function eventStartTemplate(eventId, footerImageUrl = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png") {
+export function eventStartTemplate(eventId: string, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
   return `
     <html>
     <head>
@@ -114,7 +114,7 @@ export function eventStartTemplate(eventId, footerImageUrl = "https://i.ibb.co/Z
   `;
 }
 
-export function penalizationStartTemplate(eventId, penalization, footerImageUrl = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png") {
+export function penalizationStartTemplate(eventId: string, penalization: number, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
   return `
     <html>
     <head>
@@ -154,7 +154,7 @@ export function penalizationStartTemplate(eventId, penalization, footerImageUrl 
   `;
 }
 
-export function penalizationOneWeekTemplate(eventId, penalization, footerImageUrl = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png") {
+export function penalizationOneWeekTemplate(eventId: string, penalization: number, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
   return `
     <html>
     <head>

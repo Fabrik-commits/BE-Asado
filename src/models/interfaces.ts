@@ -1,6 +1,7 @@
 import mongoose, { Document } from "mongoose";
 
 export interface IUser extends Document {
+  _id: mongoose.Types.ObjectId;
   name: string;
   lastName?: string;
   email: string;
@@ -22,6 +23,7 @@ export interface IUser extends Document {
 }
 
 export interface ITransferReceipt extends Document {
+  _id: mongoose.Types.ObjectId;
   image?: mongoose.Types.ObjectId | null;
   description?: string;
   amount: number;
@@ -33,17 +35,20 @@ export interface ITransferReceipt extends Document {
 }
 
 export interface IReminder extends Document {
+  _id: mongoose.Types.ObjectId;
   event: mongoose.Types.ObjectId;
   datetime: Date;
   type: string;
 }
 
 export interface IRating extends Document {
+  _id: mongoose.Types.ObjectId;
   score: number;
   user: mongoose.Types.ObjectId;
 }
 
 export interface IPurchaseReceipt extends Document {
+  _id: mongoose.Types.ObjectId;
   image?: mongoose.Types.ObjectId | null;
   description?: string;
   amount: number;
@@ -53,12 +58,14 @@ export interface IPurchaseReceipt extends Document {
 }
 
 export interface IImage extends Document {
+  _id: mongoose.Types.ObjectId;
   name: string;
   mimetype?: string;
   image: Buffer;
 }
 
 export interface IEvent extends Document {
+  _id: mongoose.Types.ObjectId;
   name: string;
   date: Date;
   description?: string;
@@ -76,4 +83,20 @@ export interface IEvent extends Document {
   isPrivate?: boolean;
   penalization?: number | null;
   penalizationStartDate?: Date;
+}
+
+export interface IEventPopulated extends Omit<IEvent, "members" | "chef" | "organizer" | "shoppingDesignee" | "transferReceipts" | "purchaseReceipts" | "ratings"> {
+  members: IEvent["members"];
+  chef: IUser | null;
+  organizer: IUser;
+  shoppingDesignee: IUser[] | null;
+  transferReceipts: ITransferReceipt[];
+  purchaseReceipts: IPurchaseReceipt[];
+  ratings: IRating[];
+}
+
+export interface IEventWithMembersTransferReceiptsPurchaseReceipts extends Omit<IEventPopulated, "members" | "transferReceipts" | "purchaseReceipts"> {
+  members: IUser[];
+  transferReceipts: ITransferReceipt[];
+  purchaseReceipts: IPurchaseReceipt[];
 }
