@@ -1,9 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, {Model} from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { jwtPrivateKey } from "../config.js";
+import { IUser } from "./interfaces.js";
 
-const userSchema = new mongoose.Schema({
+const userSchema: mongoose.Schema<IUser> = new mongoose.Schema({
   name: { type: String, required: true },
 
   lastName: { type: String },
@@ -13,10 +14,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     validate: {
-      validator: function (v) {
+      validator: function (v: string): boolean {
         if (!v) return false;
         if (v == "davidmartingallegos@gmail.com") return true;
-        let username, domain, rest;
+        let username: string, domain: string, rest: string[];
         [username, domain, ...rest] = v.split("@");
         if (rest.length) return false;
         if (domain !== "endava.com") return false;
@@ -30,9 +31,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
     validate: {
-      validator: function (v) {
+      validator: function (v: string | null): boolean {
         if (v == null) return true;
-        let username, domain, rest;
+        let username: string, domain: string, rest: string[];
         [username, domain, ...rest] = v.split("@");
         if (rest.length) return false;
         return true;
@@ -53,7 +54,7 @@ const userSchema = new mongoose.Schema({
     type: [String],
     required: true,
     validate: {
-      validator: function (v) {
+      validator: function (v: string[]): boolean {
         const valid_diets = ["celiac", "hypertensive", "vegan", "vegetarian"];
         if (!v) return false;
         for (const diet of v) {
@@ -80,11 +81,11 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.methods.generateAuthToken = function () {
+userSchema.methods.generateAuthToken = function (this: IUser): string {
   return jwt.sign({ _id: this._id, email: this.email }, jwtPrivateKey);
 };
 
-userSchema.methods.isValidPassword = async function (password) {
+userSchema.methods.isValidPassword = async function (this: IUser, password: string): Promise<boolean> {
   try {
     return await bcrypt.compare(password, this.password);
   } catch (error) {
@@ -92,6 +93,6 @@ userSchema.methods.isValidPassword = async function (password) {
   }
 };
 
-const User = mongoose.model("User", userSchema);
+const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 
-export { userSchema as userSchema, User as User };
+export { userSchema, User };
