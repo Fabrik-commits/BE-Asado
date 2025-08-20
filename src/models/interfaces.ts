@@ -31,3 +31,9 @@ export interface ITransferReceipt extends Document {
   event: mongoose.Types.ObjectId;
   datetime: Date;
 }
+
+export interface IReminder extends Document {
+  event: mongoose.Types.ObjectId;
+  datetime: Date;
+  type: string;
+}
