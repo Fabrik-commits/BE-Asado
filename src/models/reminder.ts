@@ -18,7 +18,7 @@ const reminderSchema: mongoose.Schema<IReminder> = new mongoose.Schema({
     required: true,
     validate: {
       validator: function (v: string): boolean {
-        const valid_types = ["eventStart", "penalizationStart", "penalizationOneWeek"];
+        const valid_types: string[] = ["eventStart", "penalizationStart", "penalizationOneWeek"];
         if (!v) return false;
         if (!valid_types.includes(v)) {
           return false;

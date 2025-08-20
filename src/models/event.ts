@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { IEvent } from "./interfaces.js";
 
-const eventSchema = new mongoose.Schema({
+const eventSchema: mongoose.Schema<IEvent> = new mongoose.Schema<IEvent>({
   title: { type: String, required: true },
 
   datetime: { type: Date, required: true },
@@ -14,8 +15,8 @@ const eventSchema = new mongoose.Schema({
     required: true,
     default: "available",
     validate: {
-      validator: function (v) {
-        const valid_states = [
+      validator: function (v: string): boolean {
+        const valid_states: string[] = [
           "closed",
           "available",
           "readyforpayment",
@@ -75,6 +76,6 @@ const eventSchema = new mongoose.Schema({
   penalizationStartDate: { type: Date },
 });
 
-const event = mongoose.model("Event", eventSchema);
+const Event: mongoose.Model<IEvent> = mongoose.model<IEvent>("Event", eventSchema);
 
-export { event as Event };
+export { Event };

@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
+import { IPurchaseReceipt } from "./interfaces.js";
 
-const purchaseReceiptSchema = new mongoose.Schema({
+const purchaseReceiptSchema: mongoose.Schema = new mongoose.Schema<IPurchaseReceipt>({
   image: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Image",
@@ -29,12 +30,9 @@ const purchaseReceiptSchema = new mongoose.Schema({
   },
 });
 
-const PurchaseReceipt = mongoose.model(
+const PurchaseReceipt: Model<IPurchaseReceipt> = mongoose.model<IPurchaseReceipt>(
   "PurchaseReceipt",
   purchaseReceiptSchema
 );
 
-export {
-  purchaseReceiptSchema as purchaseReceiptSchema,
-  PurchaseReceipt as PurchaseReceipt,
-};
+export { purchaseReceiptSchema, PurchaseReceipt };
