@@ -21,3 +21,13 @@ export interface IUser extends Document {
   isValidPassword(password: string): Promise<boolean>;
 }
 
+export interface ITransferReceipt extends Document {
+  image?: mongoose.Types.ObjectId | null;
+  description?: string;
+  amount: number;
+  hasPaid: boolean;
+  paymentMethod?: string | null;
+  user: mongoose.Types.ObjectId;
+  event: mongoose.Types.ObjectId;
+  datetime: Date;
+}

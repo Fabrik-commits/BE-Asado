@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
+import { ITransferReceipt } from "./interfaces.js";
 
-const transferReceiptSchema = new mongoose.Schema({
+const transferReceiptSchema: mongoose.Schema<ITransferReceipt> = new mongoose.Schema({
   image: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Image",
@@ -30,12 +31,6 @@ const transferReceiptSchema = new mongoose.Schema({
   datetime: { type: Date, required: true },
 });
 
-const TransferReceipt = mongoose.model(
-  "TransferReceipt",
-  transferReceiptSchema
-);
+const TransferReceipt: Model<ITransferReceipt> = mongoose.model<ITransferReceipt>("TransferReceipt", transferReceiptSchema);
 
-export {
-  transferReceiptSchema as transferReceiptSchema,
-  TransferReceipt as TransferReceipt,
-};
+export { transferReceiptSchema, TransferReceipt };
