@@ -30,11 +30,12 @@ export async function getPublicEvents(req, res) {
       },
     })
       .select(
-        "datetime description state chef memberLimit members title ratings isPrivate penalization penalizationStartDate"
+        "datetime description state chef shoppingDesignee memberLimit members title ratings isPrivate penalization penalizationStartDate"
       )
-      .sort({ _id: -1 })
+      .sort({ datetime: -1 })
       .populate("chef", "name")
-      .populate("ratings");
+      .populate("ratings")
+      .populate("shoppingDesignee");
 
     const publicEvents = reduceEventsInformation(events);
 
@@ -59,11 +60,12 @@ export async function getPublicAndPrivateEvents(req, res) {
       ],
     })
       .select(
-        "datetime description state chef memberLimit members title ratings isPrivate penalization penalizationStartDate"
+        "datetime description state chef shoppingDesignee memberLimit members title ratings isPrivate penalization penalizationStartDate"
       )
-      .sort({ _id: -1 })
+      .sort({ datetime: -1 })
       .populate("chef", "name")
-      .populate("ratings");
+      .populate("ratings")
+      .populate("shoppingDesignee");
 
     const allEvents = reduceEventsInformation(events);
 
@@ -125,18 +127,19 @@ async function updateReminders(event) {
       const penalizationStartReminder = new Reminder({
         event: event._id,
         type: "penalizationStart",
-        datetime: penalizationReminderDate, 
+        datetime: penalizationReminderDate,
       });
       await penalizationStartReminder.save();
       const penalizationOneWeekReminder = new Reminder({
         event: event._id,
         type: "penalizationOneWeek",
-        datetime: new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000) // one week after penalization start
+        datetime: new Date(
+          penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000
+        ), // one week after penalization start
       });
       await penalizationOneWeekReminder.save();
     }
-  }
-  else {
+  } else {
     const eventStartReminder = reminders.find(
       (reminder) => reminder.type === "eventStart"
     );
@@ -157,13 +160,15 @@ async function updateReminders(event) {
         const newPenalizationStartReminder = new Reminder({
           event: event._id,
           type: "penalizationStart",
-          datetime: penalizationReminderDate
+          datetime: penalizationReminderDate,
         });
         await newPenalizationStartReminder.save();
         const newPenalizationOneWeekReminder = new Reminder({
           event: event._id,
           type: "penalizationOneWeek",
-          datetime: new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000) // one week after penalization start
+          datetime: new Date(
+            penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000
+          ), // one week after penalization start
         });
         await newPenalizationOneWeekReminder.save();
       } else {
@@ -172,7 +177,9 @@ async function updateReminders(event) {
         const penalizationOneWeekReminder = reminders.find(
           (reminder) => reminder.type === "penalizationOneWeek"
         );
-        penalizationOneWeekReminder.datetime = new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000); // one week after penalization start
+        penalizationOneWeekReminder.datetime = new Date(
+          penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000
+        ); // one week after penalization start
         await penalizationOneWeekReminder.save();
       }
     }
@@ -316,21 +323,21 @@ export async function editEvent(req, res) {
     event.description = req.body.description;
     event.memberLimit = req.body.memberLimit;
     event.penalization = req.body.penalization;
-    event.penalizationStartDate = req.body.penalization > 0 ? req.body.penalizationStartDate : null;
+    event.penalizationStartDate =
+      req.body.penalization > 0 ? req.body.penalizationStartDate : null;
     event.state = req.body.state;
     event.isPrivate = req.body.isPrivate;
-    if (
-      (event.shoppingDesignee.length == 0 || !event.chef) &&
-      event.state !== "available"
-    )
+    if (event.shoppingDesignee.length == 0 && event.state !== "available")
       return res.status(STATUS_CODES.BAD_REQUEST).json({
-        message: "The event has no chef or has no shopping designees.",
+        message: "The event has no shopping designees.",
       });
     await event.save();
     await updateReminders(event);
     return res.status(STATUS_CODES.OK).json(event);
   } catch (e) {
-    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+    return res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ message: e.message });
   }
 }
 
@@ -354,7 +361,9 @@ export async function deleteEvent(req, res) {
     await Event.findByIdAndDelete(req.params.id);
     return res.status(STATUS_CODES.OK).json(event);
   } catch (e) {
-    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+    return res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ message: e.message });
   }
 }
 
@@ -366,8 +375,11 @@ async function deleteEvents() {
         $in: ["finished", "cancelled"],
       },
     }).sort({ datetime: "asc" });
-    if (matches.length > 0) {
+    const eventsToDelete = Math.min(totalEvents - 6, matches.length);
+
+    for (let i = 0; i < eventsToDelete; i++) {
       const deletedId = matches[0].id;
+      matches = matches.slice(1);
       await deleteReminders(deletedId);
       await deleteReceipts(deletedId);
       const deletedEvent = await Event.findByIdAndDelete(deletedId);
@@ -420,6 +432,7 @@ function reduceEventsInformation(events) {
       description: event.description,
       state: event.state,
       chef: event.chef ? event.chef.name : null,
+      shoppingDesignee: event.shoppingDesignee,
       memberLimit: event.memberLimit,
       members: event.members.length,
       ratings: {
@@ -439,7 +452,6 @@ function reduceEventsInformation(events) {
   }
   return reducedEvents;
 }
-
 
 export function calculateTransfersInfo(amounts) {
   const transferInfo = [];
@@ -472,13 +484,12 @@ export function calculateTransfersInfo(amounts) {
     });
     const updatedAmount = Number(
       (amounts[amounts.length - 1].totalCost + payer.totalCost).toFixed(2)
-    )
-    amounts[amounts.length - 1].totalCost = updatedAmount
+    );
+    amounts[amounts.length - 1].totalCost = updatedAmount;
     amounts.splice(0, 1);
   }
   return transferInfo;
 }
-
 
 export function assignEventValues(receipts) {
   const userBalances = [];
@@ -487,7 +498,9 @@ export function assignEventValues(receipts) {
       (receipt.amount / receipt.participants.length).toFixed(2)
     );
     for (const participant of receipt.participants) {
-      let participantEntry = userBalances.find((a) => participant._id.equals(a.userId));
+      let participantEntry = userBalances.find((a) =>
+        participant._id.equals(a.userId)
+      );
       if (participantEntry) {
         participantEntry.totalCost = Number(
           (participantEntry.totalCost - receiptCostPerUser).toFixed(2)
@@ -499,7 +512,7 @@ export function assignEventValues(receipts) {
           userLastName: participant.lastName,
           userCbu: participant.cbu,
           userAlias: participant.alias,
-          totalCost: - receiptCostPerUser,
+          totalCost: -receiptCostPerUser,
         });
       }
     }
@@ -526,7 +539,6 @@ export function assignEventValues(receipts) {
   }
   return userBalances;
 }
-
 
 export async function getMembersAmount(req, res) {
   try {
@@ -563,7 +575,7 @@ export async function getMembersAmount(req, res) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "The event has no purchase receipts." });
-    const userBalances = assignEventValues(event.purchaseReceipts)
+    const userBalances = assignEventValues(event.purchaseReceipts);
     const transferInfo = calculateTransfersInfo(userBalances);
     return res.status(STATUS_CODES.OK).json(transferInfo);
   } catch (e) {
