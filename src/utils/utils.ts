@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { brevo } from "../config.js";
 import https from "https";
-import { IEventWithMembersTransferReceiptsPurchaseReceipts } from "../models/interfaces.js";
+import { IEventAmountCalculationsWithTransfers, IEventWithMembersTransferReceiptsPurchaseReceipts, ITransferInfo, IUser, IUserBalance } from "../models/interfaces.js";
 import { Event } from "../models/event.js";
 import { User } from "../models/user.js";
 import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
@@ -55,40 +55,58 @@ function isValidId(id: string): boolean {
 }
 
 
-function removeElementfromArray(array: any[], index: number = 0): any[] {
-    if (typeof array != "object" || !Array.isArray(array)){
-        throw new Error("array should be an Array.");
-    }
-    const halfBeforeElement: any[] = array.slice(0, index);
-    const halfAfterElement: any[] = array.slice(index + 1);
-    return halfBeforeElement.concat(halfAfterElement);
-}
-
-async function getEventsDebtors(eventId: string): Promise<any[]> {
-  const event: IEventWithMembersTransferReceiptsPurchaseReceipts | null = await Event.findById(eventId).populate("members transferReceipts purchaseReceipts");
+async function getEventsDebtors(eventId: string): Promise<IUser[]> {
+  // const event: IEventWithMembersTransferReceiptsPurchaseReceipts | null = await Event.findById(eventId).populate("members transferReceipts purchaseReceipts");
+  const event: IEventAmountCalculationsWithTransfers | null = await Event.findById(eventId)
+    .populate([
+      {
+        path: "purchaseReceipts",
+        populate: [
+          {
+            path: "shoppingDesignee",
+            model: "User",
+          },
+          {
+            path: "participants",
+            model: "User",
+          },
+        ],
+      },
+      {
+        path: "members",
+        model: "User",
+      },
+      {
+        path: "transferReceipts",
+        populate: {
+          path: "user",
+          model: "User",
+        }
+      },
+    ]);
 
   if (!event) {
     throw new Error(`Event with ID ${eventId} not found.`);
   }
 
-  const userBalances = assignEventValues(event.purchaseReceipts);
-  const transferInfo = calculateTransfersInfo(userBalances);
-  const expectedTransfers = transferInfo.filter(t => t.receiver !== null);
+  const userBalances: IUserBalance[] = assignEventValues(event.purchaseReceipts);
+  const transferInfo: ITransferInfo[] = calculateTransfersInfo(userBalances);
+  const expectedTransfers: ITransferInfo[] = transferInfo.filter(t => t.receiver !== null);
 
-  const debtorUsers = await Promise.all(
+  const debtorUsers: (IUser | null)[] = await Promise.all(
     expectedTransfers.map(async transfer => {
-      const receipt = event.transferReceipts.find(r => r.user.equals(transfer.userId));
+      const receipt = event.transferReceipts.find(r => r.user._id.equals(transfer.userId));
       if (!receipt) {
-        return await User.findById(transfer.userId);
+        return receipt.user;
       }
       return null;
     })
   );
 
-  const debtors = debtorUsers.filter(user => user !== null);
+  const debtors: IUser[] = debtorUsers.filter(user => user !== null);
   return debtors;
 }
 
 
 
-export {isValidId, removeElementfromArray, sendEmail, getEventsDebtors};
+export {isValidId, sendEmail, getEventsDebtors};

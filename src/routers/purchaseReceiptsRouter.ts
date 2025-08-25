@@ -9,7 +9,7 @@ import {
 } from "../controllers/purchaseReceipts.js";
 import { auth, shoppingDesignee, eventParticipant, multerUpload } from "../middleware/middleware.js";
 
-const purchaseReceiptRouter = express.Router();
+const purchaseReceiptRouter: express.Router = express.Router();
 
 purchaseReceiptRouter.get(
   "/getPurchaseReceiptsByEvent/:event",

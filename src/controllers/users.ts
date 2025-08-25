@@ -1,3 +1,4 @@
+import {Request, Response} from "express";
 import bcrypt from "bcrypt";
 import { User } from "../models/user.js";
 import { Image } from "../models/image.js";
@@ -7,25 +8,26 @@ import { hasUploaded } from "./transferReceipts.js";
 import { assignEventValues, calculateTransfersInfo } from "./events.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
-import e from "express";
+import { IEventWithMembersPurchaseReceiptsPopulated, IImage, ISafeUser, ITransferReceipt, IUser } from "../models/interfaces.js";
+import mongoose from "mongoose";
 
 
 const userNotFoundMessage = "The user with the given ID was not found.";
 
-export async function getUsers(req, res) {
+export async function getUsers(req: Request, res: Response): Promise<Response> {
   try {
-    const users = await User.find().select("-password -verificationCode");
+    const users: ISafeUser[] = await User.find().select("-password -verificationCode");
     return res.status(STATUS_CODES.OK).json(users);
-  } catch (e) {
+  } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ message: e.message });
+      .json({ message: error?.message || "Internal server error." });
   }
 }
 
-export async function getUserById(req, res) {
+export async function getUserById(req: Request, res: Response): Promise<Response> {
   try {
-    const user = await User.findById(req.params.id).select(
+    const user: ISafeUser | null = await User.findById(req.params.id).select(
       "-password -verificationCode"
     );
     if (!user) {
@@ -35,18 +37,18 @@ export async function getUserById(req, res) {
     } else {
       return res.status(STATUS_CODES.OK).json(user);
     }
-  } catch (e) {
+  } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ message: e.message });
+      .json({ message: error?.message || "Internal server error." });
   }
 }
 
-export async function isDebtor(req, res) {
+export async function isDebtor(req: Request, res: Response): Promise<Response> {
   try {
-    const userId = req.params.id;
+    const userId: string = req.params.id;
 
-    const events = await Event.find({
+    const events: IEventWithMembersPurchaseReceiptsPopulated[] = await Event.find({
       members: userId,
       state: "readyforpayment",
     })
@@ -58,7 +60,7 @@ export async function isDebtor(req, res) {
         ],
       })
       .populate({ path: "members", model: "User" });
-    const debtorEvents = [];
+    const debtorEvents: mongoose.Types.ObjectId[] = [];
     for (const event of events) {
       const userBalances = assignEventValues(event.purchaseReceipts);
       const transferInfo = calculateTransfersInfo(userBalances);
@@ -68,7 +70,7 @@ export async function isDebtor(req, res) {
       );
 
       if (userTransfer) {
-        const receipt = await TransferReceipt.findOne({
+        const receipt: ITransferReceipt | null = await TransferReceipt.findOne({
           event: event._id,
           user: userId,
         });
@@ -79,70 +81,23 @@ export async function isDebtor(req, res) {
       }
     }
     return res.status(STATUS_CODES.OK).json(debtorEvents);
-  } catch (e) {
+  } catch (error) {
     return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-      message: e.message,
+      message: error?.message || "Internal server error.",
     });
   }
 }
 
-export async function oldIsDebtor(req, res) {
-  try {
-    const userId = req.params.id;
-    const eventsWithoutReceipts = await Event.find({
-      members: userId,
-      state: "readyforpayment",
-      purchaseReceipts: { $exists: true, $ne: [] },
-    });
-
-    for (const event of eventsWithoutReceipts) {
-      const eventId = event.id;
-      const { hasUploaded, hasReceiptApproved } = await hasUploaded(
-        userId,
-        eventId
-      );
-      if (hasUploaded) {
-        if (hasReceiptApproved) {
-          continue;
-        } else {
-          return res.status(STATUS_CODES.OK).json({
-            eventId,
-            reason: "Receipt is not approved by Shopping Designee.",
-          });
-        }
-      } else {
-        return res.status(STATUS_CODES.OK).json({
-          eventId,
-          reason: "Transfer Receipt hasn't been uploaded yet.",
-        });
-      }
-    }
-    return res
-      .status(STATUS_CODES.OK)
-      .json({ eventId: null, reason: "User has no debts." });
-  } catch (e) {
-    return res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ message: e.message });
-  }
-}
-
-async function hasToPay(userId, eventId) {
-  const event = await Event.findOne(eventId).populate("purchaseReceipts");
-
-}
-
-export async function register(req, res) {
+export async function register(req: Request, res: Response): Promise<Response> {
   try {
     req.body.email = req.body.email.toLowerCase();
-    const existingUser = await User.findOne({ email: req.body.email });
+    const existingUser: IUser = await User.findOne({ email: req.body.email });
     if (existingUser)
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "User already registered" });
-    let user = new User(req.body);
-    const salt = await bcrypt.genSalt(10);
-    const passwordPattern = new RegExp(
+
+    const passwordPattern: RegExp = new RegExp(
       "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,}$"
     );
     if (!passwordPattern.test(req.body.password)) {
@@ -150,19 +105,21 @@ export async function register(req, res) {
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "Password doesn't match the requirements." });
     }
+    let user: IUser = new User(req.body);
+    const salt: string = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     user = await user.save();
     return res.status(STATUS_CODES.CREATED).json(user);
-  } catch (e) {
+  } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ message: e.message });
+      .json({ message: error?.message || "Internal server error." });
   }
 }
 
-export async function editUser(req, res) {
+export async function editUser(req: Request, res: Response): Promise<Response> {
   try {
-    let user = await User.findById(req.params.id);
+    let user: IUser | null = await User.findById(req.params.id);
     if (!user)
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -183,47 +140,47 @@ export async function editUser(req, res) {
     };
     user = await user.save();
     return res.status(STATUS_CODES.OK).json(user);
-  } catch (e) {
+  } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ message: e.message });
+      .json({ message: error?.message || "Internal server error." });
   }
 }
 
-export async function editProfilePicture(req, res) {
+export async function editProfilePicture(req: Request, res: Response): Promise<Response> {
   try {
     if (req.file) {
-      let user = await User.findById(req.params.id);
+      let user: IUser | null = await User.findById(req.params.id);
       if (!user)
         return res
           .status(STATUS_CODES.NOT_FOUND)
           .json({ message: userNotFoundMessage });
       if (user.profilePicture) {
-        const deletedImage = await Image.findOneAndDelete(user.profilePicture);
+        const deletedImage: IImage | null = await Image.findOneAndDelete(user.profilePicture);
       }
-      const imageId = await saveImage(req.file);
+      const imageId: mongoose.Types.ObjectId = await saveImage(req.file);
       user.profilePicture = imageId;
       user = await user.save();
       return res.status(STATUS_CODES.OK).json({ imageId: imageId });
     }
-  } catch (e) {
+  } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ message: e.message });
+      .json({ message: error?.message || "Internal server error." });
   }
 }
 
-export async function deleteUser(req, res) {
+export async function deleteUser(req: Request, res: Response): Promise<Response> {
   try {
-    const user = await User.findByIdAndRemove(req.params.id);
+    const user: IUser | null = await User.findByIdAndRemove(req.params.id);
     if (!user)
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: userNotFoundMessage });
     return res.status(STATUS_CODES.OK).json(user);
-  } catch (e) {
+  } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ message: e.message });
+      .json({ message: error?.message || "Internal server error." });
   }
 }

@@ -1,17 +1,23 @@
+import mongoose from "mongoose";
 import { Rating } from "../models/rating.js";
 import { Event } from "../models/event.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
+import { Request, Response } from "express";
+import { IRequestWithUser, IRating, IEvent } from "../models/interfaces.js";
 
-export async function createRating(req, res) {
+interface IEventWithRatings extends Omit<IEvent, "ratings"> {
+  ratings: IRating[];
+}
+
+export async function createRating(req: Request, res: Response): Promise<Response> {
   try {
-    const event = await Event.findById(req.params.event)
-      .populate("ratings")
-      .exec();
+    const event: IEventWithRatings | null = await Event.findById(req.params.event)
+      .populate("ratings");
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: "The event with the given ID was not found." });
-    if (!event.members.includes(req.params.user))
+    if (!event.members.includes(new mongoose.Types.ObjectId(req.params.user)))
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({
@@ -21,14 +27,14 @@ export async function createRating(req, res) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "The event is not closed or finished." });
-    const rating = event.ratings.find((r) => r.user.equals(req.params.user));
+    const rating: IRating | undefined = event.ratings.find((r) => r.user.equals(req.params.user));
     if (rating) {
       rating.score = req.body.score;
       await rating.save();
       await event.save();
       return res.status(STATUS_CODES.OK).json(rating);
     } else {
-      const newRating = new Rating({
+      const newRating: IRating = new Rating({
         score: req.body.score,
         user: req.params.user,
       });
@@ -37,21 +43,20 @@ export async function createRating(req, res) {
       await event.save();
       return res.status(STATUS_CODES.OK).json(newRating);
     }
-  } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+  } catch (error: any) {
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
   }
 }
 
-export async function getRatingFromUser(req, res) {
+export async function getRatingFromUser(req: Request, res: Response): Promise<Response> {
   try {
-    const event = await Event.findById(req.params.event)
-      .populate("ratings")
-      .exec();
+    const event: IEventWithRatings | null = await Event.findById(req.params.event)
+      .populate("ratings");
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: "The event with the given ID was not found." });
-    if (!event.members.includes(req.params.user))
+    if (!event.members.includes(new mongoose.Types.ObjectId(req.params.user)))
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({
@@ -65,7 +70,7 @@ export async function getRatingFromUser(req, res) {
         .status(STATUS_CODES.OK)
         .json({ message: "User does not have a rating for this event." });
     }
-  } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+  } catch (error: any) {
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
   }
 }

@@ -1,16 +1,18 @@
 import bcrypt from "bcrypt";
+import { Request, Response } from "express";
 import { User } from "../models/user.js";
+import {IUser} from "../models/interfaces.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 
-export async function login(req, res) {
+export async function login(req: Request, res: Response): Promise<Response> {
   try {
     req.body.email = req.body.email.toLowerCase();
-    const existingUser = await User.findOne({ email: req.body.email });
+    const existingUser: IUser | null = await User.findOne({ email: req.body.email });
     if (!existingUser)
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "Invalid email or password" });
-    const validPassword = await bcrypt.compare(
+    const validPassword: boolean = await bcrypt.compare(
       req.body.password,
       existingUser.password
     );
@@ -18,15 +20,15 @@ export async function login(req, res) {
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "Invalid email or password" });
-    const token = existingUser.generateAuthToken();
+    const token: string = existingUser.generateAuthToken();
     return res.status(STATUS_CODES.OK).json({
       id: existingUser.id,
       name: existingUser.name,
       jwt: token,
     });
-  } catch (e) {
+  } catch (error: any) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .status({ message: e.message });
+      .json({ message: error?.message || "Internal server error" });
   }
 }

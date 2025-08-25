@@ -15,7 +15,7 @@ import {
 } from "../controllers/events.js";
 import { auth, sameUser, eventOrganizer, shoppingDesigneeOrEventOrganizer } from "../middleware/middleware.js";
 
-const eventRouter = express.Router();
+const eventRouter: express.Router = express.Router();
 
 eventRouter.get(
   "/getEvents", 

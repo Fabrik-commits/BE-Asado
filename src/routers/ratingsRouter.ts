@@ -2,7 +2,7 @@ import express from "express";
 import { createRating, getRatingFromUser } from "../controllers/ratings.js";
 import { auth } from "../middleware/middleware.js";
 
-const ratingsRouter = express.Router();
+const ratingsRouter: express.Router = express.Router();
 
 ratingsRouter.post(
     "/createRating/:event/:user", 

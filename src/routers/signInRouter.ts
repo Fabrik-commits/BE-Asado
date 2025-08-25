@@ -1,7 +1,7 @@
 import express from "express";
 import { login } from "../controllers/login.js";
 
-const signInRouter = express.Router();
+const signInRouter: express.Router = express.Router();
 
 signInRouter.post(
     "/", 

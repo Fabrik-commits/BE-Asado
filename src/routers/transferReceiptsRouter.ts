@@ -14,7 +14,7 @@ import {
   multerUpload,
 } from "../middleware/middleware.js";
 
-const transferReceiptRouter = express.Router();
+const transferReceiptRouter: express.Router = express.Router();
 
 transferReceiptRouter.get(
   "/getTransferReceiptsByEvent/:event",

@@ -1,7 +1,7 @@
 import express from "express";
 import { forgot, verifyCode, recover } from "../controllers/password.js";
 
-const passwordRouter = express.Router();
+const passwordRouter: express.Router = express.Router();
 
 passwordRouter.post(
     "/forgot", 

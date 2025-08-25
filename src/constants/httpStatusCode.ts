@@ -1,4 +1,4 @@
-export const STATUS_CODES = {
+export const STATUS_CODES: { [key: string]: number } = {
   OK: 200,
   CREATED: 201,
   BAD_REQUEST: 400,

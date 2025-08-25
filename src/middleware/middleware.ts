@@ -1,36 +1,43 @@
 import jwt from "jsonwebtoken";
 import multer from "multer";
+import mongoose from "mongoose";
+import { NextFunction } from "express";
 import { Event } from "../models/event.js";
 import { TransferReceipt } from "../models/transferReceipt.js";
 import { isValidId } from "../utils/utils.js";
 import { jwtPrivateKey } from "../config.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
+import { Request, Response } from "express";
+import { IEvent, ITransferReceipt, IUserPayload, IRequestWithUser } from "../models/interfaces.js";
 
-const invalidObjectIdMessage = "Invalid ObjectID";
+const invalidObjectIdMessage: string = "Invalid ObjectID";
 
-export function auth(req, res, next) {
-  const token = req.header("Authorization");
+const MIMETYPES: string[] = ["image/jpeg", "image/png", "application/pdf"];
+const MIMETYPES_IMAGE: string[] = ["image/jpeg", "image/png"];
+
+export function auth(req: IRequestWithUser, res: Response, next: NextFunction) {
+  const token: string = req.header("Authorization");
   if (!token)
     return res
       .status(STATUS_CODES.UNAUTHORIZED)
       .json({ message: "Access denied. No token provided." });
 
   try {
-    const decoded = jwt.verify(token, jwtPrivateKey);
+    const decoded = jwt.verify(token, jwtPrivateKey) as IUserPayload;
     req.user = decoded;
     next();
-  } catch (error) {
-    res.status(STATUS_CODES.BAD_REQUEST).json({ message: "Invalid token." });
+  } catch (error: any) {
+    return res.status(STATUS_CODES.BAD_REQUEST).json({ message: "Invalid token." });
   }
 }
 
-export async function eventOrganizer(req, res, next) {
+export async function eventOrganizer(req: IRequestWithUser, res: Response, next: NextFunction) {
   try {
     if (!isValidId(req.params.id))
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: invalidObjectIdMessage });
-    const event = await Event.findById(req.params.id);
+    const event: IEvent = await Event.findById(req.params.id);
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -40,38 +47,35 @@ export async function eventOrganizer(req, res, next) {
         message: "Access denied. The user is not the event's organizer.",
       });
     next();
-  } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+  } catch (error: any) {
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
   }
 }
 
-export async function eventParticipant(req, res, next) {
+export async function eventParticipant(req: IRequestWithUser, res: Response, next: NextFunction) {
   try {
     if (!isValidId(req.params.event))
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: invalidObjectIdMessage });
-    const event = await Event.findById(req.params.event);
+    const event: IEvent = await Event.findById(req.params.event);
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: "The event with the given ID does not exist." });
-    if (!event.members.includes(req.user._id))
+    if (!event.members.includes(new mongoose.Types.ObjectId(req.user._id)))
       return res.status(STATUS_CODES.FORBIDDEN).json({
         message: "Access denied. The user is not a participant of the event.",
       });
     next();
-  } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+  } catch (error: any) {
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
   }
 }
 
-const MIMETYPES = ["image/jpeg", "image/png", "application/pdf"];
-const MIMETYPES_IMAGE = ["image/jpeg", "image/png", "application/pdf"];
-
 export const multerUpload = multer({
   storage: multer.memoryStorage(),
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     if (MIMETYPES.includes(file.mimetype)) cb(null, true);
     else cb(new Error(`Only ${MIMETYPES.join(" - ")} mime types are allowed.`));
   },
@@ -80,8 +84,8 @@ export const multerUpload = multer({
 
 export const multerUploadImages = multer({
   storage: multer.memoryStorage(),
-  fileFilter: (req, file, cb) => {
-    if (MIMETYPES.includes(file.mimetype)) cb(null, true);
+  fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    if (MIMETYPES_IMAGE.includes(file.mimetype)) cb(null, true);
     else
       cb(
         new Error(`Only ${MIMETYPES_IMAGE.join(" - ")} mime types are allowed.`)
@@ -92,7 +96,7 @@ export const multerUploadImages = multer({
   },
 });
 
-export async function sameUser(req, res, next) {
+export async function sameUser(req: IRequestWithUser, res: Response, next: NextFunction) {
   try {
     if (!isValidId(req.user._id) || !isValidId(req.params.id))
       return res
@@ -104,23 +108,23 @@ export async function sameUser(req, res, next) {
           "Access denied. User is trying to access other user's information.",
       });
     next();
-  } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+  } catch (error: any) {
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
   }
 }
 
-export async function shoppingDesignee(req, res, next) {
+export async function shoppingDesignee(req: IRequestWithUser, res: Response, next: NextFunction) {
   try {
     if (!isValidId(req.user._id) || !isValidId(req.params.event))
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: invalidObjectIdMessage });
-    const event = await Event.findById(req.params.event);
+    const event: IEvent = await Event.findById(req.params.event);
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: "The event with the given ID does not exist." });
-    const designee = event.shoppingDesignee.find(
+    const designee: mongoose.Types.ObjectId | undefined = event.shoppingDesignee.find(
       (s) => s.toString() == req.user._id
     );
     if (designee) {
@@ -130,18 +134,18 @@ export async function shoppingDesignee(req, res, next) {
         .status(STATUS_CODES.FORBIDDEN)
         .json({ message: "Access denied. User is not a shopping designee." });
     }
-  } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+  } catch (error: any) {
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
   }
 }
 
-export async function transferReceiptOwner(req, res, next) {
+export async function transferReceiptOwner(req: IRequestWithUser, res: Response, next: NextFunction) {
   try {
     if (!isValidId(req.params.id))
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "Invalid ID" });
-    const transferReceipt = await TransferReceipt.findById(req.params.id);
+    const transferReceipt: ITransferReceipt | null = await TransferReceipt.findById(req.params.id);
     if (!transferReceipt)
       return res.status(STATUS_CODES.NOT_FOUND).json({
         message: "The transfer receipt with the given ID does not exist.",
@@ -151,23 +155,23 @@ export async function transferReceiptOwner(req, res, next) {
         message: "Access denied. The user is not the owner of the receipt.",
       });
     next();
-  } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+  } catch (error: any) {
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
   }
 }
 
-export async function shoppingDesigneeOrEventOrganizer(req, res, next) {
+export async function shoppingDesigneeOrEventOrganizer(req: IRequestWithUser, res: Response, next: NextFunction) {
   try {
     if (!isValidId(req.user._id) || !isValidId(req.params.id))
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: invalidObjectIdMessage });
-    const event = await Event.findById(req.params.id);
+    const event: IEvent | null = await Event.findById(req.params.id);
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: "The event with the given ID does not exist." });
-    const isDesignee = Boolean(
+    const isDesignee: boolean = Boolean(
       event.shoppingDesignee.find(
         (id) => id.toString() === req.user._id.toString()
       )
@@ -178,7 +182,7 @@ export async function shoppingDesigneeOrEventOrganizer(req, res, next) {
           "Access denied. The user is not the event's shopping designee or organizer.",
       });
     next();
-  } catch (e) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: e.message });
+  } catch (error: any) {
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
   }
 }

@@ -15,7 +15,7 @@ import {
 } from "../middleware/middleware.js";
 
 
-const usersRouter = express.Router();
+const usersRouter: express.Router = express.Router();
 
 usersRouter.get(
   "/getUsers", 
