@@ -9,7 +9,7 @@ import usersRouter from "./routers/usersRouter.js";
 import ratingsRouter from "./routers/ratingsRouter.js";
 import cronRouter from "./routers/cronRouter.js";
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 // events routes
 router.use("/events", eventRouter);
