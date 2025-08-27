@@ -19,6 +19,7 @@ import {
   IMemberWhoHasUploaded,
   IPublicEvent,
   IPublicEventPreReduction,
+  IPurchaseReceipt,
   IPurchaseReceiptWithUsers,
   IReminder,
   IRequestWithUser,
@@ -667,5 +668,50 @@ export async function getMembersAmount(
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
       .json({ message: e.message });
+  }
+}
+
+export async function getMemberIndividualCost(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  try {
+    if (!req.params.event)
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .json({ message: "No event ID provided" });
+    if (!req.params.user)
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .json({ message: "No user ID provided" });
+    const event: IEventWithPurchaseReceipts = await Event.findById(
+      req.params.event
+    ).populate("purchaseReceipts");
+    if (!event)
+      return res
+        .status(STATUS_CODES.NOT_FOUND)
+        .json({ message: eventNotFoundMessage });
+    if (!event.members.includes(new mongoose.Types.ObjectId(req.params.user)))
+      return res
+        .status(STATUS_CODES.FORBIDDEN)
+        .json({ message: "User is not a member of the event" });
+    if (event.state !== "finished" && event.state !== "readyforpayment")
+      return res
+        .status(STATUS_CODES.FORBIDDEN)
+        .json({ message: "Event state needs to be either finished or ready for payment" });
+    const userReceipts: IPurchaseReceipt[] = event.purchaseReceipts.filter((receipt) =>
+      receipt.participants.some((p) => p._id.equals(new mongoose.Types.ObjectId(req.params.user)))
+    );
+
+    const userAmount = userReceipts.reduce((total: number, receipt: IPurchaseReceipt) => {
+      total += (receipt.amount / receipt.participants.length);
+      return total;
+    }, 0);
+
+    return res.status(STATUS_CODES.OK).json({ userAmount });
+  } catch (error: any) {
+    return res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ message: error?.message || "Internal server error" });
   }
 }

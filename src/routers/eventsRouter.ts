@@ -6,6 +6,7 @@ import {
   getEventById,
   getMembersAndReceiptsInfo,
   getMembersAmount,
+  getMemberIndividualCost,
   createEvent,
   subscribeToAnEvent,
   unsubscribeFromEvent,
@@ -33,6 +34,12 @@ eventRouter.get("/getEventById/:id", getEventById);
 eventRouter.get("/getMembersAndReceiptsInfo/:event", getMembersAndReceiptsInfo);
 
 eventRouter.get("/getMembersAmount/:event", getMembersAmount);
+
+eventRouter.get(
+  "/getMemberIndividualCost/:user/:event",
+  auth,
+  getMemberIndividualCost
+);
 
 eventRouter.post("/createEvent", auth, createEvent);
 
