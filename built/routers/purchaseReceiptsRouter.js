@@ -1,6 +1,6 @@
 import express from "express";
 import { getPurchaseReceiptsByEvent, getPurchaseReceiptById, assignMembersToReceipt, uploadFilePurchaseReceipt, createPurchaseReceipt, deletePurchaseReceipt, } from "../controllers/purchaseReceipts.js";
-import { auth, shoppingDesignee, eventParticipant, multerUpload } from "../middleware/middleware.js";
+import { auth, shoppingDesignee, eventParticipant, multerUpload, } from "../middleware/middleware.js";
 const purchaseReceiptRouter = express.Router();
 purchaseReceiptRouter.get("/getPurchaseReceiptsByEvent/:event", [auth, eventParticipant], getPurchaseReceiptsByEvent);
 purchaseReceiptRouter.get("/getPurchaseReceiptById/:id/:event", [auth, eventParticipant], getPurchaseReceiptById);

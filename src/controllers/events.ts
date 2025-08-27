@@ -703,7 +703,7 @@ export async function getMemberIndividualCost(
       receipt.participants.some((p) => p._id.equals(new mongoose.Types.ObjectId(req.params.user)))
     );
 
-    const userAmount = userReceipts.reduce((total: number, receipt: IPurchaseReceipt) => {
+    const userAmount: number = userReceipts.reduce((total: number, receipt: IPurchaseReceipt) => {
       total += (receipt.amount / receipt.participants.length);
       return total;
     }, 0);

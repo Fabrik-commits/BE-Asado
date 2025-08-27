@@ -4,7 +4,9 @@ import { STATUS_CODES } from "../constants/httpStatusCode.js";
 export async function login(req, res) {
     try {
         req.body.email = req.body.email.toLowerCase();
-        const existingUser = await User.findOne({ email: req.body.email });
+        const existingUser = await User.findOne({
+            email: req.body.email,
+        });
         if (!existingUser)
             return res
                 .status(STATUS_CODES.BAD_REQUEST)

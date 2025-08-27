@@ -12,7 +12,10 @@ import { notifyNewEvent } from "./notifications.js";
 const eventNotFoundMessage = "The event with the given ID was not found.";
 export async function getEvents(req, res) {
     try {
-        const events = await Event.find().sort({ datetime: -1, ":id": 1 });
+        const events = await Event.find().sort({
+            datetime: -1,
+            ":id": 1,
+        });
         return res.json(events);
     }
     catch (error) {
@@ -280,7 +283,9 @@ export async function editRoles(req, res) {
         res.status(STATUS_CODES.OK).json(event);
     }
     catch (error) {
-        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
+        res
+            .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+            .json({ message: error?.message || "Internal server error" });
     }
 }
 export async function editEvent(req, res) {
@@ -525,5 +530,41 @@ export async function getMembersAmount(req, res) {
         return res
             .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
             .json({ message: e.message });
+    }
+}
+export async function getMemberIndividualCost(req, res) {
+    try {
+        if (!req.params.event)
+            return res
+                .status(STATUS_CODES.BAD_REQUEST)
+                .json({ message: "No event ID provided" });
+        if (!req.params.user)
+            return res
+                .status(STATUS_CODES.BAD_REQUEST)
+                .json({ message: "No user ID provided" });
+        const event = await Event.findById(req.params.event).populate("purchaseReceipts");
+        if (!event)
+            return res
+                .status(STATUS_CODES.NOT_FOUND)
+                .json({ message: eventNotFoundMessage });
+        if (!event.members.includes(new mongoose.Types.ObjectId(req.params.user)))
+            return res
+                .status(STATUS_CODES.FORBIDDEN)
+                .json({ message: "User is not a member of the event" });
+        if (event.state !== "finished" && event.state !== "readyforpayment")
+            return res
+                .status(STATUS_CODES.FORBIDDEN)
+                .json({ message: "Event state needs to be either finished or ready for payment" });
+        const userReceipts = event.purchaseReceipts.filter((receipt) => receipt.participants.some((p) => p._id.equals(new mongoose.Types.ObjectId(req.params.user))));
+        const userAmount = userReceipts.reduce((total, receipt) => {
+            total += (receipt.amount / receipt.participants.length);
+            return total;
+        }, 0);
+        return res.status(STATUS_CODES.OK).json({ userAmount });
+    }
+    catch (error) {
+        return res
+            .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+            .json({ message: error?.message || "Internal server error" });
     }
 }

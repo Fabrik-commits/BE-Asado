@@ -4,16 +4,13 @@ import { Event } from "../models/event.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 export async function createRating(req, res) {
     try {
-        const event = await Event.findById(req.params.event)
-            .populate("ratings");
+        const event = await Event.findById(req.params.event).populate("ratings");
         if (!event)
             return res
                 .status(STATUS_CODES.NOT_FOUND)
                 .json({ message: "The event with the given ID was not found." });
         if (!event.members.includes(new mongoose.Types.ObjectId(req.params.user)))
-            return res
-                .status(STATUS_CODES.BAD_REQUEST)
-                .json({
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
                 message: "The user with the given ID was not found in the event.",
             });
         if (event.state == "available" || event.state == "cancelled")
@@ -39,21 +36,20 @@ export async function createRating(req, res) {
         }
     }
     catch (error) {
-        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
+        return res
+            .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+            .json({ message: error?.message || "Internal server error" });
     }
 }
 export async function getRatingFromUser(req, res) {
     try {
-        const event = await Event.findById(req.params.event)
-            .populate("ratings");
+        const event = await Event.findById(req.params.event).populate("ratings");
         if (!event)
             return res
                 .status(STATUS_CODES.NOT_FOUND)
                 .json({ message: "The event with the given ID was not found." });
         if (!event.members.includes(new mongoose.Types.ObjectId(req.params.user)))
-            return res
-                .status(STATUS_CODES.BAD_REQUEST)
-                .json({
+            return res.status(STATUS_CODES.BAD_REQUEST).json({
                 message: "The user with the given ID was not found in the event.",
             });
         const rating = event.ratings.find((r) => r.user.equals(req.params.user));
@@ -67,6 +63,8 @@ export async function getRatingFromUser(req, res) {
         }
     }
     catch (error) {
-        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
+        return res
+            .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+            .json({ message: error?.message || "Internal server error" });
     }
 }
