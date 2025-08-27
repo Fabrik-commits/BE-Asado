@@ -18,7 +18,9 @@ export async function forgot(req, res) {
         const salt = await bcrypt.genSalt(10);
         user.verificationCode = await bcrypt.hash(code.toString(), salt);
         await user.save();
-        const email = user.alternativeEmail ? user.alternativeEmail : user.email;
+        const email = user.alternativeEmail
+            ? user.alternativeEmail
+            : user.email;
         const subject = "FoodSpot | Recuperar contraseña";
         const message = passwordRecoveryTemplate(code.toString());
         await sendEmail(email, subject, user.name, message);
@@ -35,7 +37,9 @@ export async function forgot(req, res) {
 export async function verifyCode(req, res) {
     try {
         req.body.email = req.body.email.toLowerCase();
-        const user = await User.findOne({ email: req.body.email }).exec();
+        const user = await User.findOne({
+            email: req.body.email,
+        }).exec();
         if (!user)
             return res
                 .status(STATUS_CODES.NOT_FOUND)
@@ -61,7 +65,9 @@ export async function verifyCode(req, res) {
 export async function recover(req, res) {
     try {
         req.body.email = req.body.email.toLowerCase();
-        const user = await User.findOne({ email: req.body.email }).exec();
+        const user = await User.findOne({
+            email: req.body.email,
+        }).exec();
         if (!user)
             return res
                 .status(STATUS_CODES.NOT_FOUND)

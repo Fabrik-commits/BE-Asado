@@ -1,12 +1,10 @@
 import express from "express";
-// import cookieParser from 'cookie-parser';
 import cors from "cors";
 import { connectDB } from "./connection/connection.js";
 import router from "./router.js";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false, limit: "5mb" }));
-// app.use(cookieParser());
 const corsMethods = ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"];
 app.use(cors({
     allowedHeaders: ["authorization", "Content-Type"],

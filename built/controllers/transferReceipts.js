@@ -2,7 +2,7 @@ import { TransferReceipt } from "../models/transferReceipt.js";
 import { Event } from "../models/event.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
-import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
+import { assignEventValues, calculateTransfersInfo, } from "../controllers/events.js";
 import mongoose from "mongoose";
 const transferReceiptNotFoundMessage = "The transfer receipt with the given ID was not found.";
 const cannotCreateTransferReceiptMessage = "You can only create transfer receipts when the event is ready for payment.";

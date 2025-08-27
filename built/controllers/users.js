@@ -118,8 +118,10 @@ export async function editUser(req, res) {
         user.notifications = {
             newEvent: req.body.notifications?.newEvent ?? user.notifications.newEvent,
             eventStart: req.body.notifications?.eventStart ?? user.notifications.eventStart,
-            penalizationStart: req.body.notifications?.penalizationStart ?? user.notifications.penalizationStart,
-            penalizationOneWeek: req.body.notifications?.penalizationOneWeek ?? user.notifications.penalizationOneWeek,
+            penalizationStart: req.body.notifications?.penalizationStart ??
+                user.notifications.penalizationStart,
+            penalizationOneWeek: req.body.notifications?.penalizationOneWeek ??
+                user.notifications.penalizationOneWeek,
         };
         user = await user.save();
         return res.status(STATUS_CODES.OK).json(user);
