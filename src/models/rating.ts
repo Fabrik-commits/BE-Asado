@@ -1,4 +1,4 @@
-import mongoose, {Model} from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { IRating } from "./interfaces.js";
 
 const ratingSchema: mongoose.Schema = new mongoose.Schema<IRating>({

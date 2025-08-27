@@ -23,7 +23,8 @@ export interface IUser extends Document {
   isValidPassword(password: string): Promise<boolean>;
 }
 
-export interface ISafeUser extends Omit<IUser, "password" | "verificationCode"> {}
+export interface ISafeUser
+  extends Omit<IUser, "password" | "verificationCode"> {}
 
 export interface IUserBalance {
   userId: mongoose.Types.ObjectId;

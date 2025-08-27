@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { User } from "../models/user.js";
-import { adminMail } from "../config.js";
 import { sendEmail } from "../utils/utils.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 import { passwordRecoveryTemplate } from "../utils/templates.js";
@@ -22,7 +21,9 @@ export async function forgot(req: Request, res: Response): Promise<Response> {
     const salt: string = await bcrypt.genSalt(10);
     user.verificationCode = await bcrypt.hash(code.toString(), salt);
     await user.save();
-    const email: string = user.alternativeEmail ? user.alternativeEmail : user.email;
+    const email: string = user.alternativeEmail
+      ? user.alternativeEmail
+      : user.email;
     const subject: string = "FoodSpot | Recuperar contraseña";
     const message: string = passwordRecoveryTemplate(code.toString());
 
@@ -37,10 +38,15 @@ export async function forgot(req: Request, res: Response): Promise<Response> {
   }
 }
 
-export async function verifyCode(req: Request, res: Response): Promise<Response> {
+export async function verifyCode(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     req.body.email = req.body.email.toLowerCase();
-    const user: IUser | null = await User.findOne({ email: req.body.email }).exec();
+    const user: IUser | null = await User.findOne({
+      email: req.body.email,
+    }).exec();
     if (!user)
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -68,7 +74,9 @@ export async function verifyCode(req: Request, res: Response): Promise<Response>
 export async function recover(req: Request, res: Response): Promise<Response> {
   try {
     req.body.email = req.body.email.toLowerCase();
-    const user: IUser | null = await User.findOne({ email: req.body.email }).exec();
+    const user: IUser | null = await User.findOne({
+      email: req.body.email,
+    }).exec();
     if (!user)
       return res
         .status(STATUS_CODES.NOT_FOUND)

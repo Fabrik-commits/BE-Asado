@@ -1,18 +1,32 @@
 import mongoose from "mongoose";
 import { brevo } from "../config.js";
 import https from "https";
-import { IEventAmountCalculationsWithTransfers, IEventWithMembersTransferReceiptsPurchaseReceipts, ITransferInfo, IUser, IUserBalance } from "../models/interfaces.js";
+import {
+  IEventAmountCalculationsWithTransfers,
+  ITransferInfo,
+  IUser,
+  IUserBalance,
+} from "../models/interfaces.js";
 import { Event } from "../models/event.js";
-import { User } from "../models/user.js";
-import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
+import {
+  assignEventValues,
+  calculateTransfersInfo,
+} from "../controllers/events.js";
 
-
-function sendEmail(email: string, subject: string, name: string, htmlContent: string): Promise<void> {
+function sendEmail(
+  email: string,
+  subject: string,
+  name: string,
+  htmlContent: string
+): Promise<void> {
   const payload: string = JSON.stringify({
-    sender: { name: "FoodSpot", email: "food-spot-no-reply@5865554.brevosend.com" },
+    sender: {
+      name: "FoodSpot",
+      email: "food-spot-no-reply@5865554.brevosend.com",
+    },
     to: [{ email, name }],
     subject,
-    htmlContent
+    htmlContent,
   });
 
   const byteLength: number = Buffer.byteLength(payload, "utf8");
@@ -23,8 +37,8 @@ function sendEmail(email: string, subject: string, name: string, htmlContent: st
       Accept: "application/json",
       "api-key": brevo.apiKey,
       "Content-Type": "application/json; charset=utf-8",
-      "Content-Length": byteLength
-    }
+      "Content-Length": byteLength,
+    },
   };
 
   return new Promise((resolve, reject) => {
@@ -44,21 +58,18 @@ function sendEmail(email: string, subject: string, name: string, htmlContent: st
   });
 }
 
-
 function isValidId(id: string): boolean {
-  if (mongoose.Types.ObjectId.isValid(id)){
-    if ((String)(new mongoose.Types.ObjectId(id)) == id){
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    if (String(new mongoose.Types.ObjectId(id)) == id) {
       return true;
     }
   }
   return false;
 }
 
-
 async function getEventsDebtors(eventId: string): Promise<IUser[]> {
-  // const event: IEventWithMembersTransferReceiptsPurchaseReceipts | null = await Event.findById(eventId).populate("members transferReceipts purchaseReceipts");
-  const event: IEventAmountCalculationsWithTransfers | null = await Event.findById(eventId)
-    .populate([
+  const event: IEventAmountCalculationsWithTransfers | null =
+    await Event.findById(eventId).populate([
       {
         path: "purchaseReceipts",
         populate: [
@@ -81,7 +92,7 @@ async function getEventsDebtors(eventId: string): Promise<IUser[]> {
         populate: {
           path: "user",
           model: "User",
-        }
+        },
       },
     ]);
 
@@ -89,13 +100,19 @@ async function getEventsDebtors(eventId: string): Promise<IUser[]> {
     throw new Error(`Event with ID ${eventId} not found.`);
   }
 
-  const userBalances: IUserBalance[] = assignEventValues(event.purchaseReceipts);
+  const userBalances: IUserBalance[] = assignEventValues(
+    event.purchaseReceipts
+  );
   const transferInfo: ITransferInfo[] = calculateTransfersInfo(userBalances);
-  const expectedTransfers: ITransferInfo[] = transferInfo.filter(t => t.receiver !== null);
+  const expectedTransfers: ITransferInfo[] = transferInfo.filter(
+    (t) => t.receiver !== null
+  );
 
   const debtorUsers: (IUser | null)[] = await Promise.all(
-    expectedTransfers.map(async transfer => {
-      const receipt = event.transferReceipts.find(r => r.user._id.equals(transfer.userId));
+    expectedTransfers.map(async (transfer) => {
+      const receipt = event.transferReceipts.find((r) =>
+        r.user._id.equals(transfer.userId)
+      );
       if (!receipt) {
         return receipt.user;
       }
@@ -103,10 +120,10 @@ async function getEventsDebtors(eventId: string): Promise<IUser[]> {
     })
   );
 
-  const debtors: IUser[] = debtorUsers.filter(user => user !== null);
+  const debtors: IUser[] = debtorUsers.filter(
+    (user): user is IUser => user !== null
+  );
   return debtors;
 }
 
-
-
-export {isValidId, sendEmail, getEventsDebtors};
+export { isValidId, sendEmail, getEventsDebtors };

@@ -10,13 +10,35 @@ import { Reminder } from "../models/reminder.js";
 import { membersWhoHaveUploaded } from "./transferReceipts.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 import { notifyNewEvent } from "./notifications.js";
-import { IEvent, IEventAmountCalculations, IEventPopulated, IEventWithPurchaseReceipts, IEventWithTransferReceiptsPurchaseReceiptsRatings, IMemberWhoHasUploaded, IPublicEvent, IPublicEventPreReduction, IPurchaseReceiptWithUsers, IReminder, IRequestWithUser, ITransferInfo, IUser, IUserBalance } from "../models/interfaces.js";
+import {
+  IEvent,
+  IEventAmountCalculations,
+  IEventPopulated,
+  IEventWithPurchaseReceipts,
+  IEventWithTransferReceiptsPurchaseReceiptsRatings,
+  IMemberWhoHasUploaded,
+  IPublicEvent,
+  IPublicEventPreReduction,
+  IPurchaseReceiptWithUsers,
+  IReminder,
+  IRequestWithUser,
+  ITransferInfo,
+  IUser,
+  IUserBalance,
+} from "../models/interfaces.js";
 
-const eventNotFoundMessage: string = "The event with the given ID was not found.";
+const eventNotFoundMessage: string =
+  "The event with the given ID was not found.";
 
-export async function getEvents(req: Request, res: Response): Promise<Response> {
+export async function getEvents(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const events: IEvent[] = await Event.find().sort({ datetime: -1, ":id": 1 });
+    const events: IEvent[] = await Event.find().sort({
+      datetime: -1,
+      ":id": 1,
+    });
     return res.json(events);
   } catch (error: any) {
     return res
@@ -25,7 +47,10 @@ export async function getEvents(req: Request, res: Response): Promise<Response> 
   }
 }
 
-export async function getPublicEvents(req: Request, res: Response): Promise<Response> {
+export async function getPublicEvents(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const events: IPublicEventPreReduction[] = await Event.find({
       isPrivate: {
@@ -50,7 +75,10 @@ export async function getPublicEvents(req: Request, res: Response): Promise<Resp
   }
 }
 
-export async function getPublicAndPrivateEvents(req: IRequestWithUser, res: Response): Promise<Response> {
+export async function getPublicAndPrivateEvents(
+  req: IRequestWithUser,
+  res: Response
+): Promise<Response> {
   try {
     const events: IPublicEventPreReduction[] = await Event.find({
       $or: [
@@ -80,7 +108,10 @@ export async function getPublicAndPrivateEvents(req: IRequestWithUser, res: Resp
   }
 }
 
-export async function getEventById(req: Request, res: Response): Promise<Response> {
+export async function getEventById(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const event: IEventPopulated = await Event.findById(req.params.id)
       .populate("members")
@@ -103,9 +134,14 @@ export async function getEventById(req: Request, res: Response): Promise<Respons
   }
 }
 
-export async function getMembersAndReceiptsInfo(req: Request, res: Response): Promise<Response> {
+export async function getMembersAndReceiptsInfo(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const answer: IMemberWhoHasUploaded[] = await membersWhoHaveUploaded(req.params.event);
+    const answer: IMemberWhoHasUploaded[] = await membersWhoHaveUploaded(
+      req.params.event
+    );
     return res.status(STATUS_CODES.OK).json(answer);
   } catch (error: any) {
     return res
@@ -124,7 +160,9 @@ async function updateReminders(event: IEvent): Promise<void> {
     });
     await eventStartReminder.save();
     if (event.penalizationStartDate) {
-      const penalizationReminderDate: Date = new Date(event.penalizationStartDate);
+      const penalizationReminderDate: Date = new Date(
+        event.penalizationStartDate
+      );
       penalizationReminderDate.setDate(penalizationReminderDate.getDate() - 1);
       penalizationReminderDate.setHours(20, 0, 0, 0); // 8 PM the day before penalization starts
       const penalizationStartReminder: IReminder = new Reminder({
@@ -148,7 +186,9 @@ async function updateReminders(event: IEvent): Promise<void> {
     );
 
     if (eventStartReminder) {
-      eventStartReminder.datetime = new Date(event.datetime.getTime() - 30 * 60 * 1000); // 30 minutes before the event
+      eventStartReminder.datetime = new Date(
+        event.datetime.getTime() - 30 * 60 * 1000
+      ); // 30 minutes before the event
       await eventStartReminder.save();
     }
 
@@ -156,7 +196,9 @@ async function updateReminders(event: IEvent): Promise<void> {
       const penalizationStartReminder: IReminder | undefined = reminders.find(
         (reminder) => reminder.type === "penalizationStart"
       );
-      const penalizationReminderDate: Date = new Date(event.penalizationStartDate);
+      const penalizationReminderDate: Date = new Date(
+        event.penalizationStartDate
+      );
       penalizationReminderDate.setDate(penalizationReminderDate.getDate() - 1);
       penalizationReminderDate.setHours(20, 0, 0, 0); // 8 PM the day before penalization starts
       if (!penalizationStartReminder) {
@@ -177,9 +219,8 @@ async function updateReminders(event: IEvent): Promise<void> {
       } else {
         penalizationStartReminder.datetime = penalizationReminderDate;
         await penalizationStartReminder.save();
-        const penalizationOneWeekReminder: IReminder | undefined = reminders.find(
-          (reminder) => reminder.type === "penalizationOneWeek"
-        );
+        const penalizationOneWeekReminder: IReminder | undefined =
+          reminders.find((reminder) => reminder.type === "penalizationOneWeek");
         penalizationOneWeekReminder.datetime = new Date(
           penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000
         ); // one week after penalization start
@@ -189,7 +230,10 @@ async function updateReminders(event: IEvent): Promise<void> {
   }
 }
 
-export async function createEvent(req: Request, res: Response): Promise<Response> {
+export async function createEvent(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     let event: IEvent = new Event(req.body);
     event.chef = req.body.isChef ? req.body.organizer : null;
@@ -207,15 +251,18 @@ export async function createEvent(req: Request, res: Response): Promise<Response
   }
 }
 
-export async function subscribeToAnEvent(req: Request, res: Response): Promise<Response> {
+export async function subscribeToAnEvent(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     if (!req.params.event)
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "No event ID provided." });
-    const event: IEventWithPurchaseReceipts | null = await Event.findById(req.params.event).populate(
-      "purchaseReceipts"
-    );
+    const event: IEventWithPurchaseReceipts | null = await Event.findById(
+      req.params.event
+    ).populate("purchaseReceipts");
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -253,20 +300,25 @@ export async function subscribeToAnEvent(req: Request, res: Response): Promise<R
   }
 }
 
-export async function unsubscribeFromEvent(req: Request, res: Response): Promise<Response> {
+export async function unsubscribeFromEvent(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     if (!req.params.event)
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "No event ID provided." });
-    const event: IEventWithPurchaseReceipts | null = await Event.findById(req.params.event).populate(
-      "purchaseReceipts"
-    );
+    const event: IEventWithPurchaseReceipts | null = await Event.findById(
+      req.params.event
+    ).populate("purchaseReceipts");
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
         .json({ message: eventNotFoundMessage });
-    const index: number = event.members.indexOf(new mongoose.Types.ObjectId(req.params.id));
+    const index: number = event.members.indexOf(
+      new mongoose.Types.ObjectId(req.params.id)
+    );
     if (index === -1)
       return res.status(STATUS_CODES.NOT_FOUND).json({
         message: "The member with the given ID is not part of the event.",
@@ -298,7 +350,10 @@ export async function unsubscribeFromEvent(req: Request, res: Response): Promise
   }
 }
 
-export async function editRoles(req: Request, res: Response): Promise<Response> {
+export async function editRoles(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const event: IEvent | null = await Event.findById(req.params.id);
     if (!event)
@@ -310,11 +365,16 @@ export async function editRoles(req: Request, res: Response): Promise<Response> 
     await event.save();
     res.status(STATUS_CODES.OK).json(event);
   } catch (error: any) {
-    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ message: error?.message || "Internal server error" });
   }
 }
 
-export async function editEvent(req: Request, res: Response): Promise<Response> {
+export async function editEvent(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const event: IEvent | null = await Event.findById(req.params.id);
     if (!event)
@@ -344,7 +404,9 @@ export async function editEvent(req: Request, res: Response): Promise<Response> 
   }
 }
 
-async function deleteReminders(eventId: mongoose.Types.ObjectId): Promise<void> {
+async function deleteReminders(
+  eventId: mongoose.Types.ObjectId
+): Promise<void> {
   try {
     await Reminder.deleteMany({ event: eventId });
   } catch (error) {
@@ -352,7 +414,10 @@ async function deleteReminders(eventId: mongoose.Types.ObjectId): Promise<void> 
   }
 }
 
-export async function deleteEvent(req: Request, res: Response): Promise<Response> {
+export async function deleteEvent(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const event = await Event.findById(req.params.id);
     if (!event)
@@ -385,17 +450,20 @@ async function deleteEvents(): Promise<void> {
       matches = matches.slice(1);
       await deleteReminders(deletedId);
       await deleteReceipts(deletedId);
-      const deletedEvent: IEvent | null = await Event.findByIdAndDelete(deletedId);
+      const deletedEvent: IEvent | null = await Event.findByIdAndDelete(
+        deletedId
+      );
     }
   }
 }
 
 async function deleteReceipts(eventId: mongoose.Types.ObjectId): Promise<void> {
-  const event: IEventWithTransferReceiptsPurchaseReceiptsRatings = await Event.findById(eventId).populate([
-    "transferReceipts",
-    "purchaseReceipts",
-    "ratings",
-  ]);
+  const event: IEventWithTransferReceiptsPurchaseReceiptsRatings =
+    await Event.findById(eventId).populate([
+      "transferReceipts",
+      "purchaseReceipts",
+      "ratings",
+    ]);
 
   await Promise.all(
     event.transferReceipts.map(async (transferReceipt) => {
@@ -420,7 +488,9 @@ async function deleteReceipts(eventId: mongoose.Types.ObjectId): Promise<void> {
   );
 }
 
-function reduceEventsInformation(events: IPublicEventPreReduction[]): IPublicEvent[] {
+function reduceEventsInformation(
+  events: IPublicEventPreReduction[]
+): IPublicEvent[] {
   let reducedEvents: IPublicEvent[] = [];
   for (let event of events) {
     let eventRating: number = event.ratings
@@ -457,7 +527,9 @@ function reduceEventsInformation(events: IPublicEventPreReduction[]): IPublicEve
   return reducedEvents;
 }
 
-export function calculateTransfersInfo(amounts: IUserBalance[]): ITransferInfo[] {
+export function calculateTransfersInfo(
+  amounts: IUserBalance[]
+): ITransferInfo[] {
   const transferInfo: ITransferInfo[] = [];
 
   while (amounts.length > 0) {
@@ -495,7 +567,9 @@ export function calculateTransfersInfo(amounts: IUserBalance[]): ITransferInfo[]
   return transferInfo;
 }
 
-export function assignEventValues(receipts: IPurchaseReceiptWithUsers[]): IUserBalance[] {
+export function assignEventValues(
+  receipts: IPurchaseReceiptWithUsers[]
+): IUserBalance[] {
   const userBalances: IUserBalance[] = [];
   for (const receipt of receipts) {
     const receiptCostPerUser: number = Number(
@@ -544,13 +618,18 @@ export function assignEventValues(receipts: IPurchaseReceiptWithUsers[]): IUserB
   return userBalances;
 }
 
-export async function getMembersAmount(req: Request, res: Response): Promise<Response> {
+export async function getMembersAmount(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     if (!req.params.event)
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "No event ID provided" });
-    const event: IEventAmountCalculations = await Event.findById(req.params.event)
+    const event: IEventAmountCalculations = await Event.findById(
+      req.params.event
+    )
       .select("purchaseReceipts members")
       .populate([
         {
@@ -579,7 +658,9 @@ export async function getMembersAmount(req: Request, res: Response): Promise<Res
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "The event has no purchase receipts." });
-    const userBalances: IUserBalance[] = assignEventValues(event.purchaseReceipts);
+    const userBalances: IUserBalance[] = assignEventValues(
+      event.purchaseReceipts
+    );
     const transferInfo: ITransferInfo[] = calculateTransfersInfo(userBalances);
     return res.status(STATUS_CODES.OK).json(transferInfo);
   } catch (e) {

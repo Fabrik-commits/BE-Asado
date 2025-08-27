@@ -1,22 +1,28 @@
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { User } from "../models/user.js";
 import { Image } from "../models/image.js";
 import { Event } from "../models/event.js";
 import { TransferReceipt } from "../models/transferReceipt.js";
-import { hasUploaded } from "./transferReceipts.js";
 import { assignEventValues, calculateTransfersInfo } from "./events.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
-import { IEventWithMembersPurchaseReceiptsPopulated, IImage, ISafeUser, ITransferReceipt, IUser } from "../models/interfaces.js";
+import {
+  IEventWithMembersPurchaseReceiptsPopulated,
+  IImage,
+  ISafeUser,
+  ITransferReceipt,
+  IUser,
+} from "../models/interfaces.js";
 import mongoose from "mongoose";
-
 
 const userNotFoundMessage = "The user with the given ID was not found.";
 
 export async function getUsers(req: Request, res: Response): Promise<Response> {
   try {
-    const users: ISafeUser[] = await User.find().select("-password -verificationCode");
+    const users: ISafeUser[] = await User.find().select(
+      "-password -verificationCode"
+    );
     return res.status(STATUS_CODES.OK).json(users);
   } catch (error) {
     return res
@@ -25,7 +31,10 @@ export async function getUsers(req: Request, res: Response): Promise<Response> {
   }
 }
 
-export async function getUserById(req: Request, res: Response): Promise<Response> {
+export async function getUserById(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const user: ISafeUser | null = await User.findById(req.params.id).select(
       "-password -verificationCode"
@@ -48,18 +57,19 @@ export async function isDebtor(req: Request, res: Response): Promise<Response> {
   try {
     const userId: string = req.params.id;
 
-    const events: IEventWithMembersPurchaseReceiptsPopulated[] = await Event.find({
-      members: userId,
-      state: "readyforpayment",
-    })
-      .populate({
-        path: "purchaseReceipts",
-        populate: [
-          { path: "shoppingDesignee", model: "User" },
-          { path: "participants", model: "User" },
-        ],
+    const events: IEventWithMembersPurchaseReceiptsPopulated[] =
+      await Event.find({
+        members: userId,
+        state: "readyforpayment",
       })
-      .populate({ path: "members", model: "User" });
+        .populate({
+          path: "purchaseReceipts",
+          populate: [
+            { path: "shoppingDesignee", model: "User" },
+            { path: "participants", model: "User" },
+          ],
+        })
+        .populate({ path: "members", model: "User" });
     const debtorEvents: mongoose.Types.ObjectId[] = [];
     for (const event of events) {
       const userBalances = assignEventValues(event.purchaseReceipts);
@@ -134,9 +144,14 @@ export async function editUser(req: Request, res: Response): Promise<Response> {
     user.cbu = req.body.cbu;
     user.notifications = {
       newEvent: req.body.notifications?.newEvent ?? user.notifications.newEvent,
-      eventStart: req.body.notifications?.eventStart ?? user.notifications.eventStart,
-      penalizationStart: req.body.notifications?.penalizationStart ?? user.notifications.penalizationStart,
-      penalizationOneWeek: req.body.notifications?.penalizationOneWeek ?? user.notifications.penalizationOneWeek,
+      eventStart:
+        req.body.notifications?.eventStart ?? user.notifications.eventStart,
+      penalizationStart:
+        req.body.notifications?.penalizationStart ??
+        user.notifications.penalizationStart,
+      penalizationOneWeek:
+        req.body.notifications?.penalizationOneWeek ??
+        user.notifications.penalizationOneWeek,
     };
     user = await user.save();
     return res.status(STATUS_CODES.OK).json(user);
@@ -147,7 +162,10 @@ export async function editUser(req: Request, res: Response): Promise<Response> {
   }
 }
 
-export async function editProfilePicture(req: Request, res: Response): Promise<Response> {
+export async function editProfilePicture(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     if (req.file) {
       let user: IUser | null = await User.findById(req.params.id);
@@ -156,7 +174,9 @@ export async function editProfilePicture(req: Request, res: Response): Promise<R
           .status(STATUS_CODES.NOT_FOUND)
           .json({ message: userNotFoundMessage });
       if (user.profilePicture) {
-        const deletedImage: IImage | null = await Image.findOneAndDelete(user.profilePicture);
+        const deletedImage: IImage | null = await Image.findOneAndDelete(
+          user.profilePicture
+        );
       }
       const imageId: mongoose.Types.ObjectId = await saveImage(req.file);
       user.profilePicture = imageId;
@@ -170,7 +190,10 @@ export async function editProfilePicture(req: Request, res: Response): Promise<R
   }
 }
 
-export async function deleteUser(req: Request, res: Response): Promise<Response> {
+export async function deleteUser(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const user: IUser | null = await User.findByIdAndRemove(req.params.id);
     if (!user)

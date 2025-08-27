@@ -3,8 +3,22 @@ import { TransferReceipt } from "../models/transferReceipt.js";
 import { Event } from "../models/event.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
-import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
-import { IEvent, IEventWithMembersTransferReceipts, IEventWithPurchaseReceiptsPopulated, IEventWithPurchaseReceiptsPopulatedMembersTransferReceipts, IEventWithTransferReceipts, IHasUploadedInfo, IMemberWhoHasUploaded, IReceiptInfo, ITransferInfo, ITransferReceipt, IUserBalance } from "../models/interfaces.js";
+import {
+  assignEventValues,
+  calculateTransfersInfo,
+} from "../controllers/events.js";
+import {
+  IEvent,
+  IEventWithMembersTransferReceipts,
+  IEventWithPurchaseReceiptsPopulatedMembersTransferReceipts,
+  IEventWithTransferReceipts,
+  IHasUploadedInfo,
+  IMemberWhoHasUploaded,
+  IReceiptInfo,
+  ITransferInfo,
+  ITransferReceipt,
+  IUserBalance,
+} from "../models/interfaces.js";
 import mongoose from "mongoose";
 
 const transferReceiptNotFoundMessage: string =
@@ -13,11 +27,14 @@ const transferReceiptNotFoundMessage: string =
 const cannotCreateTransferReceiptMessage: string =
   "You can only create transfer receipts when the event is ready for payment.";
 
-export async function getTransferReceiptsByEvent(req: Request, res: Response): Promise<Response> {
+export async function getTransferReceiptsByEvent(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const event: IEventWithTransferReceipts = await Event.findById(req.params.event).populate(
-      "transferReceipts"
-    );
+    const event: IEventWithTransferReceipts = await Event.findById(
+      req.params.event
+    ).populate("transferReceipts");
     return res.status(STATUS_CODES.OK).json(event.transferReceipts);
   } catch (error) {
     return res
@@ -26,9 +43,14 @@ export async function getTransferReceiptsByEvent(req: Request, res: Response): P
   }
 }
 
-export async function getTransferReceiptsById(req: Request, res: Response): Promise<Response> {
+export async function getTransferReceiptsById(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const transferReceipt: ITransferReceipt = await TransferReceipt.findById(req.params.id);
+    const transferReceipt: ITransferReceipt = await TransferReceipt.findById(
+      req.params.id
+    );
     if (!transferReceipt) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -43,7 +65,10 @@ export async function getTransferReceiptsById(req: Request, res: Response): Prom
   }
 }
 
-export async function uploadFileTransferReceipt(req: Request, res: Response): Promise<Response> {
+export async function uploadFileTransferReceipt(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     if (req.file) {
       const imageId = await saveImage(req.file);
@@ -61,19 +86,28 @@ export async function uploadFileTransferReceipt(req: Request, res: Response): Pr
   }
 }
 
-export async function createTransferReceipt(req: Request, res: Response): Promise<Response> {
+export async function createTransferReceipt(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const hasUploadedValue: IHasUploadedInfo = await hasUploaded(req.body.user, req.params.event);
+    const hasUploadedValue: IHasUploadedInfo = await hasUploaded(
+      req.body.user,
+      req.params.event
+    );
     const event: IEvent = await Event.findById(req.params.event);
     if (event.state !== "readyforpayment")
       return res.status(STATUS_CODES.BAD_REQUEST).json({
         message: cannotCreateTransferReceiptMessage,
       });
     if (hasUploadedValue.hasUploaded) {
-      const oldTransferReceipt: ITransferReceipt | null = await TransferReceipt.findByIdAndRemove(
-        hasUploadedValue.transferReceipt
+      const oldTransferReceipt: ITransferReceipt | null =
+        await TransferReceipt.findByIdAndRemove(
+          hasUploadedValue.transferReceipt
+        );
+      const index: number = event.transferReceipts.indexOf(
+        oldTransferReceipt._id
       );
-      const index: number = event.transferReceipts.indexOf(oldTransferReceipt._id);
       event.transferReceipts.splice(index, 1);
       await event.save();
     }
@@ -93,7 +127,10 @@ export async function createTransferReceipt(req: Request, res: Response): Promis
   }
 }
 
-export async function approvePaymentWithoutReceipt(req: Request, res: Response): Promise<Response> {
+export async function approvePaymentWithoutReceipt(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const hasUploadedValue = await hasUploaded(
       req.params.user,
@@ -128,9 +165,13 @@ export async function approvePaymentWithoutReceipt(req: Request, res: Response):
   }
 }
 
-export async function approveTransferReceipt(req: Request, res: Response): Promise<Response> {
+export async function approveTransferReceipt(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const transferReceipt: ITransferReceipt | null = await TransferReceipt.findById(req.params.id);
+    const transferReceipt: ITransferReceipt | null =
+      await TransferReceipt.findById(req.params.id);
     if (!transferReceipt)
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -154,11 +195,13 @@ export async function approveTransferReceipt(req: Request, res: Response): Promi
   }
 }
 
-export async function deleteTransferReceipt(req: Request, res: Response): Promise<Response> {
+export async function deleteTransferReceipt(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const transferReceipt: ITransferReceipt | null = await TransferReceipt.findByIdAndDelete(
-      req.params.id
-    );
+    const transferReceipt: ITransferReceipt | null =
+      await TransferReceipt.findByIdAndDelete(req.params.id);
     if (!transferReceipt)
       return res.status(STATUS_CODES.NOT_FOUND).json({
         message: transferReceiptNotFoundMessage,
@@ -180,25 +223,29 @@ export async function deleteTransferReceipt(req: Request, res: Response): Promis
   }
 }
 
-
 export async function isFinished(eventId: string): Promise<boolean> {
-  const event: IEventWithPurchaseReceiptsPopulatedMembersTransferReceipts | null = await Event.findById(new mongoose.Types.ObjectId(eventId))
-    .populate({
-      path: "transferReceipts",
-    })
-    .populate({
-      path: "purchaseReceipts",
-      populate: [
-        { path: "shoppingDesignee", model: "User" },
-        { path: "participants", model: "User" },
-      ],
-    })
-    .populate({ path: "members", model: "User" });
+  const event: IEventWithPurchaseReceiptsPopulatedMembersTransferReceipts | null =
+    await Event.findById(new mongoose.Types.ObjectId(eventId))
+      .populate({
+        path: "transferReceipts",
+      })
+      .populate({
+        path: "purchaseReceipts",
+        populate: [
+          { path: "shoppingDesignee", model: "User" },
+          { path: "participants", model: "User" },
+        ],
+      })
+      .populate({ path: "members", model: "User" });
 
-  const userBalances: IUserBalance[] = assignEventValues(event.purchaseReceipts)
+  const userBalances: IUserBalance[] = assignEventValues(
+    event.purchaseReceipts
+  );
   const transferInfo: ITransferInfo[] = calculateTransfersInfo(userBalances);
 
-  const expectedTransfers: ITransferInfo[] = transferInfo.filter((t) => t.receiver !== null);
+  const expectedTransfers: ITransferInfo[] = transferInfo.filter(
+    (t) => t.receiver !== null
+  );
 
   const approvedTransfers: ITransferReceipt[] = event.transferReceipts.filter(
     (r) => r.hasPaid === true
@@ -207,11 +254,12 @@ export async function isFinished(eventId: string): Promise<boolean> {
   return expectedTransfers.length === approvedTransfers.length;
 }
 
-
-export async function membersWhoHaveUploaded(eventId: string): Promise<IMemberWhoHasUploaded[]> {
-  const event: IEventWithMembersTransferReceipts = await Event.findById(eventId).populate(
-    "members transferReceipts"
-  );
+export async function membersWhoHaveUploaded(
+  eventId: string
+): Promise<IMemberWhoHasUploaded[]> {
+  const event: IEventWithMembersTransferReceipts = await Event.findById(
+    eventId
+  ).populate("members transferReceipts");
   const membersWithReceipts: string[] = [];
   const receiptInfo: IReceiptInfo[] = [];
   for (let receipt of event.transferReceipts) {
@@ -249,8 +297,13 @@ export async function membersWhoHaveUploaded(eventId: string): Promise<IMemberWh
   return members;
 }
 
-export async function hasUploaded(userId: string, eventId: string): Promise<IHasUploadedInfo> {
-  const event: IEventWithTransferReceipts = await Event.findById(new mongoose.Types.ObjectId(eventId)).populate("transferReceipts");
+export async function hasUploaded(
+  userId: string,
+  eventId: string
+): Promise<IHasUploadedInfo> {
+  const event: IEventWithTransferReceipts = await Event.findById(
+    new mongoose.Types.ObjectId(eventId)
+  ).populate("transferReceipts");
   for (const receipt of event.transferReceipts) {
     if (receipt.user.equals(new mongoose.Types.ObjectId(userId))) {
       return {

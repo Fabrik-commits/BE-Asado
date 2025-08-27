@@ -1,16 +1,16 @@
-import mongoose, {Model} from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { IReminder } from "./interfaces.js";
 
 const reminderSchema: mongoose.Schema<IReminder> = new mongoose.Schema({
   event: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Event",
-    required: true
+    required: true,
   },
 
   datetime: {
     type: Date,
-    required: true
+    required: true,
   },
 
   type: {
@@ -18,7 +18,11 @@ const reminderSchema: mongoose.Schema<IReminder> = new mongoose.Schema({
     required: true,
     validate: {
       validator: function (v: string): boolean {
-        const valid_types: string[] = ["eventStart", "penalizationStart", "penalizationOneWeek"];
+        const valid_types: string[] = [
+          "eventStart",
+          "penalizationStart",
+          "penalizationOneWeek",
+        ];
         if (!v) return false;
         if (!valid_types.includes(v)) {
           return false;
@@ -29,6 +33,9 @@ const reminderSchema: mongoose.Schema<IReminder> = new mongoose.Schema({
   },
 });
 
-const Reminder: Model<IReminder> = mongoose.model<IReminder>("Reminder", reminderSchema);
+const Reminder: Model<IReminder> = mongoose.model<IReminder>(
+  "Reminder",
+  reminderSchema
+);
 
 export { Reminder };

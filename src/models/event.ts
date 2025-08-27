@@ -76,6 +76,9 @@ const eventSchema: mongoose.Schema<IEvent> = new mongoose.Schema<IEvent>({
   penalizationStartDate: { type: Date },
 });
 
-const Event: mongoose.Model<IEvent> = mongoose.model<IEvent>("Event", eventSchema);
+const Event: mongoose.Model<IEvent> = mongoose.model<IEvent>(
+  "Event",
+  eventSchema
+);
 
 export { Event };

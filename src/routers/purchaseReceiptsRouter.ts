@@ -7,7 +7,12 @@ import {
   createPurchaseReceipt,
   deletePurchaseReceipt,
 } from "../controllers/purchaseReceipts.js";
-import { auth, shoppingDesignee, eventParticipant, multerUpload } from "../middleware/middleware.js";
+import {
+  auth,
+  shoppingDesignee,
+  eventParticipant,
+  multerUpload,
+} from "../middleware/middleware.js";
 
 const purchaseReceiptRouter: express.Router = express.Router();
 
@@ -27,7 +32,7 @@ purchaseReceiptRouter.put(
   "/assignMembersToReceipt",
   [auth],
   assignMembersToReceipt
-)
+);
 
 purchaseReceiptRouter.post(
   "/uploadFile/:purchaseReceipt",

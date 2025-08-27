@@ -1,4 +1,4 @@
-import mongoose, {Model} from "mongoose";
+import mongoose, { Model } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { jwtPrivateKey } from "../config.js";
@@ -55,7 +55,12 @@ const userSchema: mongoose.Schema<IUser> = new mongoose.Schema({
     required: true,
     validate: {
       validator: function (v: string[]): boolean {
-        const valid_diets: string[] = ["celiac", "hypertensive", "vegan", "vegetarian"];
+        const valid_diets: string[] = [
+          "celiac",
+          "hypertensive",
+          "vegan",
+          "vegetarian",
+        ];
         if (!v) return false;
         for (const diet of v) {
           if (!valid_diets.includes(diet.toLowerCase())) {
@@ -85,7 +90,10 @@ userSchema.methods.generateAuthToken = function (this: IUser): string {
   return jwt.sign({ _id: this._id, email: this.email }, jwtPrivateKey);
 };
 
-userSchema.methods.isValidPassword = async function (this: IUser, password: string): Promise<boolean> {
+userSchema.methods.isValidPassword = async function (
+  this: IUser,
+  password: string
+): Promise<boolean> {
   try {
     return await bcrypt.compare(password, this.password);
   } catch (error) {

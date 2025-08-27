@@ -41,8 +41,8 @@ transferReceiptRouter.post(
 );
 
 transferReceiptRouter.post(
-  "/approvePaymentWithoutReceipt/:event/:user", 
-  [auth, shoppingDesignee], 
+  "/approvePaymentWithoutReceipt/:event/:user",
+  [auth, shoppingDesignee],
   approvePaymentWithoutReceipt
 );
 

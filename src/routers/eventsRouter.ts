@@ -13,47 +13,28 @@ import {
   editEvent,
   deleteEvent,
 } from "../controllers/events.js";
-import { auth, sameUser, eventOrganizer, shoppingDesigneeOrEventOrganizer } from "../middleware/middleware.js";
+import {
+  auth,
+  sameUser,
+  eventOrganizer,
+  shoppingDesigneeOrEventOrganizer,
+} from "../middleware/middleware.js";
 
 const eventRouter: express.Router = express.Router();
 
-eventRouter.get(
-  "/getEvents", 
-  auth, 
-  getEvents
-);
+eventRouter.get("/getEvents", auth, getEvents);
 
-eventRouter.get(
-  "/getPublicEvents", 
-  getPublicEvents
-);
+eventRouter.get("/getPublicEvents", getPublicEvents);
 
-eventRouter.get(
-  "/getPublicAndPrivateEvents", 
-  auth, 
-  getPublicAndPrivateEvents
-);
+eventRouter.get("/getPublicAndPrivateEvents", auth, getPublicAndPrivateEvents);
 
-eventRouter.get(
-  "/getEventById/:id",
-  getEventById
-);
+eventRouter.get("/getEventById/:id", getEventById);
 
-eventRouter.get(
-  "/getMembersAndReceiptsInfo/:event", 
-  getMembersAndReceiptsInfo
-);
+eventRouter.get("/getMembersAndReceiptsInfo/:event", getMembersAndReceiptsInfo);
 
-eventRouter.get(
-  "/getMembersAmount/:event",
-  getMembersAmount
-)
+eventRouter.get("/getMembersAmount/:event", getMembersAmount);
 
-eventRouter.post(
-  "/createEvent", 
-  auth, 
-  createEvent
-);
+eventRouter.post("/createEvent", auth, createEvent);
 
 eventRouter.put(
   "/subscribeToAnEvent/:id/:event",
@@ -67,22 +48,14 @@ eventRouter.put(
   unsubscribeFromEvent
 );
 
-eventRouter.put(
-  "/editRoles/:id", 
-  auth, 
-  editRoles
-);
+eventRouter.put("/editRoles/:id", auth, editRoles);
 
 eventRouter.put(
-  "/editEvent/:id", 
-  [auth, shoppingDesigneeOrEventOrganizer], 
+  "/editEvent/:id",
+  [auth, shoppingDesigneeOrEventOrganizer],
   editEvent
 );
 
-eventRouter.delete(
-  "/deleteEvent/:id", 
-  [auth, eventOrganizer], 
-  deleteEvent
-);
+eventRouter.delete("/deleteEvent/:id", [auth, eventOrganizer], deleteEvent);
 
 export default eventRouter;

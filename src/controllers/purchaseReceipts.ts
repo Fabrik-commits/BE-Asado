@@ -77,9 +77,8 @@ export async function uploadFilePurchaseReceipt(
   try {
     if (req.file) {
       const imageId: mongoose.Types.ObjectId = await saveImage(req.file);
-      let purchaseReceipt: IPurchaseReceipt | null = await PurchaseReceipt.findById(
-        req.params.purchaseReceipt
-      );
+      let purchaseReceipt: IPurchaseReceipt | null =
+        await PurchaseReceipt.findById(req.params.purchaseReceipt);
       if (!purchaseReceipt) {
         return res.status(STATUS_CODES.NOT_FOUND).json({
           message: "The purchase receipt with the given ID was not found.",
@@ -96,7 +95,10 @@ export async function uploadFilePurchaseReceipt(
   }
 }
 
-export async function createPurchaseReceipt(req: IRequestWithUser, res: Response): Promise<Response> {
+export async function createPurchaseReceipt(
+  req: IRequestWithUser,
+  res: Response
+): Promise<Response> {
   try {
     const event: IEvent | null = await Event.findById(req.params.event);
     if (event.state !== "closed")
@@ -106,7 +108,9 @@ export async function createPurchaseReceipt(req: IRequestWithUser, res: Response
       });
     let purchaseReceipt: IPurchaseReceipt = new PurchaseReceipt(req.body);
     purchaseReceipt.event = event._id;
-    purchaseReceipt.shoppingDesignee = new mongoose.Types.ObjectId(req.user._id);
+    purchaseReceipt.shoppingDesignee = new mongoose.Types.ObjectId(
+      req.user._id
+    );
     purchaseReceipt.participants = req.body.participants
       ? req.body.participants
       : event.members;
@@ -121,10 +125,15 @@ export async function createPurchaseReceipt(req: IRequestWithUser, res: Response
   }
 }
 
-export async function assignMembersToReceipt(req: Request, res: Response): Promise<Response> {
+export async function assignMembersToReceipt(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     for (const receipt of req.body.receipts) {
-      const purchaseReceipt: IPurchaseReceipt= await PurchaseReceipt.findById(receipt.id);
+      const purchaseReceipt: IPurchaseReceipt = await PurchaseReceipt.findById(
+        receipt.id
+      );
       if (!purchaseReceipt)
         return res
           .status(STATUS_CODES.NOT_FOUND)
@@ -142,9 +151,13 @@ export async function assignMembersToReceipt(req: Request, res: Response): Promi
   }
 }
 
-export async function deletePurchaseReceipt(req: Request, res: Response): Promise<Response> {
+export async function deletePurchaseReceipt(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const purchaseReceipt: IPurchaseReceipt | null = await PurchaseReceipt.findById(req.params.id);
+    const purchaseReceipt: IPurchaseReceipt | null =
+      await PurchaseReceipt.findById(req.params.id);
     if (!purchaseReceipt)
       return res.status(STATUS_CODES.NOT_FOUND).json({
         message: "The purchase receipt with the given ID was not found.",

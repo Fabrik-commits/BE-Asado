@@ -1,4 +1,7 @@
-export function passwordRecoveryTemplate(code: string, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
+export function passwordRecoveryTemplate(
+  code: string,
+  footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"
+): string {
   return `
     <html>
     <head>
@@ -38,7 +41,10 @@ export function passwordRecoveryTemplate(code: string, footerImageUrl: string = 
   `;
 }
 
-export function newEventTemplate(eventId: string, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
+export function newEventTemplate(
+  eventId: string,
+  footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"
+): string {
   return `
     <html>
     <head>
@@ -76,7 +82,10 @@ export function newEventTemplate(eventId: string, footerImageUrl: string = "http
   `;
 }
 
-export function eventStartTemplate(eventId: string, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
+export function eventStartTemplate(
+  eventId: string,
+  footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"
+): string {
   return `
     <html>
     <head>
@@ -114,7 +123,11 @@ export function eventStartTemplate(eventId: string, footerImageUrl: string = "ht
   `;
 }
 
-export function penalizationStartTemplate(eventId: string, penalization: number, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
+export function penalizationStartTemplate(
+  eventId: string,
+  penalization: number,
+  footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"
+): string {
   return `
     <html>
     <head>
@@ -154,7 +167,11 @@ export function penalizationStartTemplate(eventId: string, penalization: number,
   `;
 }
 
-export function penalizationOneWeekTemplate(eventId: string, penalization: number, footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"): string {
+export function penalizationOneWeekTemplate(
+  eventId: string,
+  penalization: number,
+  footerImageUrl: string = "https://i.ibb.co/Zz37kZxZ/logo-rojo.png"
+): string {
   return `
     <html>
     <head>
