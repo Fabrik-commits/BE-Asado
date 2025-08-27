@@ -1,0 +1,14 @@
+{
+  "strict": true,
+  "target": "es2024",
+  "module": "NodeNext", 
+  "compilerOptions": {
+    "module": "NodeNext",
+    "outDir": "./built",
+    "allowJs": true,
+    "target": "es2024",
+    "moduleResolution": "NodeNext"
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./node_modules", "./built"]
+}
