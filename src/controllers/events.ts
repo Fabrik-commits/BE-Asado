@@ -708,7 +708,7 @@ export async function getMemberIndividualCost(
       return total;
     }, 0);
 
-    return res.status(STATUS_CODES.OK).json({ userAmount });
+    return res.status(STATUS_CODES.OK).json({"userAmount": userAmount });
   } catch (error: any) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
