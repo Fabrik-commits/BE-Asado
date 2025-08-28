@@ -560,7 +560,7 @@ export async function getMemberIndividualCost(req, res) {
             total += (receipt.amount / receipt.participants.length);
             return total;
         }, 0);
-        return res.status(STATUS_CODES.OK).json({ userAmount });
+        return res.status(STATUS_CODES.OK).json({ "userAmount": userAmount });
     }
     catch (error) {
         return res
