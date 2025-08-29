@@ -12,7 +12,10 @@ import { notifyNewEvent } from "./notifications.js";
 const eventNotFoundMessage = "The event with the given ID was not found.";
 export async function getEvents(req, res) {
     try {
-        const events = await Event.find().sort({ datetime: -1, ":id": 1 });
+        const events = await Event.find().sort({
+            datetime: -1,
+            ":id": 1,
+        });
         return res.json(events);
     }
     catch (error) {
@@ -105,63 +108,49 @@ export async function getMembersAndReceiptsInfo(req, res) {
 }
 async function updateReminders(event) {
     const reminders = await Reminder.find({ event: event._id });
-    if (reminders.length == 0) {
-        const eventStartReminder = new Reminder({
+    const eventStartReminder = reminders.find((reminder) => reminder.type === "eventStart");
+    if (eventStartReminder) {
+        eventStartReminder.datetime = new Date(event.datetime.getTime() - 30 * 60 * 1000);
+        await eventStartReminder.save();
+    }
+    else {
+        const newEventStartReminder = new Reminder({
             event: event._id,
             type: "eventStart",
-            datetime: new Date(event.datetime.getTime() - 30 * 60 * 1000), // 30 minutes before the event
+            datetime: new Date(event.datetime.getTime() - 30 * 60 * 1000),
         });
-        await eventStartReminder.save();
-        if (event.penalizationStartDate) {
-            const penalizationReminderDate = new Date(event.penalizationStartDate);
-            penalizationReminderDate.setDate(penalizationReminderDate.getDate() - 1);
-            penalizationReminderDate.setHours(20, 0, 0, 0); // 8 PM the day before penalization starts
-            const penalizationStartReminder = new Reminder({
+        await newEventStartReminder.save();
+    }
+    if (event.penalizationStartDate && event.penalization > 0) {
+        const penalizationReminderDate = new Date(event.penalizationStartDate);
+        penalizationReminderDate.setDate(penalizationReminderDate.getDate() - 1);
+        penalizationReminderDate.setHours(20, 0, 0, 0); // 8 PM the day before penalization starts
+        const penalizationStartReminder = reminders.find((reminder) => reminder.type === "penalizationStart");
+        if (penalizationStartReminder) {
+            penalizationStartReminder.datetime = penalizationReminderDate;
+            await penalizationStartReminder.save();
+        }
+        else {
+            const newPenalizationStartReminder = new Reminder({
                 event: event._id,
                 type: "penalizationStart",
                 datetime: penalizationReminderDate,
             });
-            await penalizationStartReminder.save();
-            const penalizationOneWeekReminder = new Reminder({
-                event: event._id,
-                type: "penalizationOneWeek",
-                datetime: new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000), // one week after penalization start
-            });
+            await newPenalizationStartReminder.save();
+        }
+        const penalizationOneWeekReminderDate = new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const penalizationOneWeekReminder = reminders.find((reminder) => reminder.type === "penalizationOneWeek");
+        if (penalizationOneWeekReminder) {
+            penalizationOneWeekReminder.datetime = penalizationOneWeekReminderDate;
             await penalizationOneWeekReminder.save();
         }
-    }
-    else {
-        const eventStartReminder = reminders.find((reminder) => reminder.type === "eventStart");
-        if (eventStartReminder) {
-            eventStartReminder.datetime = new Date(event.datetime.getTime() - 30 * 60 * 1000); // 30 minutes before the event
-            await eventStartReminder.save();
-        }
-        if (event.penalizationStartDate) {
-            const penalizationStartReminder = reminders.find((reminder) => reminder.type === "penalizationStart");
-            const penalizationReminderDate = new Date(event.penalizationStartDate);
-            penalizationReminderDate.setDate(penalizationReminderDate.getDate() - 1);
-            penalizationReminderDate.setHours(20, 0, 0, 0); // 8 PM the day before penalization starts
-            if (!penalizationStartReminder) {
-                const newPenalizationStartReminder = new Reminder({
-                    event: event._id,
-                    type: "penalizationStart",
-                    datetime: penalizationReminderDate,
-                });
-                await newPenalizationStartReminder.save();
-                const newPenalizationOneWeekReminder = new Reminder({
-                    event: event._id,
-                    type: "penalizationOneWeek",
-                    datetime: new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000), // one week after penalization start
-                });
-                await newPenalizationOneWeekReminder.save();
-            }
-            else {
-                penalizationStartReminder.datetime = penalizationReminderDate;
-                await penalizationStartReminder.save();
-                const penalizationOneWeekReminder = reminders.find((reminder) => reminder.type === "penalizationOneWeek");
-                penalizationOneWeekReminder.datetime = new Date(penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000); // one week after penalization start
-                await penalizationOneWeekReminder.save();
-            }
+        else {
+            const newPenalizationOneWeekReminder = new Reminder({
+                event: event._id,
+                type: "penalizationOneWeek",
+                datetime: penalizationOneWeekReminderDate,
+            });
+            await newPenalizationOneWeekReminder.save();
         }
     }
 }
@@ -280,7 +269,9 @@ export async function editRoles(req, res) {
         res.status(STATUS_CODES.OK).json(event);
     }
     catch (error) {
-        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
+        res
+            .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+            .json({ message: error?.message || "Internal server error" });
     }
 }
 export async function editEvent(req, res) {
@@ -525,5 +516,41 @@ export async function getMembersAmount(req, res) {
         return res
             .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
             .json({ message: e.message });
+    }
+}
+export async function getMemberIndividualCost(req, res) {
+    try {
+        if (!req.params.event)
+            return res
+                .status(STATUS_CODES.BAD_REQUEST)
+                .json({ message: "No event ID provided" });
+        if (!req.params.user)
+            return res
+                .status(STATUS_CODES.BAD_REQUEST)
+                .json({ message: "No user ID provided" });
+        const event = await Event.findById(req.params.event).populate("purchaseReceipts");
+        if (!event)
+            return res
+                .status(STATUS_CODES.NOT_FOUND)
+                .json({ message: eventNotFoundMessage });
+        if (!event.members.includes(new mongoose.Types.ObjectId(req.params.user)))
+            return res
+                .status(STATUS_CODES.FORBIDDEN)
+                .json({ message: "User is not a member of the event" });
+        if (event.state !== "finished" && event.state !== "readyforpayment")
+            return res
+                .status(STATUS_CODES.FORBIDDEN)
+                .json({ message: "Event state needs to be either finished or ready for payment" });
+        const userReceipts = event.purchaseReceipts.filter((receipt) => receipt.participants.some((p) => p._id.equals(new mongoose.Types.ObjectId(req.params.user))));
+        const userAmount = userReceipts.reduce((total, receipt) => {
+            total += (receipt.amount / receipt.participants.length);
+            return total;
+        }, 0);
+        return res.status(STATUS_CODES.OK).json({ "userAmount": userAmount });
+    }
+    catch (error) {
+        return res
+            .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+            .json({ message: error?.message || "Internal server error" });
     }
 }

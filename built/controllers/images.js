@@ -6,15 +6,21 @@ export async function getImage(req, res) {
     try {
         const id = req.params.id;
         if (!isValidId(id))
-            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: "No valid id was provided." });
+            return res
+                .status(STATUS_CODES.BAD_REQUEST)
+                .json({ message: "No valid id was provided." });
         const image = await Image.findById(id);
         if (!image)
-            return res.status(STATUS_CODES.BAD_REQUEST).json({ message: "No image was found." });
+            return res
+                .status(STATUS_CODES.BAD_REQUEST)
+                .json({ message: "No image was found." });
         res.contentType(image.mimetype);
         return res.status(STATUS_CODES.OK).send(image.image);
     }
     catch (error) {
-        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ message: error?.message || "Internal server error" });
+        return res
+            .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+            .json({ message: error?.message || "Internal server error" });
     }
 }
 export async function saveImage(file) {

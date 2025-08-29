@@ -2,13 +2,16 @@ import mongoose from "mongoose";
 import { brevo } from "../config.js";
 import https from "https";
 import { Event } from "../models/event.js";
-import { assignEventValues, calculateTransfersInfo } from "../controllers/events.js";
+import { assignEventValues, calculateTransfersInfo, } from "../controllers/events.js";
 function sendEmail(email, subject, name, htmlContent) {
     const payload = JSON.stringify({
-        sender: { name: "FoodSpot", email: "food-spot-no-reply@5865554.brevosend.com" },
+        sender: {
+            name: "FoodSpot",
+            email: "food-spot-no-reply@5865554.brevosend.com",
+        },
         to: [{ email, name }],
         subject,
-        htmlContent
+        htmlContent,
     });
     const byteLength = Buffer.byteLength(payload, "utf8");
     const options = {
@@ -17,8 +20,8 @@ function sendEmail(email, subject, name, htmlContent) {
             Accept: "application/json",
             "api-key": brevo.apiKey,
             "Content-Type": "application/json; charset=utf-8",
-            "Content-Length": byteLength
-        }
+            "Content-Length": byteLength,
+        },
     };
     return new Promise((resolve, reject) => {
         const req = https.request(brevo.url, options, (res) => {
@@ -39,16 +42,14 @@ function sendEmail(email, subject, name, htmlContent) {
 }
 function isValidId(id) {
     if (mongoose.Types.ObjectId.isValid(id)) {
-        if ((String)(new mongoose.Types.ObjectId(id)) == id) {
+        if (String(new mongoose.Types.ObjectId(id)) == id) {
             return true;
         }
     }
     return false;
 }
 async function getEventsDebtors(eventId) {
-    // const event: IEventWithMembersTransferReceiptsPurchaseReceipts | null = await Event.findById(eventId).populate("members transferReceipts purchaseReceipts");
-    const event = await Event.findById(eventId)
-        .populate([
+    const event = await Event.findById(eventId).populate([
         {
             path: "purchaseReceipts",
             populate: [
@@ -71,7 +72,7 @@ async function getEventsDebtors(eventId) {
             populate: {
                 path: "user",
                 model: "User",
-            }
+            },
         },
     ]);
     if (!event) {
@@ -79,9 +80,9 @@ async function getEventsDebtors(eventId) {
     }
     const userBalances = assignEventValues(event.purchaseReceipts);
     const transferInfo = calculateTransfersInfo(userBalances);
-    const expectedTransfers = transferInfo.filter(t => t.receiver !== null);
+    const expectedTransfers = transferInfo.filter((t) => t.receiver !== null);
     const debtorUsers = await Promise.all(expectedTransfers.map(async (transfer) => {
-        const receipt = event.transferReceipts.find(r => r.user._id.equals(transfer.userId));
+        const receipt = event.transferReceipts.find((r) => r.user._id.equals(transfer.userId));
         if (!receipt) {
             return receipt.user;
         }
