@@ -3,6 +3,7 @@ import {
   getUsers,
   getUserById,
   isDebtor,
+  hasPendingTransfers,
   register,
   editUser,
   editProfilePicture,
@@ -21,6 +22,8 @@ usersRouter.get("/getUsers", auth, getUsers);
 usersRouter.get("/getUserById/:id", auth, getUserById);
 
 usersRouter.get("/isDebtor/:id", auth, isDebtor);
+
+usersRouter.get("/hasPendingTransfers/:id", auth, hasPendingTransfers);
 
 usersRouter.post("/register", register);
 

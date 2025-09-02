@@ -8,9 +8,11 @@ import { assignEventValues, calculateTransfersInfo } from "./events.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
 import {
+  IEventAmountCalculationsWithTransfers,
   IEventWithMembersPurchaseReceiptsPopulated,
   IImage,
   ISafeUser,
+  ITransferInfo,
   ITransferReceipt,
   IUser,
 } from "../models/interfaces.js";
@@ -87,6 +89,54 @@ export async function isDebtor(req: Request, res: Response): Promise<Response> {
 
         if (!receipt || !receipt.hasPaid) {
           debtorEvents.push(event._id);
+        }
+      }
+    }
+    return res.status(STATUS_CODES.OK).json(debtorEvents);
+  } catch (error) {
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      message: error?.message || "Internal server error.",
+    });
+  }
+}
+
+export async function hasPendingTransfers(req: Request, res: Response) {
+  try {
+    const shoppingDesigneeId: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(req.params.id);
+    const events: IEventAmountCalculationsWithTransfers[] = await Event.find({
+      shoppingDesignee: shoppingDesigneeId,
+      state: "readyforpayment",
+    })
+      .select("purchaseReceipts members")
+      .populate([
+        {
+          path: "purchaseReceipts",
+          populate: [
+            {
+              path: "shoppingDesignee",
+              model: "User",
+            },
+            {
+              path: "participants",
+              model: "User",
+            },
+          ],
+        },
+        {
+          path: "members",
+          model: "User",
+        },
+        {
+          path: "transferReceipts",
+          model: "TransferReceipt",
+        }
+      ]);
+    const debtorEvents: mongoose.Types.ObjectId[] = [];
+    for (const event of events) {
+      for (const receipt of event.transferReceipts) {
+        if (!receipt.hasPaid && shoppingDesigneeId.equals(receipt.receiver)) {
+          debtorEvents.push(event._id);
+          break;
         }
       }
     }

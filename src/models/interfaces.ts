@@ -73,6 +73,7 @@ export interface ITransferReceipt extends Document {
   user: mongoose.Types.ObjectId;
   event: mongoose.Types.ObjectId;
   datetime: Date;
+  receiver: mongoose.Types.ObjectId | null;
 }
 
 export interface ITransferReceiptWithUser
