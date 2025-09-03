@@ -6,6 +6,7 @@ import { TransferReceipt } from "../models/transferReceipt.js";
 import { assignEventValues, calculateTransfersInfo } from "./events.js";
 import { saveImage } from "./images.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
+import mongoose from "mongoose";
 const userNotFoundMessage = "The user with the given ID was not found.";
 export async function getUsers(req, res) {
     try {
@@ -63,6 +64,54 @@ export async function isDebtor(req, res) {
                 });
                 if (!receipt || !receipt.hasPaid) {
                     debtorEvents.push(event._id);
+                }
+            }
+        }
+        return res.status(STATUS_CODES.OK).json(debtorEvents);
+    }
+    catch (error) {
+        return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            message: error?.message || "Internal server error.",
+        });
+    }
+}
+export async function hasPendingTransfers(req, res) {
+    try {
+        const shoppingDesigneeId = new mongoose.Types.ObjectId(req.params.id);
+        const events = await Event.find({
+            shoppingDesignee: shoppingDesigneeId,
+            state: "readyforpayment",
+        })
+            .select("purchaseReceipts members")
+            .populate([
+            {
+                path: "purchaseReceipts",
+                populate: [
+                    {
+                        path: "shoppingDesignee",
+                        model: "User",
+                    },
+                    {
+                        path: "participants",
+                        model: "User",
+                    },
+                ],
+            },
+            {
+                path: "members",
+                model: "User",
+            },
+            {
+                path: "transferReceipts",
+                model: "TransferReceipt",
+            }
+        ]);
+        const debtorEvents = [];
+        for (const event of events) {
+            for (const receipt of event.transferReceipts) {
+                if (!receipt.hasPaid && shoppingDesigneeId.equals(receipt.receiver)) {
+                    debtorEvents.push(event._id);
+                    break;
                 }
             }
         }
