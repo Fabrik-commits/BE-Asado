@@ -10,7 +10,7 @@ import {
 const optionRouter: express.Router = express.Router();
 
 optionRouter.get("/getMembersWhoHaventVoted/:event", auth, getMembersWhoHaventVoted);
-optionRouter.post("/createOption", auth, createOption);
+optionRouter.post("/createOption/:event", auth, createOption);
 optionRouter.put("/editOption/:id", auth, editOptions);
 optionRouter.delete("/deleteOption/:id", auth, deleteOption);
 

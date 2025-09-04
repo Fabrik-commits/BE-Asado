@@ -9,6 +9,9 @@ export async function createOption(req, res) {
             participants,
         });
         await newOption.save();
+        await Event.findByIdAndUpdate(req.params.event, {
+            $push: { options: newOption._id },
+        });
         return res.status(STATUS_CODES.CREATED).json(newOption);
     }
     catch (error) {
@@ -43,9 +46,7 @@ export async function deleteOption(req, res) {
                 .json({ message: "Option not found" });
         }
         await Event.updateOne({ options: deletedOption._id }, { $pull: { options: deletedOption._id } });
-        return res
-            .status(STATUS_CODES.OK)
-            .json(deletedOption);
+        return res.status(STATUS_CODES.OK).json(deletedOption);
     }
     catch (error) {
         return res
@@ -63,13 +64,15 @@ export async function getMembersWhoHaventVoted(req, res) {
         }
         const allOptions = await Option.find({ _id: { $in: event.options } });
         const participantsInOptions = new Set();
-        allOptions.forEach(option => {
+        allOptions.forEach((option) => {
             option.participants.forEach((participantId) => {
                 participantsInOptions.add(participantId.toString());
             });
         });
         const membersWhoHaventVoted = event.members.filter((memberId) => !participantsInOptions.has(memberId.toString()));
-        return res.status(STATUS_CODES.OK).json({ count: membersWhoHaventVoted.length });
+        return res
+            .status(STATUS_CODES.OK)
+            .json({ count: membersWhoHaventVoted.length });
     }
     catch (error) {
         return res
@@ -77,4 +80,3 @@ export async function getMembersWhoHaventVoted(req, res) {
             .json({ message: error?.message || "Internal server error" });
     }
 }
-;
