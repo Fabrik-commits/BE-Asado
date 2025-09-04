@@ -15,6 +15,7 @@ import {
   IEventAmountCalculations,
   IEventPopulated,
   IEventWithPurchaseReceipts,
+  IEventWithPurchaseReceiptsOptions,
   IEventWithTransferReceiptsPurchaseReceiptsRatings,
   IMemberWhoHasUploaded,
   IPublicEvent,
@@ -311,7 +312,7 @@ export async function unsubscribeFromEvent(
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "No event ID provided." });
-    const event: IEventWithPurchaseReceipts | null = await Event.findById(
+    const event: IEventWithPurchaseReceiptsOptions | null = await Event.findById(
       req.params.event
     ).populate("purchaseReceipts");
     if (!event)
@@ -341,6 +342,12 @@ export async function unsubscribeFromEvent(
         (participantId) => !participantId.equals(user._id)
       );
       await receipt.save();
+    }
+    for (const option of event.options) {
+      option.participants = option.participants.filter(
+        (participantId) => !participantId.equals(user._id)
+      );
+      await option.save();
     }
     event.members.splice(index, 1);
     await event.save();

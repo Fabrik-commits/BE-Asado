@@ -223,6 +223,12 @@ export interface IEventWithPurchaseReceipts
   purchaseReceipts: IPurchaseReceipt[];
 }
 
+export interface IEventWithPurchaseReceiptsOptions
+  extends Omit<IEvent, "purchaseReceipts" | "options"> {
+  purchaseReceipts: IPurchaseReceipt[];
+  options: IOption[];
+}
+
 export interface IEventWithPurchaseReceiptsPopulated
   extends Omit<IEvent, "purchaseReceipts"> {
   purchaseReceipts: IPurchaseReceiptWithUsers[];
@@ -275,5 +281,5 @@ export interface IRequestWithUser extends Request {
 export interface IOption extends Document {
   _id: mongoose.Types.ObjectId;
   title: string;
-  participants: IUser[];
+  participants: mongoose.Types.ObjectId[];
 }
