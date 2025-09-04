@@ -136,6 +136,7 @@ export interface IEvent extends Document {
   transferReceipts: mongoose.Types.ObjectId[];
   purchaseReceipts: mongoose.Types.ObjectId[];
   ratings: mongoose.Types.ObjectId[];
+  options: mongoose.Types.ObjectId[];
   isPrivate?: boolean;
   penalization?: number | null;
   penalizationStartDate?: Date | null;
@@ -200,6 +201,7 @@ export interface IEventPopulated
     | "transferReceipts"
     | "purchaseReceipts"
     | "ratings"
+    | "options"
   > {
   members: IEvent["members"];
   chef: IUser | null;
@@ -208,6 +210,7 @@ export interface IEventPopulated
   transferReceipts: ITransferReceipt[];
   purchaseReceipts: IPurchaseReceipt[];
   ratings: IRating[];
+  options: IOption[];
 }
 
 export interface IEventWithTransferReceipts
@@ -267,4 +270,10 @@ export interface IUserPayload {
 
 export interface IRequestWithUser extends Request {
   user?: IUserPayload;
+}
+
+export interface IOption extends Document {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  participants: IUser[];
 }

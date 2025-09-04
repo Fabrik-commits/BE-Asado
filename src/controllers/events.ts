@@ -120,7 +120,8 @@ export async function getEventById(
       .populate("organizer")
       .populate("shoppingDesignee")
       .populate("transferReceipts")
-      .populate("purchaseReceipts");
+      .populate("purchaseReceipts")
+      .populate("options");
     if (!event) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
