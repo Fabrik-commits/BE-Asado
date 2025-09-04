@@ -32,8 +32,7 @@ References:
 | options | getMembersWhoHaventVoted/:event | Returns the count of event members who haven't voted for any option | GET | event | Yes |  | count: Number |
 | options | createOption | Creates a new option for an event | POST |  | Yes | <ul><li>title: String</li><li>participants: [ObjectId]</li></ul> | Option |
 | options | editOption/:id | Edits an option by its id | PUT | id | Yes | <ul><li>title: String</li><li>participants: [ObjectId]</li></ul> | Option |
-| options | deleteOption/:id | Deletes an option by its id and removes it from the event | DELETE | id | Yes |  | { message: String } |
-
+| options | deleteOption/:id | Deletes an option by its id and removes it from the event | DELETE | id | Yes |  | Option |
 | purchaseReceipts | getPurchaseReceiptsByEvent/:event | Gets all purchaseReceipts from an event providing the event's id (12 byte Object ID) | GET | event | Yes and user token needs to be an event member |  |
 | purchaseReceipts | getPurchaseReceiptById/:id/:event | Gets a single purchaseReceipt by id for a certain event providing the event's id (12 byte Object ID)  | GET | id, event | Yes and user token needs to be an event member |  |
 | purchaseReceipts | createPurchaseReceipt/:event | Creates a purchaseReceipt for a certain event | POST | event | Yes and user token needs to be the shoppingDesignee's | <ul><li>description: String</li> <li>amount: Number</li></ul> |

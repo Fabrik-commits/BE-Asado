@@ -80,7 +80,7 @@ export async function deleteOption(
 
     return res
       .status(STATUS_CODES.OK)
-      .json({ message: "Option deleted successfully" });
+      .json(deletedOption);
   } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
