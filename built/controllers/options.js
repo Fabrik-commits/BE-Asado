@@ -45,7 +45,7 @@ export async function deleteOption(req, res) {
         await Event.updateOne({ options: deletedOption._id }, { $pull: { options: deletedOption._id } });
         return res
             .status(STATUS_CODES.OK)
-            .json({ message: "Option deleted successfully" });
+            .json(deletedOption);
     }
     catch (error) {
         return res
