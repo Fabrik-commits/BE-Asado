@@ -290,7 +290,9 @@ export async function unsubscribeFromEvent(
         .json({ message: "No event ID provided." });
     const event: IEventWithPurchaseReceiptsOptions | null = await Event.findById(
       req.params.event
-    ).populate("purchaseReceipts");
+    )
+    .populate("purchaseReceipts")
+    .populate("options");
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
