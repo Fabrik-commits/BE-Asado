@@ -79,7 +79,8 @@ export async function getEventById(req, res) {
             .populate("organizer")
             .populate("shoppingDesignee")
             .populate("transferReceipts")
-            .populate("purchaseReceipts");
+            .populate("purchaseReceipts")
+            .populate("options");
         if (!event) {
             return res
                 .status(STATUS_CODES.NOT_FOUND)
@@ -245,6 +246,10 @@ export async function unsubscribeFromEvent(req, res) {
         for (const receipt of event.purchaseReceipts) {
             receipt.participants = receipt.participants.filter((participantId) => !participantId.equals(user._id));
             await receipt.save();
+        }
+        for (const option of event.options) {
+            option.participants = option.participants.filter((participantId) => !participantId.equals(user._id));
+            await option.save();
         }
         event.members.splice(index, 1);
         await event.save();
