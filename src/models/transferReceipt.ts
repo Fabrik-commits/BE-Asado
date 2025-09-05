@@ -30,6 +30,12 @@ const transferReceiptSchema: mongoose.Schema<ITransferReceipt> =
     },
 
     datetime: { type: Date, required: true },
+
+    receiver: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
   });
 
 const TransferReceipt: Model<ITransferReceipt> =
