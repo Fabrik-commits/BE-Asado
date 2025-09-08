@@ -163,7 +163,9 @@ export async function createEvent(req, res) {
             event.shoppingDesignee.push(req.body.organizer);
         event = await event.save();
         await deleteEvents();
-        await notifyNewEvent(event.id);
+        if (!event.isPrivate) {
+            await notifyNewEvent(event.id);
+        }
         await updateReminders(event);
         return res.status(STATUS_CODES.CREATED).json(event);
     }
@@ -223,7 +225,9 @@ export async function unsubscribeFromEvent(req, res) {
             return res
                 .status(STATUS_CODES.BAD_REQUEST)
                 .json({ message: "No event ID provided." });
-        const event = await Event.findById(req.params.event).populate("purchaseReceipts");
+        const event = await Event.findById(req.params.event)
+            .populate("purchaseReceipts")
+            .populate("options");
         if (!event)
             return res
                 .status(STATUS_CODES.NOT_FOUND)

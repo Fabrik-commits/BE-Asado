@@ -94,6 +94,7 @@ export async function approvePaymentWithoutReceipt(req, res) {
         date.setHours(date.getHours() - 3);
         transferReceipt.datetime = date;
         transferReceipt.amount = 0;
+        transferReceipt.receiver = req.body.receiver ? new mongoose.Types.ObjectId(req.body.receiver) : null;
         transferReceipt.event = new mongoose.Types.ObjectId(req.params.event);
         transferReceipt.user = new mongoose.Types.ObjectId(req.params.user);
         transferReceipt.hasPaid = true;
