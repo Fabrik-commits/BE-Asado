@@ -32,7 +32,7 @@ const eventSchema: mongoose.Schema<IEvent> = new mongoose.Schema<IEvent>({
     },
   },
 
-  members: { type: [mongoose.Schema.Types.ObjectId], ref: "User" },
+  members: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
 
   chef: {
     type: mongoose.Schema.Types.ObjectId,
@@ -67,6 +67,12 @@ const eventSchema: mongoose.Schema<IEvent> = new mongoose.Schema<IEvent>({
   ratings: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Rating",
+  },
+
+  options: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Option",
+    default: [],
   },
 
   isPrivate: { type: Boolean, default: false },

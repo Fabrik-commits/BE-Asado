@@ -26,7 +26,7 @@ const eventSchema = new mongoose.Schema({
             },
         },
     },
-    members: { type: [mongoose.Schema.Types.ObjectId], ref: "User" },
+    members: { type: [mongoose.Schema.Types.ObjectId], ref: "User", default: [] },
     chef: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -55,6 +55,11 @@ const eventSchema = new mongoose.Schema({
     ratings: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "Rating",
+    },
+    options: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "Option",
+        default: [],
     },
     isPrivate: { type: Boolean, default: false },
     penalization: { type: Number, default: null },

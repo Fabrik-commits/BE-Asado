@@ -8,6 +8,7 @@ import transferReceiptRouter from "./routers/transferReceiptsRouter.js";
 import usersRouter from "./routers/usersRouter.js";
 import ratingsRouter from "./routers/ratingsRouter.js";
 import cronRouter from "./routers/cronRouter.js";
+import optionRouter from "./routers/optionsRouter.js";
 const router = express.Router();
 // events routes
 router.use("/events", eventRouter);
@@ -15,6 +16,8 @@ router.use("/events", eventRouter);
 router.use("/images", imageRouter);
 // login
 router.use("/login", signInRouter);
+// options routes
+router.use("/options", optionRouter);
 // purchaseReceipts routes
 router.use("/purchaseReceipts", purchaseReceiptRouter);
 // password routes
