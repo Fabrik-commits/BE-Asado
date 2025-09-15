@@ -13,7 +13,7 @@ import { notifyNewEvent } from "./notifications.js";
 import {
   IEvent,
   IEventAmountCalculations,
-  IEventPopulated,
+  IEventPopulatedWithOptions,
   IEventWithPurchaseReceipts,
   IEventWithPurchaseReceiptsOptions,
   IEventWithTransferReceiptsPurchaseReceiptsRatings,
@@ -115,7 +115,7 @@ export async function getEventById(
   res: Response
 ): Promise<Response> {
   try {
-    const event: IEventPopulated = await Event.findById(req.params.id)
+    const event: IEventPopulatedWithOptions = await Event.findById(req.params.id)
       .populate("members")
       .populate("chef")
       .populate("organizer")

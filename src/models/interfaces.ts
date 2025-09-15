@@ -214,6 +214,10 @@ export interface IEventPopulated
   options: IOption[];
 }
 
+export interface IEventPopulatedWithOptions extends Omit<IEvent, "options"> {
+  options: IOptionPopulated[];
+}
+
 export interface IEventWithTransferReceipts
   extends Omit<IEvent, "transferReceipts"> {
   transferReceipts: ITransferReceipt[];
@@ -283,4 +287,8 @@ export interface IOption extends Document {
   _id: mongoose.Types.ObjectId;
   title: string;
   participants: mongoose.Types.ObjectId[];
+}
+
+export interface IOptionPopulated extends Omit<IOption, "participants"> {
+  participants: IUser[];
 }
