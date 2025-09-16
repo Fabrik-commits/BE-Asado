@@ -26,6 +26,8 @@ export interface IUser extends Document {
 export interface ISafeUser
   extends Omit<IUser, "password" | "verificationCode"> {}
 
+export interface IUserName extends Pick<IUser, "_id" | "name" | "lastName"> {}
+
 export interface IUserBalance {
   userId: mongoose.Types.ObjectId;
   userName: string;
@@ -290,5 +292,5 @@ export interface IOption extends Document {
 }
 
 export interface IOptionPopulated extends Omit<IOption, "participants"> {
-  participants: IUser[];
+  participants: IUserName[];
 }

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Option } from "../models/option.js";
 import { Event } from "../models/event.js";
 import { STATUS_CODES } from "../constants/httpStatusCode.js";
-import { IEvent, IOption } from "../models/interfaces.js";
+import { IEvent, IEventWithMembers, IOption, IUser, IUserName } from "../models/interfaces.js";
 import mongoose from "mongoose";
 
 export async function createOption(
@@ -92,7 +92,13 @@ export async function deleteOption(
 
 export async function getMembersWhoHaventVoted(req: Request, res: Response) {
   try {
-    const event: IEvent | null = await Event.findById(req.params.event);
+    interface IEventWithMembersName extends Omit<IEvent, "members"> {
+      members: IUserName[];
+    }
+    const event: IEventWithMembersName | null = await Event.findById(req.params.event).populate({
+      path: "members",
+      select: "_id name lastName"
+    });
 
     if (!event) {
       return res
@@ -109,13 +115,13 @@ export async function getMembersWhoHaventVoted(req: Request, res: Response) {
     });
 
     const membersWhoHaventVoted = event.members.filter(
-      (memberId: mongoose.Types.ObjectId) =>
-        !participantsInOptions.has(memberId.toString())
+      (member: IUserName) =>
+        !participantsInOptions.has(member._id.toString())
     );
 
     return res
       .status(STATUS_CODES.OK)
-      .json({ count: membersWhoHaventVoted.length });
+      .json({ membersWhoHaventVoted });
   } catch (error) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)

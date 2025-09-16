@@ -123,8 +123,12 @@ export async function getEventById(
       .populate("transferReceipts")
       .populate("purchaseReceipts")
       .populate({
-        path: "options",
-        populate: { path: "participants", model: "User" },
+      path: "options",
+      populate: {
+        path: "participants",
+        model: "User",
+        select: "name lastName _id"
+      },
       });
     if (!event) {
       return res
