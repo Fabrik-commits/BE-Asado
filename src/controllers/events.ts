@@ -13,7 +13,7 @@ import { notifyNewEvent } from "./notifications.js";
 import {
   IEvent,
   IEventAmountCalculations,
-  IEventPopulated,
+  IEventPopulatedWithOptions,
   IEventWithPurchaseReceipts,
   IEventWithPurchaseReceiptsOptions,
   IEventWithTransferReceiptsPurchaseReceiptsRatings,
@@ -115,14 +115,21 @@ export async function getEventById(
   res: Response
 ): Promise<Response> {
   try {
-    const event: IEventPopulated = await Event.findById(req.params.id)
+    const event: IEventPopulatedWithOptions = await Event.findById(req.params.id)
       .populate("members")
       .populate("chef")
       .populate("organizer")
       .populate("shoppingDesignee")
       .populate("transferReceipts")
       .populate("purchaseReceipts")
-      .populate("options");
+      .populate({
+      path: "options",
+      populate: {
+        path: "participants",
+        model: "User",
+        select: "name lastName _id"
+      },
+      });
     if (!event) {
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -155,21 +162,27 @@ export async function getMembersAndReceiptsInfo(
 
 async function updateReminders(event: IEvent): Promise<void> {
   const reminders: IReminder[] = await Reminder.find({ event: event._id });
-  const eventStartReminder: IReminder | undefined = reminders.find((reminder) => reminder.type === "eventStart");
+  const eventStartReminder: IReminder | undefined = reminders.find(
+    (reminder) => reminder.type === "eventStart"
+  );
   if (eventStartReminder) {
-    eventStartReminder.datetime = new Date(event.datetime.getTime() - 30 * 60 * 1000);
+    eventStartReminder.datetime = new Date(
+      event.datetime.getTime() - 30 * 60 * 1000
+    );
     await eventStartReminder.save();
   } else {
     const newEventStartReminder: IReminder = new Reminder({
       event: event._id,
       type: "eventStart",
-      datetime: new Date(event.datetime.getTime() - 30 * 60 * 1000), 
+      datetime: new Date(event.datetime.getTime() - 30 * 60 * 1000),
     });
     await newEventStartReminder.save();
   }
 
   if (event.penalizationStartDate && event.penalization > 0) {
-    const penalizationReminderDate: Date = new Date(event.penalizationStartDate);
+    const penalizationReminderDate: Date = new Date(
+      event.penalizationStartDate
+    );
     penalizationReminderDate.setDate(penalizationReminderDate.getDate() - 1);
     penalizationReminderDate.setHours(20, 0, 0, 0); // 8 PM the day before penalization starts
 
@@ -177,7 +190,7 @@ async function updateReminders(event: IEvent): Promise<void> {
       (reminder) => reminder.type === "penalizationStart"
     );
 
-  if (penalizationStartReminder) {
+    if (penalizationStartReminder) {
       penalizationStartReminder.datetime = penalizationReminderDate;
       await penalizationStartReminder.save();
     } else {
@@ -188,7 +201,7 @@ async function updateReminders(event: IEvent): Promise<void> {
       });
       await newPenalizationStartReminder.save();
     }
-    
+
     const penalizationOneWeekReminderDate: Date = new Date(
       penalizationReminderDate.getTime() + 7 * 24 * 60 * 60 * 1000
     );
@@ -220,7 +233,7 @@ export async function createEvent(
       event.shoppingDesignee.push(req.body.organizer);
     event = await event.save();
     await deleteEvents();
-    if (!event.isPrivate){
+    if (!event.isPrivate) {
       await notifyNewEvent(event.id);
     }
     await updateReminders(event);
@@ -290,11 +303,10 @@ export async function unsubscribeFromEvent(
       return res
         .status(STATUS_CODES.BAD_REQUEST)
         .json({ message: "No event ID provided." });
-    const event: IEventWithPurchaseReceiptsOptions | null = await Event.findById(
-      req.params.event
-    )
-    .populate("purchaseReceipts")
-    .populate("options");
+    const event: IEventWithPurchaseReceiptsOptions | null =
+      await Event.findById(req.params.event)
+        .populate("purchaseReceipts")
+        .populate("options");
     if (!event)
       return res
         .status(STATUS_CODES.NOT_FOUND)
@@ -686,17 +698,26 @@ export async function getMemberIndividualCost(
     if (event.state !== "finished" && event.state !== "readyforpayment")
       return res
         .status(STATUS_CODES.FORBIDDEN)
-        .json({ message: "Event state needs to be either finished or ready for payment" });
-    const userReceipts: IPurchaseReceipt[] = event.purchaseReceipts.filter((receipt) =>
-      receipt.participants.some((p) => p._id.equals(new mongoose.Types.ObjectId(req.params.user)))
+        .json({
+          message:
+            "Event state needs to be either finished or ready for payment",
+        });
+    const userReceipts: IPurchaseReceipt[] = event.purchaseReceipts.filter(
+      (receipt) =>
+        receipt.participants.some((p) =>
+          p._id.equals(new mongoose.Types.ObjectId(req.params.user))
+        )
     );
 
-    const userAmount: number = userReceipts.reduce((total: number, receipt: IPurchaseReceipt) => {
-      total += (receipt.amount / receipt.participants.length);
-      return total;
-    }, 0);
+    const userAmount: number = userReceipts.reduce(
+      (total: number, receipt: IPurchaseReceipt) => {
+        total += receipt.amount / receipt.participants.length;
+        return total;
+      },
+      0
+    );
 
-    return res.status(STATUS_CODES.OK).json({"userAmount": userAmount });
+    return res.status(STATUS_CODES.OK).json({ userAmount: userAmount });
   } catch (error: any) {
     return res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
