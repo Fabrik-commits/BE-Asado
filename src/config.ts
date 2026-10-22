@@ -1,9 +1,19 @@
 import "dotenv/config";
 
-export const brevo: { apiKey: string; url: string } = {
-  apiKey: process.env.BREVO_API_KEY,
-  url: process.env.BREVO_URL,
-};
-export const adminMail: string = process.env.ADMIN_MAIL;
+export function getRequiredEnv(name: string): string {
+  const value = process.env[name];
 
-export const jwtPrivateKey: string = process.env.JWTPRIVATEKEY;
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+
+  return value;
+}
+
+export const brevo: { apiKey: string; url: string } = {
+  apiKey: getRequiredEnv("BREVO_API_KEY"),
+  url: getRequiredEnv("BREVO_URL"),
+};
+export const adminMail: string = getRequiredEnv("ADMIN_MAIL");
+
+export const jwtPrivateKey: string = getRequiredEnv("JWTPRIVATEKEY");

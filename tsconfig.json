@@ -5,6 +5,7 @@
   "compilerOptions": {
     "module": "NodeNext",
     "outDir": "./built",
+    "rootDir": "./src",
     "allowJs": true,
     "target": "es2024",
     "moduleResolution": "NodeNext"

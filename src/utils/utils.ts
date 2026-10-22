@@ -45,10 +45,11 @@ function sendEmail(
     const req = https.request(brevo.url, options, (res) => {
       res.on("data", () => {});
       res.on("end", () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
+        const statusCode = res.statusCode;
+        if (statusCode !== undefined && statusCode >= 200 && statusCode < 300) {
           resolve();
         } else {
-          reject(new Error(`Brevo error: ${res.statusCode}`));
+          reject(new Error(`Brevo error: ${statusCode ?? "unknown status"}`));
         }
       });
     });
@@ -108,17 +109,18 @@ async function getEventsDebtors(eventId: string): Promise<IUser[]> {
     (t) => t.receiver !== null
   );
 
-  const debtorUsers: (IUser | null)[] = await Promise.all(
-    expectedTransfers.map(async (transfer) => {
-      const receipt = event.transferReceipts.find((r) =>
-        r.user._id.equals(transfer.userId)
+  const debtorUsers: (IUser | null)[] = expectedTransfers.map((transfer) => {
+    const receipt = event.transferReceipts.find((r) =>
+      r.user._id.equals(transfer.userId)
+    );
+    if (!receipt) {
+      return (
+        event.members.find((member) => member._id.equals(transfer.userId)) ??
+        null
       );
-      if (!receipt) {
-        return receipt.user;
-      }
-      return null;
-    })
-  );
+    }
+    return null;
+  });
 
   const debtors: IUser[] = debtorUsers.filter(
     (user): user is IUser => user !== null
